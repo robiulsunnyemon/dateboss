@@ -7,18 +7,18 @@ export function App() {
       
       {/* =========================================================================
           RIGHT HERO IMAGE WITH PRECISE CONVEX CURVED MASK
-          (Extends from top: 0 to bottom, navbar floats on top)
+          (Starts at top: 0, covers right half, curve passes between Roles & Safety)
          ========================================================================= */}
-      <div className="absolute right-0 top-0 bottom-0 w-[48%] xl:w-[46%] h-full z-10 pointer-events-none hidden lg:block overflow-hidden">
+      <div className="absolute right-0 top-0 bottom-0 w-[50%] xl:w-[48%] h-full z-10 pointer-events-none hidden lg:block overflow-hidden">
         
         {/* SVG ClipPath Definition for the exact curved arc */}
         <svg width="0" height="0" className="absolute">
           <defs>
             <clipPath id="heroRightArc" clipPathUnits="objectBoundingBox">
-              {/* Convex circular arc: starts at top (~0.24), bows out to the left (~0.04), and curves to bottom (~0.22) */}
-              <path d="M 0.24, 0 
-                       C 0.10, 0.25, 0.02, 0.45, 0.02, 0.58 
-                       C 0.02, 0.72, 0.09, 0.88, 0.22, 1 
+              {/* Convex circular arc: starts at top (~0.14), bows out to the left (~0.02), curves back to bottom (~0.16) */}
+              <path d="M 0.14, 0 
+                       C 0.06, 0.22, 0.01, 0.42, 0.01, 0.55 
+                       C 0.01, 0.70, 0.06, 0.86, 0.16, 1 
                        L 1, 1 
                        L 1, 0 
                        Z" />
@@ -42,13 +42,16 @@ export function App() {
       </div>
 
       {/* =========================================================================
-          1. HEADER / NAVIGATION BAR (FLOATS ON TOP OF BOTH SIDES)
+          1. HEADER / NAVIGATION BAR
+          - Logo on far left
+          - Nav capsule shifted to the middle/center-left (as indicated by the red arrow)
+          - Join now button on the far right
          ========================================================================= */}
       <header className="w-full relative z-30 pt-6 px-6 sm:px-10 lg:px-14">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between">
           
           {/* Left: Wax Seal Logo + "thedateboss" */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <div className="w-9 h-9 relative shrink-0">
               <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_2px_5px_rgba(150,28,35,0.35)]">
                 <path
@@ -92,19 +95,19 @@ export function App() {
             </span>
           </div>
 
-          {/* Right: Nav Capsule + "Join now" Button */}
-          <div className="flex items-center gap-4">
+          {/* Center-Left Nav Capsule + Right Join Button */}
+          <div className="flex items-center justify-end flex-1">
             
-            {/* Rounded Pill Navigation Container (frosted glass) */}
-            <nav className="bg-[#EFE9DF]/85 backdrop-blur-md border border-[#E5DECF]/80 rounded-full px-6 py-2 hidden sm:flex items-center gap-7 text-xs font-medium text-[#5F5B54] shadow-sm">
+            {/* Shifted to the left as requested by the red arrow */}
+            <nav className="bg-[#EFE9DF]/85 backdrop-blur-md border border-[#E5DECF]/80 rounded-full px-7 py-2.5 hidden sm:flex items-center gap-8 text-xs font-medium text-[#5F5B54] shadow-sm mr-8 md:mr-16 lg:mr-28 xl:mr-40">
               <a href="#how-it-works" className="hover:text-[#961C23] transition-colors">How it works</a>
               <a href="#roles" className="hover:text-[#961C23] transition-colors">Roles</a>
               <a href="#safety" className="hover:text-[#961C23] transition-colors">Safety</a>
               <a href="#faq" className="hover:text-[#961C23] transition-colors">FAQ</a>
             </nav>
 
-            {/* "Join now" Red Button */}
-            <button className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-all shadow-sm hover:shadow">
+            {/* "Join now" Red Button on far right */}
+            <button className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0">
               Join now
             </button>
 
@@ -194,7 +197,7 @@ export function App() {
 
         </div>
 
-        {/* Mobile/Tablet fallback view of the image (placed cleanly below cards on < lg screens) */}
+        {/* Mobile/Tablet fallback view of the image (placed below cards on < lg screens) */}
         <div className="block lg:hidden mt-10 w-full rounded-2xl overflow-hidden shadow-lg border border-[#E8E1D3] max-h-[380px]">
           <img
             src="/assets/hero-couple.jpg"
