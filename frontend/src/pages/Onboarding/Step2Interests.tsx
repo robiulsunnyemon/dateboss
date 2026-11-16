@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Check } from 'lucide-react';
+import { InterestCategory } from '../../types/onboarding';
 
-interface Step2PageProps {
+interface Step2InterestsProps {
   onBack: () => void;
-  onContinue?: () => void;
+  onContinue?: (selected: string[]) => void;
 }
 
-interface InterestCategory {
-  title: string;
-  items: string[];
-}
-
-export function Step2Page({ onBack, onContinue }: Step2PageProps) {
+export function Step2Interests({ onBack, onContinue }: Step2InterestsProps) {
   // Pre-select the exact 6 items from the Figma screenshot
   const [selectedInterests, setSelectedInterests] = useState<string[]>([
     'Win bars',
@@ -47,7 +43,7 @@ export function Step2Page({ onBack, onContinue }: Step2PageProps) {
 
   const handleContinue = () => {
     if (onContinue) {
-      onContinue();
+      onContinue(selectedInterests);
     } else {
       setSubmitted(true);
     }
@@ -166,4 +162,4 @@ export function Step2Page({ onBack, onContinue }: Step2PageProps) {
   );
 }
 
-export default Step2Page;
+export default Step2Interests;

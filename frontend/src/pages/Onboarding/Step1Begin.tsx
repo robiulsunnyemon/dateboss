@@ -1,27 +1,40 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { UserRole, GenderIdentity, GenderPreference } from '../../types/onboarding';
 
-interface JoinPageProps {
-  initialRole?: 'host' | 'guest';
+interface Step1BeginProps {
+  initialRole?: UserRole;
   onBack: () => void;
-  onContinueToStep2?: () => void;
+  onContinueToStep2?: (data: {
+    role: UserRole;
+    whoYouAre: GenderIdentity;
+    whoToMeet: GenderPreference;
+  }) => void;
 }
 
-export function JoinPage({ initialRole = 'host', onBack, onContinueToStep2 }: JoinPageProps) {
-  const [selectedRole, setSelectedRole] = useState<'host' | 'guest'>(initialRole);
-  const [whoYouAre, setWhoYouAre] = useState<'Men' | 'Women' | 'Everyone'>('Men');
-  const [whoToMeet, setWhoToMeet] = useState<'Men' | 'Women' | 'Everyone'>('Women');
+export function Step1Begin({
+  initialRole = 'host',
+  onBack,
+  onContinueToStep2,
+}: Step1BeginProps) {
+  const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
+  const [whoYouAre, setWhoYouAre] = useState<GenderIdentity>('Men');
+  const [whoToMeet, setWhoToMeet] = useState<GenderPreference>('Women');
 
   const handleContinue = () => {
     if (onContinueToStep2) {
-      onContinueToStep2();
+      onContinueToStep2({
+        role: selectedRole,
+        whoYouAre,
+        whoToMeet,
+      });
     }
   };
 
   return (
     <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#1E1C1A]">
       
-      {/* Container: Full width on mobile, centered card on desktop */}
+      {/* Container: Edge-to-edge on mobile, centered card on desktop */}
       <div className="w-full max-w-[760px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
         
         {/* Top Header: Dark Red Rounded Back Button + Official thedateboss Logo */}
@@ -63,7 +76,7 @@ export function JoinPage({ initialRole = 'host', onBack, onContinueToStep2 }: Jo
           Your role is about what you do here. You can switch any time.
         </p>
 
-        {/* Two Role Cards (Stacked on mobile, side-by-side on sm+) */}
+        {/* Two Role Cards (Stacked on mobile, side-by-side on desktop) */}
         <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3.5 sm:gap-4 my-5 sm:my-6">
           
           {/* Card 1: Host */}
@@ -90,7 +103,13 @@ export function JoinPage({ initialRole = 'host', onBack, onContinueToStep2 }: Jo
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedRole('host');
-                if (onContinueToStep2) onContinueToStep2();
+                if (onContinueToStep2) {
+                  onContinueToStep2({
+                    role: 'host',
+                    whoYouAre,
+                    whoToMeet,
+                  });
+                }
               }}
               className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs py-3.5 px-4 rounded-full transition-colors mt-4 text-center shadow-xs"
             >
@@ -198,4 +217,4 @@ export function JoinPage({ initialRole = 'host', onBack, onContinueToStep2 }: Jo
   );
 }
 
-export default JoinPage;
+export default Step1Begin;
