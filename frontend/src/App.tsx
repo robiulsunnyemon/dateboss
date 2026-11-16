@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Check,
   ChevronLeft,
@@ -12,8 +12,53 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import { JoinPage } from './JoinPage';
 
 export function App() {
+  // View routing state: 'landing' | 'join'
+  const [currentView, setCurrentView] = useState<'landing' | 'join'>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      const hash = window.location.hash;
+      if (path === '/join' || hash === '#join') return 'join';
+    }
+    return 'landing';
+  });
+
+  const [joinInitialRole, setJoinInitialRole] = useState<'host' | 'guest'>('host');
+
+  const navigateToJoin = (role: 'host' | 'guest' = 'host') => {
+    setJoinInitialRole(role);
+    setCurrentView('join');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'join' }, '', '#join');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const navigateToLanding = () => {
+    setCurrentView('landing');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'landing' }, '', '/');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Sync with browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      const hash = window.location.hash;
+      if (path === '/join' || hash === '#join') {
+        setCurrentView('join');
+      } else {
+        setCurrentView('landing');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // Mobile navigation drawer toggle
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -128,6 +173,15 @@ export function App() {
     },
   ];
 
+  if (currentView === 'join') {
+    return (
+      <JoinPage
+        initialRole={joinInitialRole}
+        onBack={navigateToLanding}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#1E1C1A] font-sans antialiased selection:bg-[#961C23] selection:text-white flex flex-col justify-between overflow-x-hidden">
       
@@ -199,7 +253,11 @@ export function App() {
             </nav>
 
             {/* Right: Join now Button */}
-            <button className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-4 sm:px-6 py-2 sm:py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0">
+            <button
+              type="button"
+              onClick={() => navigateToJoin('host')}
+              className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-4 sm:px-6 py-2 sm:py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0"
+            >
               Join now
             </button>
 
@@ -298,7 +356,11 @@ export function App() {
                   </h3>
                 </div>
 
-                <button className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => navigateToJoin('host')}
+                  className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
+                >
                   Join as a Host
                 </button>
               </div>
@@ -315,7 +377,11 @@ export function App() {
                   </h3>
                 </div>
 
-                <button className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => navigateToJoin('guest')}
+                  className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
+                >
                   Join as a Guest of Honor
                 </button>
               </div>
@@ -778,10 +844,18 @@ export function App() {
 
             {/* Two Action Buttons (Stacked full-width on mobile, side-by-side on sm+) */}
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2 sm:pt-3 w-full justify-center">
-              <button className="w-full sm:w-auto bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm">
+              <button
+                type="button"
+                onClick={() => navigateToJoin('host')}
+                className="w-full sm:w-auto bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
+              >
                 Join as a Host
               </button>
-              <button className="w-full sm:w-auto bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm">
+              <button
+                type="button"
+                onClick={() => navigateToJoin('guest')}
+                className="w-full sm:w-auto bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
+              >
                 Join as a Guest of Honor
               </button>
             </div>
