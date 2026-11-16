@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { LandingPage } from './pages/Landing';
-import { Step1Begin, Step2Interests, Step3Account } from './pages/Onboarding';
+import {
+  Step1Begin,
+  Step2Interests,
+  Step3Account,
+  Step4Details,
+} from './pages/Onboarding';
 import { UserRole } from './types/onboarding';
 
 export function App() {
-  // Routing view state: 'landing' | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-step3'
+  // Routing view state: 'landing' | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-step3' | 'onboarding-step4'
   const [currentView, setCurrentView] = useState<
-    'landing' | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-step3'
+    'landing' | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-step3' | 'onboarding-step4'
   >(() => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       const hash = window.location.hash;
+      if (path === '/step4' || hash === '#step4' || hash === '#details') return 'onboarding-step4';
       if (path === '/step3' || hash === '#step3' || hash === '#account') return 'onboarding-step3';
       if (path === '/step2' || hash === '#step2' || hash === '#host') return 'onboarding-step2';
       if (path === '/join' || hash === '#join') return 'onboarding-step1';
@@ -45,6 +51,14 @@ export function App() {
     }
   };
 
+  const navigateToStep4 = () => {
+    setCurrentView('onboarding-step4');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'onboarding-step4' }, '', '#step4');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const navigateToLanding = () => {
     setCurrentView('landing');
     if (typeof window !== 'undefined') {
@@ -58,7 +72,9 @@ export function App() {
     const handlePopState = () => {
       const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/step3' || hash === '#step3' || hash === '#account') {
+      if (path === '/step4' || hash === '#step4' || hash === '#details') {
+        setCurrentView('onboarding-step4');
+      } else if (path === '/step3' || hash === '#step3' || hash === '#account') {
         setCurrentView('onboarding-step3');
       } else if (path === '/step2' || hash === '#step2' || hash === '#host') {
         setCurrentView('onboarding-step2');
@@ -95,8 +111,20 @@ export function App() {
     return (
       <Step3Account
         onBack={() => navigateToStep2()}
-        onComplete={() => navigateToLanding()}
+        onComplete={() => navigateToStep4()}
         onSignIn={navigateToLanding}
+      />
+    );
+  }
+
+  if (currentView === 'onboarding-step4') {
+    return (
+      <Step4Details
+        onBack={() => navigateToStep3()}
+        onComplete={(_data) => {
+          // Navigate to landing or dashboard once completed
+          navigateToLanding();
+        }}
       />
     );
   }
