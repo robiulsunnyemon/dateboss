@@ -39,48 +39,14 @@ export function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-[#1E1C1A] font-sans antialiased selection:bg-[#961C23] selection:text-white flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAF7F2] text-[#1E1C1A] font-sans antialiased selection:bg-[#961C23] selection:text-white flex flex-col justify-between">
       
       {/* =========================================================================
-          HERO RIGHT IMAGE WITH PRECISE CONVEX CURVED MASK
-          (Contained strictly within the Hero Section viewport)
-         ========================================================================= */}
-      <div className="absolute right-0 top-0 h-[760px] xl:h-[820px] w-[50%] xl:w-[48%] z-10 pointer-events-none hidden lg:block overflow-hidden">
-        
-        {/* SVG ClipPath Definition for the exact curved arc */}
-        <svg width="0" height="0" className="absolute">
-          <defs>
-            <clipPath id="heroRightArc" clipPathUnits="objectBoundingBox">
-              <path d="M 0.14, 0 
-                       C 0.06, 0.22, 0.01, 0.42, 0.01, 0.55 
-                       C 0.01, 0.70, 0.06, 0.86, 0.16, 1 
-                       L 1, 1 
-                       L 1, 0 
-                       Z" />
-            </clipPath>
-          </defs>
-        </svg>
-
-        {/* The Couple Dining Image */}
-        <div
-          className="w-full h-full relative"
-          style={{ clipPath: 'url(#heroRightArc)' }}
-        >
-          <img
-            src="/assets/hero-couple.jpg"
-            alt="Romantic couple dining with wine glasses at restaurant table"
-            className="w-full h-full object-cover object-[center_right] pointer-events-auto"
-          />
-          {/* Subtle warm depth vignette */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10 pointer-events-none" />
-        </div>
-      </div>
-
-      {/* =========================================================================
           1. HEADER / NAVIGATION BAR
+          - Clean on cream background (no dark image collision)
          ========================================================================= */}
-      <header className="w-full relative z-30 pt-6 px-6 sm:px-10 lg:px-14">
-        <div className="max-w-[1360px] mx-auto flex items-center justify-between">
+      <header className="w-full bg-[#FAF7F2] border-b border-[#EFE8DC]/80 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 h-20 flex items-center justify-between">
           
           {/* Left: Wax Seal Logo + "thedateboss" */}
           <div className="flex items-center gap-3 shrink-0">
@@ -126,18 +92,22 @@ export function App() {
             </span>
           </div>
 
-          {/* Center-Left Nav Capsule + Right Join Button */}
-          <div className="flex items-center justify-end flex-1">
-            <nav className="bg-[#EFE9DF]/85 backdrop-blur-md border border-[#E5DECF]/80 rounded-full px-7 py-2.5 hidden sm:flex items-center gap-8 text-xs font-medium text-[#5F5B54] shadow-sm mr-8 md:mr-16 lg:mr-28 xl:mr-40">
+          {/* Right Navigation & Button */}
+          <div className="flex items-center gap-4 sm:gap-6">
+            
+            {/* Nav Capsule */}
+            <nav className="bg-[#EFE9DF]/80 border border-[#E5DECF] rounded-full px-6 py-2 hidden sm:flex items-center gap-7 text-xs font-medium text-[#5F5B54]">
               <a href="#how-it-works" className="hover:text-[#961C23] transition-colors">How it works</a>
               <a href="#roles" className="hover:text-[#961C23] transition-colors">Roles</a>
               <a href="#safety" className="hover:text-[#961C23] transition-colors">Safety</a>
               <a href="#faq" className="hover:text-[#961C23] transition-colors">FAQ</a>
             </nav>
 
+            {/* Join now Button */}
             <button className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0">
               Join now
             </button>
+
           </div>
 
         </div>
@@ -146,91 +116,108 @@ export function App() {
 
       {/* =========================================================================
           2. HERO SECTION
+          - Clean 2-column grid layout (left: text & cards, right: arched photo)
+          - Zero overlap with Section 2 or Navbar!
          ========================================================================= */}
-      <section className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pt-8 lg:pt-14 pb-16 lg:pb-20 min-h-[680px] flex flex-col justify-center">
+      <section className="w-full max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-10 sm:pt-14 pb-16 sm:pb-20">
         
-        <div className="w-full lg:w-[54%] xl:w-[52%] space-y-7 pr-2 sm:pr-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* Label: Gifted dating */}
-          <div className="flex items-center gap-2">
-            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
-            <span className="text-xs font-semibold text-[#961C23] tracking-wide">
-              Gifted dating
-            </span>
-          </div>
-
-          {/* Main Headline */}
-          <h1 className="font-serif font-extrabold text-4xl sm:text-5xl md:text-6xl xl:text-[68px] leading-[1.08] tracking-tight text-[#1A1816]">
-            THE DATE STARTS <br />
-            WITH AN <span className="text-[#961C23] font-serif">OFFER.</span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-[#656059] text-sm sm:text-base leading-relaxed max-w-lg font-normal">
-            Skip the 'hey'. Propose a real lunch, dinner or event, and let them say yes. Fewer ghosts, more tables for two.
-          </p>
-
-          {/* Two Action Cards Side-by-Side */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 max-w-xl">
+          {/* Left Column: Headlines, Cards, Trust Indicators */}
+          <div className="lg:col-span-7 space-y-6 sm:space-y-7">
             
-            {/* Card 1: Host */}
-            <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-[22px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[195px] hover:border-[#F3A83B] transition-colors">
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
-                  <span className="text-[#F3A83B] text-sm leading-none">👑</span>
-                  <span className="font-medium">Host</span>
-                </div>
-                <h3 className="font-serif font-bold text-stone-900 text-lg leading-snug">
-                  You Send The Offers. Pick The Place And The Time.
-                </h3>
-              </div>
-
-              <button className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs py-3 px-4 rounded-full transition-colors mt-4 text-center shadow-sm">
-                Join as a Host
-              </button>
+            {/* Label: Gifted dating */}
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+              <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+                Gifted dating
+              </span>
             </div>
 
-            {/* Card 2: Guest of Honor */}
-            <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-[22px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[195px] hover:border-[#961C23] transition-colors">
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
-                  <span className="text-[#8E8A83] text-sm leading-none">👑</span>
-                  <span className="font-medium">Guest of Honor</span>
+            {/* Main Headline */}
+            <h1 className="font-serif font-extrabold text-4xl sm:text-5xl md:text-6xl xl:text-7xl leading-[1.08] tracking-tight text-[#1A1816]">
+              THE DATE STARTS <br />
+              WITH AN <span className="text-[#961C23] font-serif">OFFER.</span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-[#656059] text-sm sm:text-base leading-relaxed max-w-lg font-normal">
+              Skip the 'hey'. Propose a real lunch, dinner or event, and let them say yes. Fewer ghosts, more tables for two.
+            </p>
+
+            {/* Two Action Cards Side-by-Side */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 max-w-xl">
+              
+              {/* Card 1: Host */}
+              <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-[22px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[195px] hover:border-[#F3A83B] transition-colors">
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
+                    <span className="text-[#F3A83B] text-sm leading-none">👑</span>
+                    <span className="font-medium">Host</span>
+                  </div>
+                  <h3 className="font-serif font-bold text-stone-900 text-lg leading-snug">
+                    You Send The Offers. Pick The Place And The Time.
+                  </h3>
                 </div>
-                <h3 className="font-serif font-bold text-stone-900 text-lg leading-snug">
-                  You Receive The Offers. Say Yes, Counter Or Pass.
-                </h3>
+
+                <button className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs py-3 px-4 rounded-full transition-colors mt-4 text-center shadow-sm">
+                  Join as a Host
+                </button>
               </div>
 
-              <button className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs py-3 px-4 rounded-full transition-colors mt-4 text-center shadow-sm">
-                Join as a Guest of Honor
-              </button>
+              {/* Card 2: Guest of Honor */}
+              <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-[22px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[195px] hover:border-[#961C23] transition-colors">
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
+                    <span className="text-[#8E8A83] text-sm leading-none">👑</span>
+                    <span className="font-medium">Guest of Honor</span>
+                  </div>
+                  <h3 className="font-serif font-bold text-stone-900 text-lg leading-snug">
+                    You Receive The Offers. Say Yes, Counter Or Pass.
+                  </h3>
+                </div>
+
+                <button className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs py-3 px-4 rounded-full transition-colors mt-4 text-center shadow-sm">
+                  Join as a Guest of Honor
+                </button>
+              </div>
+
+            </div>
+
+            {/* Trust Checkmarks */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#6D6760] font-normal pt-1">
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#8E8880]" /> ID-verified members
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#8E8880]" /> Public venues only
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#8E8880]" /> Offers expire in 48h
+              </span>
             </div>
 
           </div>
 
-          {/* Trust Checkmarks */}
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#6D6760] font-normal pt-1">
-            <span className="inline-flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-[#8E8880]" /> ID-verified members
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-[#8E8880]" /> Public venues only
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-[#8E8880]" /> Offers expire in 48h
-            </span>
+          {/* Right Column: Romantic Dining Arched Photo */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <div className="relative w-full max-w-md">
+              
+              {/* Arched Photo Frame (Exact arched cathedral window shape from original design) */}
+              <div className="overflow-hidden rounded-t-[240px] rounded-b-[28px] border-4 border-[#EFE7D8] shadow-2xl bg-[#EBE2D0] aspect-[4/5] max-h-[580px] w-full">
+                <img
+                  src="/assets/hero-couple.jpg"
+                  alt="Couple dining at candlelit restaurant table with wine glasses"
+                  className="w-full h-full object-cover object-[center_right]"
+                />
+              </div>
+
+              {/* Decorative subtle ambient warm glow behind arch */}
+              <div className="absolute -top-6 -right-6 w-36 h-36 bg-[#F3A83B]/15 rounded-full blur-2xl -z-10" />
+              <div className="absolute -bottom-6 -left-6 w-36 h-36 bg-[#961C23]/10 rounded-full blur-2xl -z-10" />
+            </div>
           </div>
 
-        </div>
-
-        {/* Mobile/Tablet fallback view of the image (placed below cards on < lg screens) */}
-        <div className="block lg:hidden mt-10 w-full rounded-2xl overflow-hidden shadow-lg border border-[#E8E1D3] max-h-[380px]">
-          <img
-            src="/assets/hero-couple.jpg"
-            alt="Romantic couple dining"
-            className="w-full h-full object-cover object-center"
-          />
         </div>
 
       </section>
@@ -238,8 +225,9 @@ export function App() {
 
       {/* =========================================================================
           3. "LESS CHAT. MORE CHEMISTRY." (HOW IT WORKS CARD CONTAINER)
+          - Sits cleanly below Hero with generous breathing room
          ========================================================================= */}
-      <section id="how-it-works" className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+      <section id="how-it-works" className="w-full max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
         
         {/* Large Rounded Container Card */}
         <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-8 sm:p-12 lg:p-16 shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
@@ -302,7 +290,7 @@ export function App() {
           </div>
 
           {/* Nested Invitation Card (An offer for you) */}
-          <div className="bg-[#EFE8DB] border border-[#E2D8C6] rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div className="bg-[#EDE5D6] border border-[#DDD3C2] rounded-2xl p-6 sm:p-8 shadow-sm">
             
             <div className="mb-4">
               <span className="text-xs text-[#8E8880] font-normal block">
@@ -314,7 +302,7 @@ export function App() {
             </div>
 
             {/* Details Table */}
-            <div className="divide-y divide-[#DFD5C2] text-xs mb-6">
+            <div className="divide-y divide-[#D8CDBC] text-xs mb-6">
               
               <div className="flex items-center justify-between py-2.5">
                 <span className="text-[#8E8880] font-normal">When</span>
@@ -361,9 +349,9 @@ export function App() {
 
 
       {/* =========================================================================
-          4. "WHAT MAKES THEDATEBOSS DIFFERENT?" (THE THEDATEBOSS ADVANTAGE CARD)
+          4. "WHAT MAKES THEDATEBOSS DIFFERENT?" (THE THEDATEBOSS ADVANTAGE)
          ========================================================================= */}
-      <section id="why-us" className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+      <section id="why-us" className="w-full max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
         
         {/* Large Rounded Container Card */}
         <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-8 sm:p-12 lg:p-16 text-center shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
@@ -436,9 +424,9 @@ export function App() {
 
 
       {/* =========================================================================
-          5. "WHAT OUR USERS ARE SAYING" (TESTIMONIALS DIRECTLY ON BG)
+          5. "WHAT OUR USERS ARE SAYING" (TESTIMONIALS)
          ========================================================================= */}
-      <section id="reviews" className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+      <section id="reviews" className="w-full max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
         
         {/* Section Header */}
         <div className="text-center mb-10 space-y-2">
@@ -539,7 +527,7 @@ export function App() {
       {/* =========================================================================
           6. "BUILT AGAINST GHOSTING." (100% FULL-WIDTH EDGE-TO-EDGE DARK BAND)
          ========================================================================= */}
-      <section id="safety" className="w-full bg-[#141414] text-white py-16 sm:py-20 lg:py-24 relative z-20">
+      <section id="safety" className="w-full bg-[#141414] text-white py-16 sm:py-20 lg:py-24">
         
         <div className="max-w-4xl mx-auto px-6 sm:px-10">
           
@@ -556,7 +544,7 @@ export function App() {
             Built Against Ghosting.
           </h2>
 
-          {/* 4 Feature Items (Minimalist rows with red circle icon badges) */}
+          {/* 4 Feature Items */}
           <div className="space-y-8">
             
             {/* Feature 1: Chat Opens After Yes */}
@@ -629,7 +617,7 @@ export function App() {
       {/* =========================================================================
           7. "FREQUENTLY ASKED QUESTIONS" (FAQ SECTION)
          ========================================================================= */}
-      <section id="faq" className="relative z-20 max-w-4xl mx-auto w-full px-6 sm:px-10 py-16 sm:py-20">
+      <section id="faq" className="max-w-4xl mx-auto w-full px-6 sm:px-10 py-16 sm:py-20">
         
         {/* Top Label */}
         <div className="flex items-center gap-2 mb-3">
@@ -679,7 +667,7 @@ export function App() {
       {/* =========================================================================
           8. CALL TO ACTION BANNER (MAKE THE FIRST MOVE WORTH ANSWERING)
          ========================================================================= */}
-      <section className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-16 sm:pb-20">
+      <section className="max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-16 sm:pb-20">
         
         <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-10 sm:p-14 lg:p-16 text-center shadow-sm">
           
@@ -747,9 +735,9 @@ export function App() {
 
 
       {/* =========================================================================
-          9. FOOTER (100% FULL-WIDTH)
+          9. FOOTER
          ========================================================================= */}
-      <footer className="w-full border-t border-[#ECE3D4] py-8 bg-[#FAF7F2] relative z-20">
+      <footer className="w-full border-t border-[#ECE3D4] py-8 bg-[#FAF7F2]">
         <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 flex flex-col sm:flex-row items-center justify-between gap-4">
           
           {/* Left: Wax Seal + Copyright */}
