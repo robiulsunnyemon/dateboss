@@ -184,49 +184,14 @@ export function App() {
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
 
-            {/* Left/Center: Wax Seal Logo + "thedateboss" */}
-            <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 relative shrink-0">
-                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_2px_5px_rgba(150,28,35,0.35)]">
-                  <path
-                    d="M50 4 
-                       C57 5 62 10 68 8 
-                       C75 7 80 13 85 18 
-                       C90 23 94 28 95 35 
-                       C96 42 93 47 96 54 
-                       C98 61 95 67 92 73 
-                       C89 79 83 83 78 87 
-                       C72 91 66 92 60 95 
-                       C53 97 47 95 41 96 
-                       C34 97 28 93 23 89 
-                       C17 85 13 80 9 74 
-                       C5 68 6 62 4 55 
-                       C3 48 6 42 6 36 
-                       C7 29 11 24 16 19 
-                       C21 14 27 10 33 8 
-                       C40 6 44 4 50 4 Z"
-                    fill="#961C23"
-                  />
-                  <circle cx="50" cy="50" r="32" stroke="#681016" strokeWidth="2" strokeDasharray="3 3" fill="#84171E" />
-                  <text
-                    x="50"
-                    y="61"
-                    textAnchor="middle"
-                    fill="#F7EADB"
-                    fontFamily="'Playfair Display', Georgia, serif"
-                    fontWeight="bold"
-                    fontSize="36"
-                    fontStyle="italic"
-                  >
-                    d
-                  </text>
-                </svg>
-              </div>
-
-              <span className="font-serif font-bold text-xl sm:text-2xl tracking-tight text-[#1E1C1A]">
-                thedateboss
-              </span>
-            </div>
+            {/* Official Logo: thedateboss */}
+            <a href="#" className="flex items-center shrink-0">
+              <img
+                src="/assets/logo.png"
+                alt="thedateboss"
+                className="h-8 sm:h-9 w-auto object-contain"
+              />
+            </a>
 
             {/* Center Desktop: Nav Capsule on clean cream background */}
             <nav className="bg-[#EFE9DF]/85 backdrop-blur-md border border-[#E5DECF] rounded-full px-7 py-2.5 hidden md:flex items-center gap-7 text-xs font-medium text-[#5F5B54] shadow-sm">
@@ -887,42 +852,13 @@ export function App() {
           
           <div className="flex flex-col items-center max-w-xl mx-auto space-y-4">
             
-            {/* Wax Seal Stamp Icon */}
-            <div className="w-14 h-14 sm:w-16 sm:h-16">
-              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_4px_10px_rgba(150,28,35,0.35)]">
-                <path
-                  d="M50 4 
-                     C57 5 62 10 68 8 
-                     C75 7 80 13 85 18 
-                     C90 23 94 28 95 35 
-                     C96 42 93 47 96 54 
-                     C98 61 95 67 92 73 
-                     C89 79 83 83 78 87 
-                     C72 91 66 92 60 95 
-                     C53 97 47 95 41 96 
-                     C34 97 28 93 23 89 
-                     C17 85 13 80 9 74 
-                     C5 68 6 62 4 55 
-                     C3 48 6 42 6 36 
-                     C7 29 11 24 16 19 
-                     C21 14 27 10 33 8 
-                     C40 6 44 4 50 4 Z"
-                  fill="#961C23"
-                />
-                <circle cx="50" cy="50" r="32" stroke="#681016" strokeWidth="2" strokeDasharray="3 3" fill="#84171E" />
-                <text
-                  x="50"
-                  y="61"
-                  textAnchor="middle"
-                  fill="#F7EADB"
-                  fontFamily="'Playfair Display', Georgia, serif"
-                  fontWeight="bold"
-                  fontSize="36"
-                  fontStyle="italic"
-                >
-                  d
-                </text>
-              </svg>
+            {/* Official Wax Seal Stamp Icon */}
+            <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
+              <img
+                src="/assets/seal.png"
+                alt="thedateboss wax seal"
+                className="w-full h-full object-contain drop-shadow-[0_4px_12px_rgba(150,28,35,0.35)]"
+              />
             </div>
 
             {/* Headline */}
@@ -954,11 +890,13 @@ export function App() {
       <footer className="w-full border-t border-[#ECE3D4] py-6 sm:py-8 bg-[#FAF7F2]">
         <div className="max-w-[1360px] mx-auto px-4 sm:px-10 lg:px-14 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           
-          {/* Left: Wax Seal + Copyright */}
+          {/* Left: Official Wax Seal + Copyright */}
           <div className="flex items-center gap-2.5">
-            <div className="w-5 h-5 rounded-full bg-[#961C23] flex items-center justify-center text-[10px] text-white font-serif font-bold italic shrink-0">
-              d
-            </div>
+            <img
+              src="/assets/seal.png"
+              alt="thedateboss seal"
+              className="w-6 h-6 object-contain shrink-0"
+            />
             <span className="text-xs text-stone-500 font-medium">
               © 2025 thedateboss • 18+ only
             </span>
