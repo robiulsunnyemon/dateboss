@@ -17,9 +17,6 @@ export function App() {
   // Mobile navigation drawer toggle
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Mobile navigation style: 'card' (Image 1 - Light Card Dropdown) | 'overlay' (Image 2 - Dark Fullscreen Backdrop)
-  const [mobileMenuStyle, setMobileMenuStyle] = useState<'card' | 'overlay'>('card');
-
   // Carousel state for mobile metrics ($99 and 25%)
   const [activeMetricSlide, setActiveMetricSlide] = useState(0);
 
@@ -207,70 +204,13 @@ export function App() {
             </button>
 
           </div>
-
-          {/* Mobile Navigation Dropdown Menu: Image 1 (Light Card Dropdown) */}
-          {mobileMenuOpen && mobileMenuStyle === 'card' && (
-            <div className="md:hidden mt-3 bg-[#FAF7F2] border border-[#E8DFD0] rounded-[24px] px-6 py-3 shadow-[0_4px_25px_rgba(0,0,0,0.03)] animate-in fade-in slide-in-from-top-2 duration-200">
-              <nav className="divide-y divide-[#EAE3D5]/90 text-[#5F5B54]">
-                <a
-                  href="#how-it-works"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block py-3.5 text-base font-normal hover:text-[#961C23] transition-colors"
-                >
-                  How it works
-                </a>
-                <a
-                  href="#roles"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block py-3.5 text-base font-normal hover:text-[#961C23] transition-colors"
-                >
-                  Roles
-                </a>
-                <a
-                  href="#safety"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block py-3.5 text-base font-normal hover:text-[#961C23] transition-colors"
-                >
-                  Safety
-                </a>
-                <a
-                  href="#faq"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block py-3.5 text-base font-normal hover:text-[#961C23] transition-colors"
-                >
-                  FAQ
-                </a>
-              </nav>
-
-              {/* Style Switcher Pill */}
-              <div className="mt-2 pt-3 border-t border-[#EAE3D5]/60 flex items-center justify-between text-[11px] text-[#8E8880]">
-                <span>Menu Style:</span>
-                <div className="inline-flex rounded-full bg-[#EFE9DF] p-0.5 border border-[#E5DECF]">
-                  <button
-                    type="button"
-                    onClick={() => setMobileMenuStyle('card')}
-                    className="px-2.5 py-0.5 rounded-full font-medium transition-all bg-[#961C23] text-white shadow-xs"
-                  >
-                    Card (Image 1)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMobileMenuStyle('overlay')}
-                    className="px-2.5 py-0.5 rounded-full font-medium transition-all text-[#6E6861] hover:text-[#1E1C1A]"
-                  >
-                    Dark Overlay (Image 2)
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </header>
 
-        {/* Mobile Navigation Fullscreen Backdrop Overlay: Image 2 */}
-        {mobileMenuOpen && mobileMenuStyle === 'overlay' && (
-          <div className="md:hidden fixed inset-0 z-50 bg-[#141414]/90 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between animate-in fade-in duration-200">
+        {/* Mobile Navigation Fullscreen Backdrop Overlay */}
+        {mobileMenuOpen && (
+          <div className="md:hidden fixed inset-0 z-50 bg-[#141414]/90 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-start animate-in fade-in duration-200">
             
-            {/* Top row: Close button on top-right */}
+            {/* Top row: Red square close button on top-right */}
             <div className="w-full flex items-center justify-end">
               <button
                 type="button"
@@ -282,7 +222,7 @@ export function App() {
               </button>
             </div>
 
-            {/* Nav Links on top-left (Serif typography matching Image 2) */}
+            {/* Nav Links on top-left (Serif typography matching Figma) */}
             <div className="flex-1 flex flex-col justify-start pt-6 space-y-6">
               <nav className="flex flex-col space-y-5">
                 <a
@@ -314,37 +254,6 @@ export function App() {
                   FAQ
                 </a>
               </nav>
-            </div>
-
-            {/* Bottom Action & Style Switcher */}
-            <div className="pt-6 border-t border-white/10 space-y-4">
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs py-3.5 rounded-full transition-colors shadow-sm"
-              >
-                Join now
-              </button>
-
-              <div className="flex items-center justify-between text-[11px] text-white/50 pt-1">
-                <span>Menu Style:</span>
-                <div className="inline-flex rounded-full bg-white/10 p-0.5 border border-white/15">
-                  <button
-                    type="button"
-                    onClick={() => setMobileMenuStyle('card')}
-                    className="px-2.5 py-0.5 rounded-full font-medium transition-all text-white/70 hover:text-white"
-                  >
-                    Card (Image 1)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMobileMenuStyle('overlay')}
-                    className="px-2.5 py-0.5 rounded-full font-medium transition-all bg-[#961C23] text-white"
-                  >
-                    Dark Overlay (Image 2)
-                  </button>
-                </div>
-              </div>
             </div>
 
           </div>
