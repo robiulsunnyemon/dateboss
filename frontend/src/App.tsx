@@ -1,7 +1,43 @@
-import React from 'react';
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Minus,
+  MessageSquare,
+  Clock,
+  CalendarCheck,
+  ShieldCheck
+} from 'lucide-react';
 
 export function App() {
+  // State for FAQ accordion
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
+  const faqs = [
+    {
+      question: '1. Do Guests Of Honor Ever Pay?',
+      answer: 'Never. No plan, no card, no catch. Hosts carry a $9.99 monthly membership that keeps the community serious.',
+    },
+    {
+      question: '2. Is This An Escort Or Paid-Companionship Service?',
+      answer: 'No, absolutely not. Thedateboss is strictly a premium dating platform designed for genuine romantic connections and intentional dates. Compensated dating or escorting is strictly prohibited and immediately banned.',
+    },
+    {
+      question: "3. What Happens If Someone Doesn't Show?",
+      answer: 'We enforce a strict Anti-Ghosting protocol. Both members confirm 24 hours prior. Unexcused no-shows trigger reliability penalties and temporary or permanent account suspension.',
+    },
+    {
+      question: '4. Can I Switch Between Host And Guest Of Honor?',
+      answer: 'Yes! Every member has full versatility. You can switch between initiating date offers as a Host and receiving curated date proposals as a Guest of Honor whenever you like.',
+    },
+  ];
+
   return (
     <div className="relative min-h-screen bg-[#FAF7F2] text-[#1E1C1A] font-sans antialiased selection:bg-[#961C23] selection:text-white flex flex-col justify-between overflow-x-hidden">
       
@@ -402,7 +438,7 @@ export function App() {
       {/* =========================================================================
           5. "WHAT OUR USERS ARE SAYING" (TESTIMONIALS)
          ========================================================================= */}
-      <section id="reviews" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-20">
+      <section id="reviews" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
         
         {/* Section Header */}
         <div className="text-center mb-10 space-y-2">
@@ -501,21 +537,240 @@ export function App() {
 
 
       {/* =========================================================================
-          FOOTER
+          6. "BUILT AGAINST GHOSTING." (DARK/CHARCOAL SECTION)
+         ========================================================================= */}
+      <section id="safety" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+        
+        {/* Dark Container Card */}
+        <div className="bg-[#171716] border border-[#2A2928] rounded-[32px] p-8 sm:p-12 lg:p-16 text-white shadow-2xl">
+          
+          {/* Top Label */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+            <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+              Safety
+            </span>
+          </div>
+
+          {/* Section Headline */}
+          <h2 className="font-serif font-extrabold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-8">
+            Built Against Ghosting.
+          </h2>
+
+          {/* 4 Feature Items Stacked Vertically */}
+          <div className="space-y-4">
+            
+            {/* Feature 1: Chat Opens After Yes */}
+            <div className="bg-[#1F1E1D] border border-[#2B2A29] rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full border border-[#961C23]/40 bg-[#961C23]/15 flex items-center justify-center shrink-0 text-[#E63946]">
+                <MessageSquare className="w-4 h-4" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-serif font-bold text-base sm:text-lg text-white">
+                  Chat Opens After Yes
+                </h3>
+                <p className="text-[#8E8A83] text-xs sm:text-sm leading-relaxed">
+                  No inbox to drown in. Messages unlock only once an offer is accepted.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 2: Offers Expire In 48 Hours */}
+            <div className="bg-[#1F1E1D] border border-[#2B2A29] rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full border border-[#961C23]/40 bg-[#961C23]/15 flex items-center justify-center shrink-0 text-[#E63946]">
+                <Clock className="w-4 h-4" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-serif font-bold text-base sm:text-lg text-white">
+                  Offers Expire In 48 Hours
+                </h3>
+                <p className="text-[#8E8A83] text-xs sm:text-sm leading-relaxed">
+                  Every offer has a clock. Answer, counter or let it go — nothing lingers.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 3: Confirm The Day Before */}
+            <div className="bg-[#1F1E1D] border border-[#2B2A29] rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full border border-[#961C23]/40 bg-[#961C23]/15 flex items-center justify-center shrink-0 text-[#E63946]">
+                <CalendarCheck className="w-4 h-4" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-serif font-bold text-base sm:text-lg text-white">
+                  Confirm The Day Before
+                </h3>
+                <p className="text-[#8E8A83] text-xs sm:text-sm leading-relaxed">
+                  A 24-hour check-in backed by a small refundable hold. Interest where you both arrive.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 4: Verified, Public, Reliable */}
+            <div className="bg-[#1F1E1D] border border-[#2B2A29] rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full border border-[#961C23]/40 bg-[#961C23]/15 flex items-center justify-center shrink-0 text-[#E63946]">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-serif font-bold text-base sm:text-lg text-white">
+                  Verified, Public, Reliable
+                </h3>
+                <p className="text-[#8E8A83] text-xs sm:text-sm leading-relaxed">
+                  ID-verified members, public venues only, and a reliability score after every date.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =========================================================================
+          7. "FREQUENTLY ASKED QUESTIONS" (FAQ SECTION)
+         ========================================================================= */}
+      <section id="faq" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+        
+        {/* Top Label */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+          <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+            FAQ
+          </span>
+        </div>
+
+        {/* Section Headline */}
+        <h2 className="font-serif font-extrabold text-3xl sm:text-4xl text-[#1A1816] tracking-tight mb-8">
+          Frequently Asked Questions
+        </h2>
+
+        {/* Accordion Questions List */}
+        <div className="divide-y divide-[#E3D9C8]/80 border-y border-[#E3D9C8]/80">
+          {faqs.map((faq, index) => {
+            const isOpen = openFaq === index;
+            return (
+              <div key={index} className="py-4 sm:py-5">
+                <button
+                  type="button"
+                  onClick={() => toggleFaq(index)}
+                  className="w-full flex items-center justify-between text-left gap-4 focus:outline-none group"
+                >
+                  <span className="font-serif font-bold text-base sm:text-lg text-[#1A1816] group-hover:text-[#961C23] transition-colors">
+                    {faq.question}
+                  </span>
+                  <span className="shrink-0 text-stone-500 group-hover:text-[#961C23] transition-colors">
+                    {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                  </span>
+                </button>
+
+                {isOpen && (
+                  <p className="mt-2 text-xs sm:text-sm text-[#6E6860] leading-relaxed pr-8">
+                    {faq.answer}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+      </section>
+
+
+      {/* =========================================================================
+          8. CALL TO ACTION BANNER (MAKE THE FIRST MOVE WORTH ANSWERING)
+         ========================================================================= */}
+      <section className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+        
+        <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-10 sm:p-14 lg:p-16 text-center shadow-sm">
+          
+          <div className="flex flex-col items-center max-w-xl mx-auto space-y-4">
+            
+            {/* Wax Seal Stamp Icon */}
+            <div className="w-16 h-16">
+              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_4px_10px_rgba(150,28,35,0.35)]">
+                <path
+                  d="M50 4 
+                     C57 5 62 10 68 8 
+                     C75 7 80 13 85 18 
+                     C90 23 94 28 95 35 
+                     C96 42 93 47 96 54 
+                     C98 61 95 67 92 73 
+                     C89 79 83 83 78 87 
+                     C72 91 66 92 60 95 
+                     C53 97 47 95 41 96 
+                     C34 97 28 93 23 89 
+                     C17 85 13 80 9 74 
+                     C5 68 6 62 4 55 
+                     C3 48 6 42 6 36 
+                     C7 29 11 24 16 19 
+                     C21 14 27 10 33 8 
+                     C40 6 44 4 50 4 Z"
+                  fill="#961C23"
+                />
+                <circle cx="50" cy="50" r="32" stroke="#681016" strokeWidth="2" strokeDasharray="3 3" fill="#84171E" />
+                <text
+                  x="50"
+                  y="61"
+                  textAnchor="middle"
+                  fill="#F7EADB"
+                  fontFamily="'Playfair Display', Georgia, serif"
+                  fontWeight="bold"
+                  fontSize="36"
+                  fontStyle="italic"
+                >
+                  d
+                </text>
+              </svg>
+            </div>
+
+            {/* Headline */}
+            <h2 className="font-serif font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#1A1816] tracking-tight leading-tight">
+              MAKE THE FIRST MOVE <br />
+              <span className="text-[#961C23]">WORTH ANSWERING</span>
+            </h2>
+
+            {/* Two Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-3 w-full justify-center">
+              <button className="w-full sm:w-auto bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm">
+                Join as a Host
+              </button>
+              <button className="w-full sm:w-auto bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm">
+                Join as a Guest of Honor
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =========================================================================
+          9. FOOTER
          ========================================================================= */}
       <footer className="w-full border-t border-[#ECE3D4] py-8 bg-[#FAF7F2]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-14 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-xs text-stone-500">
-            <span className="font-serif font-bold text-sm text-[#1E1C1A]">thedateboss</span>
-            <span>• © {new Date().getFullYear()} All rights reserved.</span>
+          
+          {/* Left: Wax Seal + Copyright */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-5 h-5 rounded-full bg-[#961C23] flex items-center justify-center text-[10px] text-white font-serif font-bold italic">
+              d
+            </div>
+            <span className="text-xs text-stone-500 font-medium">
+              © 2025 thedateboss • 18+ only
+            </span>
           </div>
 
-          <div className="flex items-center gap-6 text-xs text-[#5F5B54]">
-            <a href="#how-it-works" className="hover:text-[#961C23]">How it works</a>
-            <a href="#roles" className="hover:text-[#961C23]">Roles</a>
-            <a href="#safety" className="hover:text-[#961C23]">Safety</a>
-            <a href="#faq" className="hover:text-[#961C23]">FAQ</a>
+          {/* Right: Legal Links */}
+          <div className="flex flex-wrap items-center gap-6 text-xs text-[#5F5B54]">
+            <a href="#terms" className="hover:text-[#961C23] transition-colors">Terms & Conditions</a>
+            <a href="#safety-tips" className="hover:text-[#961C23] transition-colors">Safety Tips</a>
+            <a href="#disclaimer" className="hover:text-[#961C23] transition-colors">Disclaimer</a>
+            <a href="#privacy" className="hover:text-[#961C23] transition-colors">Privacy Policy</a>
           </div>
+
         </div>
       </footer>
 
