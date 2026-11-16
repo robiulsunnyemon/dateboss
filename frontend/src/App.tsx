@@ -7,15 +7,14 @@ export function App() {
       
       {/* =========================================================================
           RIGHT HERO IMAGE WITH PRECISE CONVEX CURVED MASK
-          (Starts at top: 0, covers right half, curve passes between Roles & Safety)
+          (Starts at top: 0, covers right half of Hero section)
          ========================================================================= */}
-      <div className="absolute right-0 top-0 bottom-0 w-[50%] xl:w-[48%] h-full z-10 pointer-events-none hidden lg:block overflow-hidden">
+      <div className="absolute right-0 top-0 h-[820px] xl:h-[880px] w-[50%] xl:w-[48%] z-10 pointer-events-none hidden lg:block overflow-hidden">
         
         {/* SVG ClipPath Definition for the exact curved arc */}
         <svg width="0" height="0" className="absolute">
           <defs>
             <clipPath id="heroRightArc" clipPathUnits="objectBoundingBox">
-              {/* Convex circular arc: starts at top (~0.14), bows out to the left (~0.02), curves back to bottom (~0.16) */}
               <path d="M 0.14, 0 
                        C 0.06, 0.22, 0.01, 0.42, 0.01, 0.55 
                        C 0.01, 0.70, 0.06, 0.86, 0.16, 1 
@@ -43,9 +42,6 @@ export function App() {
 
       {/* =========================================================================
           1. HEADER / NAVIGATION BAR
-          - Logo on far left
-          - Nav capsule shifted to the middle/center-left (as indicated by the red arrow)
-          - Join now button on the far right
          ========================================================================= */}
       <header className="w-full relative z-30 pt-6 px-6 sm:px-10 lg:px-14">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between">
@@ -89,7 +85,6 @@ export function App() {
               </svg>
             </div>
 
-            {/* Brand Title */}
             <span className="font-serif font-bold text-2xl tracking-tight text-[#1E1C1A]">
               thedateboss
             </span>
@@ -97,8 +92,6 @@ export function App() {
 
           {/* Center-Left Nav Capsule + Right Join Button */}
           <div className="flex items-center justify-end flex-1">
-            
-            {/* Shifted to the left as requested by the red arrow */}
             <nav className="bg-[#EFE9DF]/85 backdrop-blur-md border border-[#E5DECF]/80 rounded-full px-7 py-2.5 hidden sm:flex items-center gap-8 text-xs font-medium text-[#5F5B54] shadow-sm mr-8 md:mr-16 lg:mr-28 xl:mr-40">
               <a href="#how-it-works" className="hover:text-[#961C23] transition-colors">How it works</a>
               <a href="#roles" className="hover:text-[#961C23] transition-colors">Roles</a>
@@ -106,11 +99,9 @@ export function App() {
               <a href="#faq" className="hover:text-[#961C23] transition-colors">FAQ</a>
             </nav>
 
-            {/* "Join now" Red Button on far right */}
             <button className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0">
               Join now
             </button>
-
           </div>
 
         </div>
@@ -118,9 +109,9 @@ export function App() {
 
 
       {/* =========================================================================
-          2. HERO MAIN CONTENT
+          2. HERO SECTION
          ========================================================================= */}
-      <main className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 py-8 lg:py-12 flex-1 flex flex-col justify-center">
+      <section className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pt-8 lg:pt-14 pb-12 lg:pb-24 min-h-[720px] flex flex-col justify-center">
         
         <div className="w-full lg:w-[54%] xl:w-[52%] space-y-7 pr-2 sm:pr-4">
           
@@ -206,10 +197,148 @@ export function App() {
           />
         </div>
 
-      </main>
+      </section>
 
-      {/* Subtle bottom spacing */}
-      <div className="h-6 w-full" />
+
+      {/* =========================================================================
+          3. "LESS CHAT. MORE CHEMISTRY." (THE HIGHLIGHTED SECTION)
+         ========================================================================= */}
+      <section id="how-it-works" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-20">
+        
+        {/* Large Rounded Container Card */}
+        <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-8 sm:p-12 lg:p-16 shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
+          
+          {/* Top Label */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+            <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+              How it works
+            </span>
+          </div>
+
+          {/* Section Headline */}
+          <h2 className="font-serif font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[#1A1816] leading-[1.12] tracking-tight mb-4">
+            Less Chat. <br />
+            More Chemistry.
+          </h2>
+
+          {/* Subtitle */}
+          <p className="text-[#6E6860] text-sm sm:text-base leading-relaxed max-w-2xl font-normal mb-8 sm:mb-10">
+            A direct, graceful rhythm for meeting someone — with enough information to say yes, no, or perhaps another time.
+          </p>
+
+          {/* The 3 Steps with Horizontal Dividers */}
+          <div className="space-y-5 mb-8">
+            
+            {/* Step 01 */}
+            <div className="border-b border-[#E3D9C8]/80 pb-4">
+              <span className="text-xs font-semibold text-[#961C23]">01</span>
+              <h3 className="font-serif font-bold text-lg text-[#1A1816] mt-0.5">
+                Set The Scene
+              </h3>
+              <p className="text-xs sm:text-sm text-[#6E6860] mt-1 leading-relaxed">
+                Choose the venue, the time and the gesture. Every place is public and thoughtfully selected.
+              </p>
+            </div>
+
+            {/* Step 02 */}
+            <div className="border-b border-[#E3D9C8]/80 pb-4">
+              <span className="text-xs font-semibold text-[#961C23]">02</span>
+              <h3 className="font-serif font-bold text-lg text-[#1A1816] mt-0.5">
+                Get An Answer
+              </h3>
+              <p className="text-xs sm:text-sm text-[#6E6860] mt-1 leading-relaxed">
+                They have 48 hours to accept, decline, or suggest another time. No hanging conversations.
+              </p>
+            </div>
+
+            {/* Step 03 */}
+            <div className="pb-1">
+              <span className="text-xs font-semibold text-[#961C23]">03</span>
+              <h3 className="font-serif font-bold text-lg text-[#1A1816] mt-0.5">
+                Connect Before You Meet
+              </h3>
+              <p className="text-xs sm:text-sm text-[#6E6860] mt-1 leading-relaxed">
+                Once accepted, private chat opens. A check-in before the date keeps plans on track.
+              </p>
+            </div>
+
+          </div>
+
+          {/* Nested Invitation Card (An offer for you) */}
+          <div className="bg-[#FAF7F2] border border-[#E5DCCE] rounded-2xl p-6 sm:p-8 shadow-sm">
+            
+            <div className="mb-4">
+              <span className="text-xs text-[#8E8880] font-normal block">
+                An offer for you
+              </span>
+              <h4 className="font-serif font-bold text-2xl text-[#1A1816] mt-1">
+                Dinner For Two
+              </h4>
+            </div>
+
+            {/* Details Table */}
+            <div className="divide-y divide-[#EBE3D3] text-xs mb-6">
+              
+              <div className="flex items-center justify-between py-2.5">
+                <span className="text-[#8E8880] font-normal">When</span>
+                <span className="font-medium text-[#1A1816] text-xs sm:text-sm">Thu, Nov 9, 8:00 PM</span>
+              </div>
+
+              <div className="flex items-center justify-between py-2.5">
+                <span className="text-[#8E8880] font-normal">Where</span>
+                <span className="font-medium text-[#1A1816] text-xs sm:text-sm">Osteria Verde, Downtown</span>
+              </div>
+
+              <div className="flex items-center justify-between py-2.5">
+                <span className="text-[#8E8880] font-normal">The gift</span>
+                <span className="font-medium text-[#1A1816] text-xs sm:text-sm">Dinner is on Alex</span>
+              </div>
+
+              <div className="flex items-center justify-between py-2.5">
+                <span className="text-[#8E8880] font-normal">Expires in</span>
+                <span className="font-bold text-[#961C23] text-xs sm:text-sm">47h 12min</span>
+              </div>
+
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <button className="bg-[#961C23] hover:bg-[#7D141A] text-white font-semibold text-xs px-6 py-2 rounded-full shadow-sm transition-colors">
+                Accept
+              </button>
+
+              <button className="bg-white hover:bg-stone-50 border border-[#D5CEC2] text-[#1E1C1A] font-semibold text-xs px-6 py-2 rounded-full transition-colors">
+                Counter
+              </button>
+
+              <button className="text-[#7A756D] hover:text-[#1E1C1A] text-xs font-medium px-4 py-2 transition-colors">
+                Pass
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* Footer */}
+      <footer className="w-full border-t border-[#ECE3D4] py-8 bg-[#FAF7F2]">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-14 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-xs text-stone-500">
+            <span className="font-serif font-bold text-sm text-[#1E1C1A]">thedateboss</span>
+            <span>• © {new Date().getFullYear()} All rights reserved.</span>
+          </div>
+
+          <div className="flex items-center gap-6 text-xs text-[#5F5B54]">
+            <a href="#how-it-works" className="hover:text-[#961C23]">How it works</a>
+            <a href="#roles" className="hover:text-[#961C23]">Roles</a>
+            <a href="#safety" className="hover:text-[#961C23]">Safety</a>
+            <a href="#faq" className="hover:text-[#961C23]">FAQ</a>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );
