@@ -1,0 +1,22 @@
+{
+  "name": "thedateinc-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "dashboard"
+  ],
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:dashboard": "npm --prefix dashboard run dev",
+    "build:backend": "npm --prefix backend run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:dashboard": "npm --prefix dashboard run build",
+    "build": "npm run build:backend && npm run build:frontend && npm run build:dashboard"
+  },
+  "keywords": ["dating", "typescript", "react", "express", "tailwind"],
+  "author": "",
+  "license": "MIT"
+}
