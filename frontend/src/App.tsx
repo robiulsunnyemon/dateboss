@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function App() {
   return (
@@ -201,9 +201,9 @@ export function App() {
 
 
       {/* =========================================================================
-          3. "LESS CHAT. MORE CHEMISTRY." (THE HIGHLIGHTED SECTION)
+          3. "LESS CHAT. MORE CHEMISTRY." (HOW IT WORKS)
          ========================================================================= */}
-      <section id="how-it-works" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-20">
+      <section id="how-it-works" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
         
         {/* Large Rounded Container Card */}
         <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-8 sm:p-12 lg:p-16 shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
@@ -323,7 +323,186 @@ export function App() {
 
       </section>
 
-      {/* Footer */}
+
+      {/* =========================================================================
+          4. "WHAT MAKES THEDATEBOSS DIFFERENT?" (THE THEDATEBOSS ADVANTAGE)
+         ========================================================================= */}
+      <section id="why-us" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+        
+        {/* Large Rounded Container Card */}
+        <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-8 sm:p-12 lg:p-16 text-center shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
+          
+          {/* Top Label */}
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+            <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+              The Thedateboss Advantage
+            </span>
+            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+          </div>
+
+          {/* Section Headline */}
+          <h2 className="font-serif font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[#1A1816] tracking-tight mb-4">
+            What Makes Thedateboss Different?
+          </h2>
+
+          {/* Subtitle */}
+          <p className="text-[#6E6860] text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl mx-auto font-normal mb-12 lg:mb-16">
+            Thedateboss is like a fast lane for dating. Ditch endless messaging. Get noticed and get to the good stuff — real dates — way quicker. Check out these impressive numbers:
+          </p>
+
+          {/* Two Visual Graphic Metric Columns */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 max-w-4xl mx-auto items-start">
+            
+            {/* Column 1: $99 with Red Envelope */}
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-32 h-32 flex items-center justify-center">
+                <img
+                  src="/assets/envelope-percent.png"
+                  alt="Red envelope with percentage symbol"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              <h3 className="font-serif font-bold text-4xl sm:text-5xl text-[#1A1816]">
+                $99
+              </h3>
+
+              <p className="text-[#6E6860] text-xs sm:text-sm leading-relaxed max-w-xs">
+                With an average offer of approximately $99, members demonstrate a genuine interest in turning online connections into real-life dates.
+              </p>
+            </div>
+
+            {/* Column 2: 25% with Red Lock Heart */}
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-32 h-32 flex items-center justify-center">
+                <img
+                  src="/assets/lock-heart.png"
+                  alt="Red lock with heart speech bubble"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              <h3 className="font-serif font-bold text-4xl sm:text-5xl text-[#1A1816]">
+                25%
+              </h3>
+
+              <p className="text-[#6E6860] text-xs sm:text-sm leading-relaxed max-w-xs">
+                And the best part? Nearly 25% of all offers sent on thedateboss end with a resounding yes.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =========================================================================
+          5. "WHAT OUR USERS ARE SAYING" (TESTIMONIALS)
+         ========================================================================= */}
+      <section id="reviews" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-20">
+        
+        {/* Section Header */}
+        <div className="text-center mb-10 space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+            <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+              Testimonials
+            </span>
+            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+          </div>
+
+          <h2 className="font-serif font-extrabold text-3xl sm:text-4xl text-[#1A1816] tracking-tight">
+            What Our Users Are Saying
+          </h2>
+        </div>
+
+        {/* 3 Testimonial Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          
+          {/* Card 1: Farhan Ahmed */}
+          <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[240px]">
+            <p className="text-[#6E6860] text-xs sm:text-[13px] leading-relaxed mb-6 font-normal">
+              "I had the best experience with a date! We tried paddle boarding! It was so windy that we got blown backwards and we laughed the whole time as I struggled! We saw seals in the harbor and it was something I always wanted to do! It was a fun, exciting, great first date, and we are still seeing each other!"
+            </p>
+
+            <div className="flex items-center gap-3 pt-3 border-t border-[#EAE3D5]">
+              <img
+                src="/assets/avatar-1.png"
+                alt="Farhan Ahmed"
+                className="w-10 h-10 rounded-full object-cover border border-[#961C23]/30"
+              />
+              <div>
+                <h4 className="font-bold text-xs text-[#1A1816]">Farhan Ahmed</h4>
+                <p className="text-[10px] text-[#8E8880]">Host</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Farhana Ahmed */}
+          <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[240px]">
+            <p className="text-[#6E6860] text-xs sm:text-[13px] leading-relaxed mb-6 font-normal">
+              "An exceptional, easy-to-navigate platform that makes meeting generous and established local men completely stress-free. Backed by top-tier safety and verified profiles, I was reviewing tailored offers and arranging memorable dates within days. It delivers an effortless, premium dating experience from the very first step."
+            </p>
+
+            <div className="flex items-center gap-3 pt-3 border-t border-[#EAE3D5]">
+              <img
+                src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80"
+                alt="Farhana Ahmed"
+                className="w-10 h-10 rounded-full object-cover border border-[#961C23]/30"
+              />
+              <div>
+                <h4 className="font-bold text-xs text-[#1A1816]">Farhana Ahmed</h4>
+                <p className="text-[10px] text-[#8E8880]">Guest of honor</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Aissatou Balde */}
+          <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[240px]">
+            <p className="text-[#6E6860] text-xs sm:text-[13px] leading-relaxed mb-6 font-normal">
+              "The standout experience on thedateboss has been the prompt, dedicated support team. Whenever I had an inquiry, it was handled swiftly with genuine care and clear guidance. The platform truly honors its promise of fostering meaningful, high-caliber connections between like-minded individuals."
+            </p>
+
+            <div className="flex items-center gap-3 pt-3 border-t border-[#EAE3D5]">
+              <img
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
+                alt="Aissatou Balde"
+                className="w-10 h-10 rounded-full object-cover border border-[#961C23]/30"
+              />
+              <div>
+                <h4 className="font-bold text-xs text-[#1A1816]">Aissatou Balde</h4>
+                <p className="text-[10px] text-[#8E8880]">Host</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Carousel Navigation Buttons */}
+        <div className="flex items-center justify-center gap-3">
+          <button
+            aria-label="Previous review"
+            className="w-9 h-9 rounded-full bg-white border border-[#D5CEC2] flex items-center justify-center text-[#6E6860] hover:bg-stone-50 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            aria-label="Next review"
+            className="w-9 h-9 rounded-full bg-[#961C23] text-white flex items-center justify-center hover:bg-[#7D141A] transition-colors shadow-sm"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+      </section>
+
+
+      {/* =========================================================================
+          FOOTER
+         ========================================================================= */}
       <footer className="w-full border-t border-[#ECE3D4] py-8 bg-[#FAF7F2]">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-14 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs text-stone-500">
