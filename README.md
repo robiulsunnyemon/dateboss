@@ -57,7 +57,23 @@ d:/new_tap/
 
 ---
 
-## 🚀 How to Run the Applications
+## ⚡ One-Click Run (এক ক্লিকে চালু করার উপায়)
+
+### Method 1: Double-Click Desktop File (সবচেয়ে সহজ - এক ক্লিকে)
+- ফোল্ডারে থাকা **`start.bat`** ফাইলে ডাবল ক্লিক করুন!
+- এটি স্বয়ংক্রিয়ভাবে Backend, Frontend ও Dashboard চালু করে ব্রাউজারে `http://localhost:3000` ওপেন করবে।
+
+### Method 2: Single Command Run
+টার্মিনাল থেকে এক লাইনে চালু করতে:
+```bash
+npm run dev
+# অথবা:
+npm start
+```
+
+---
+
+## 🚀 Individual Service Commands
 
 ### 1. Run the Backend API (Port 5000)
 ```bash

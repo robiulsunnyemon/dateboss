@@ -8,6 +8,8 @@
     "dashboard"
   ],
   "scripts": {
+    "dev": "node start-all.js",
+    "start": "node start-all.js",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:dashboard": "npm --prefix dashboard run dev",
