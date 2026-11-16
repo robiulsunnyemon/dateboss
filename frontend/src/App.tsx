@@ -44,18 +44,24 @@ export function App() {
       {/* =========================================================================
           HERO SECTION WRAPPER
           - Contains Header + Left Content + Right Sweeping Curved Photo
-          - Strictly constrained to Hero height (does NOT leak into Section 2!)
+          - The curve starts at top-right (screen ~72%), sweeps down to the left
+            beside the man, leaving the entire navbar capsule on the cream background!
          ========================================================================= */}
-      <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-[700px] lg:h-[720px] xl:h-[760px] flex flex-col justify-between">
+      <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-[700px] lg:h-[730px] xl:h-[770px] flex flex-col justify-between">
         
-        {/* SVG ClipPath Definition for the exact sweeping convex arc */}
+        {/* SVG ClipPath Definition matching the exact user-drawn shape */}
         <svg width="0" height="0" className="absolute">
           <defs>
-            <clipPath id="heroSweepingArc" clipPathUnits="objectBoundingBox">
-              {/* Curve starts at top (~0.12), bows out to the left (~0.01) at y=0.52, curves to bottom (~0.09) */}
-              <path d="M 0.12, 0 
-                       C 0.04, 0.25, 0.01, 0.42, 0.01, 0.52 
-                       C 0.01, 0.65, 0.04, 0.82, 0.09, 1 
+            <clipPath id="heroUserDrawnArc" clipPathUnits="objectBoundingBox">
+              {/* 
+                Container is w-[50%] on the right (x: 50% to 100% of screen).
+                At y = 0: x = 0.44 (screen 72%, to the right of the nav capsule).
+                Sweeps down & left to x = 0.03 (screen 51.5% beside the man).
+                Ends at bottom at x = 0.04 (screen 52%).
+              */}
+              <path d="M 0.44, 0 
+                       C 0.28, 0.16, 0.12, 0.34, 0.04, 0.52 
+                       C -0.01, 0.68, 0.01, 0.84, 0.04, 1 
                        L 1, 1 
                        L 1, 0 
                        Z" />
@@ -63,11 +69,11 @@ export function App() {
           </defs>
         </svg>
 
-        {/* Right Photo: Fills right half from top: 0 to bottom: 0 of HERO SECTION ONLY */}
+        {/* Right Photo: Fills right half, clipped with the exact sweeping curve */}
         <div className="absolute right-0 top-0 bottom-0 w-[50%] h-full z-10 pointer-events-none hidden lg:block overflow-hidden">
           <div
             className="w-full h-full relative"
-            style={{ clipPath: 'url(#heroSweepingArc)' }}
+            style={{ clipPath: 'url(#heroUserDrawnArc)' }}
           >
             <img
               src="/assets/hero-couple.jpg"
@@ -79,7 +85,7 @@ export function App() {
           </div>
         </div>
 
-        {/* 1. HEADER / NAVIGATION (Floats cleanly across top, z-30) */}
+        {/* 1. HEADER / NAVIGATION BAR (Floats cleanly across top, z-30) */}
         <header className="w-full relative z-30 pt-6 px-6 sm:px-10 lg:px-14">
           <div className="max-w-[1400px] mx-auto flex items-center justify-between">
             
@@ -127,19 +133,18 @@ export function App() {
               </span>
             </div>
 
-            {/* Right: Nav Capsule + Join now Button */}
-            <div className="flex items-center gap-4 sm:gap-6">
-              <nav className="bg-[#EFE9DF]/80 backdrop-blur-md border border-[#E5DECF] rounded-full px-6 py-2 hidden sm:flex items-center gap-7 text-xs font-medium text-[#5F5B54] shadow-sm">
-                <a href="#how-it-works" className="hover:text-[#961C23] transition-colors">How it works</a>
-                <a href="#roles" className="hover:text-[#961C23] transition-colors">Roles</a>
-                <a href="#safety" className="hover:text-[#961C23] transition-colors">Safety</a>
-                <a href="#faq" className="hover:text-[#961C23] transition-colors">FAQ</a>
-              </nav>
+            {/* Center: Nav Capsule completely on clean cream background */}
+            <nav className="bg-[#EFE9DF]/85 backdrop-blur-md border border-[#E5DECF] rounded-full px-7 py-2.5 hidden md:flex items-center gap-7 text-xs font-medium text-[#5F5B54] shadow-sm">
+              <a href="#how-it-works" className="hover:text-[#961C23] transition-colors">How it works</a>
+              <a href="#roles" className="hover:text-[#961C23] transition-colors">Roles</a>
+              <a href="#safety" className="hover:text-[#961C23] transition-colors">Safety</a>
+              <a href="#faq" className="hover:text-[#961C23] transition-colors">FAQ</a>
+            </nav>
 
-              <button className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0">
-                Join now
-              </button>
-            </div>
+            {/* Right: Join now Button */}
+            <button className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0">
+              Join now
+            </button>
 
           </div>
         </header>
@@ -147,7 +152,7 @@ export function App() {
         {/* 2. HERO CONTENT (Left text and action cards) */}
         <div className="relative z-20 max-w-[1400px] mx-auto w-full px-6 sm:px-10 lg:px-14 py-8 flex-1 flex flex-col justify-center">
           
-          <div className="w-full lg:w-[52%] xl:w-[50%] space-y-6 sm:space-y-7 pr-2 sm:pr-4">
+          <div className="w-full lg:w-[50%] xl:w-[48%] space-y-6 sm:space-y-7 pr-2 sm:pr-4">
             
             {/* Label: Gifted dating */}
             <div className="flex items-center gap-2">
