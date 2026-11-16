@@ -7,17 +7,26 @@ import {
   Step4Details,
   Step5Lifestyle,
   Step6Career,
+  Step7Prompts,
 } from './pages/Onboarding';
 import { UserRole } from './types/onboarding';
 
 export function App() {
-  // Routing view state: 'landing' | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-step3' | 'onboarding-step4' | 'onboarding-step5' | 'onboarding-step6'
+  // Routing view state: 'landing' | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-step3' | 'onboarding-step4' | 'onboarding-step5' | 'onboarding-step6' | 'onboarding-step7'
   const [currentView, setCurrentView] = useState<
-    'landing' | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-step3' | 'onboarding-step4' | 'onboarding-step5' | 'onboarding-step6'
+    | 'landing'
+    | 'onboarding-step1'
+    | 'onboarding-step2'
+    | 'onboarding-step3'
+    | 'onboarding-step4'
+    | 'onboarding-step5'
+    | 'onboarding-step6'
+    | 'onboarding-step7'
   >(() => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       const hash = window.location.hash;
+      if (path === '/step7' || hash === '#step7' || hash === '#prompts') return 'onboarding-step7';
       if (path === '/step6' || hash === '#step6' || hash === '#career') return 'onboarding-step6';
       if (path === '/step5' || hash === '#step5' || hash === '#lifestyle') return 'onboarding-step5';
       if (path === '/step4' || hash === '#step4' || hash === '#details') return 'onboarding-step4';
@@ -79,6 +88,14 @@ export function App() {
     }
   };
 
+  const navigateToStep7 = () => {
+    setCurrentView('onboarding-step7');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'onboarding-step7' }, '', '#step7');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const navigateToLanding = () => {
     setCurrentView('landing');
     if (typeof window !== 'undefined') {
@@ -92,7 +109,9 @@ export function App() {
     const handlePopState = () => {
       const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/step6' || hash === '#step6' || hash === '#career') {
+      if (path === '/step7' || hash === '#step7' || hash === '#prompts') {
+        setCurrentView('onboarding-step7');
+      } else if (path === '/step6' || hash === '#step6' || hash === '#career') {
         setCurrentView('onboarding-step6');
       } else if (path === '/step5' || hash === '#step5' || hash === '#lifestyle') {
         setCurrentView('onboarding-step5');
@@ -163,6 +182,16 @@ export function App() {
     return (
       <Step6Career
         onBack={() => navigateToStep5()}
+        onContinue={() => navigateToStep7()}
+      />
+    );
+  }
+
+  if (currentView === 'onboarding-step7') {
+    return (
+      <Step7Prompts
+        onBack={() => navigateToStep6()}
+        onSkip={() => navigateToLanding()}
         onContinue={(_data) => {
           navigateToLanding();
         }}
