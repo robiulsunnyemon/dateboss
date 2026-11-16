@@ -39,13 +39,13 @@ export function App() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#FAF7F2] text-[#1E1C1A] font-sans antialiased selection:bg-[#961C23] selection:text-white flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAF7F2] text-[#1E1C1A] font-sans antialiased selection:bg-[#961C23] selection:text-white flex flex-col justify-between overflow-x-hidden">
       
       {/* =========================================================================
-          RIGHT HERO IMAGE WITH PRECISE CONVEX CURVED MASK
-          (Starts at top: 0, covers right half of Hero section)
+          HERO RIGHT IMAGE WITH PRECISE CONVEX CURVED MASK
+          (Contained strictly within the Hero Section viewport)
          ========================================================================= */}
-      <div className="absolute right-0 top-0 h-[820px] xl:h-[880px] w-[50%] xl:w-[48%] z-10 pointer-events-none hidden lg:block overflow-hidden">
+      <div className="absolute right-0 top-0 h-[760px] xl:h-[820px] w-[50%] xl:w-[48%] z-10 pointer-events-none hidden lg:block overflow-hidden">
         
         {/* SVG ClipPath Definition for the exact curved arc */}
         <svg width="0" height="0" className="absolute">
@@ -80,7 +80,7 @@ export function App() {
           1. HEADER / NAVIGATION BAR
          ========================================================================= */}
       <header className="w-full relative z-30 pt-6 px-6 sm:px-10 lg:px-14">
-        <div className="max-w-[1440px] mx-auto flex items-center justify-between">
+        <div className="max-w-[1360px] mx-auto flex items-center justify-between">
           
           {/* Left: Wax Seal Logo + "thedateboss" */}
           <div className="flex items-center gap-3 shrink-0">
@@ -147,7 +147,7 @@ export function App() {
       {/* =========================================================================
           2. HERO SECTION
          ========================================================================= */}
-      <section className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pt-8 lg:pt-14 pb-12 lg:pb-24 min-h-[720px] flex flex-col justify-center">
+      <section className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pt-8 lg:pt-14 pb-16 lg:pb-20 min-h-[680px] flex flex-col justify-center">
         
         <div className="w-full lg:w-[54%] xl:w-[52%] space-y-7 pr-2 sm:pr-4">
           
@@ -237,9 +237,9 @@ export function App() {
 
 
       {/* =========================================================================
-          3. "LESS CHAT. MORE CHEMISTRY." (HOW IT WORKS)
+          3. "LESS CHAT. MORE CHEMISTRY." (HOW IT WORKS CARD CONTAINER)
          ========================================================================= */}
-      <section id="how-it-works" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+      <section id="how-it-works" className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
         
         {/* Large Rounded Container Card */}
         <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-8 sm:p-12 lg:p-16 shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
@@ -302,7 +302,7 @@ export function App() {
           </div>
 
           {/* Nested Invitation Card (An offer for you) */}
-          <div className="bg-[#FAF7F2] border border-[#E5DCCE] rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div className="bg-[#EFE8DB] border border-[#E2D8C6] rounded-2xl p-6 sm:p-8 shadow-sm">
             
             <div className="mb-4">
               <span className="text-xs text-[#8E8880] font-normal block">
@@ -314,7 +314,7 @@ export function App() {
             </div>
 
             {/* Details Table */}
-            <div className="divide-y divide-[#EBE3D3] text-xs mb-6">
+            <div className="divide-y divide-[#DFD5C2] text-xs mb-6">
               
               <div className="flex items-center justify-between py-2.5">
                 <span className="text-[#8E8880] font-normal">When</span>
@@ -361,9 +361,9 @@ export function App() {
 
 
       {/* =========================================================================
-          4. "WHAT MAKES THEDATEBOSS DIFFERENT?" (THE THEDATEBOSS ADVANTAGE)
+          4. "WHAT MAKES THEDATEBOSS DIFFERENT?" (THE THEDATEBOSS ADVANTAGE CARD)
          ========================================================================= */}
-      <section id="why-us" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+      <section id="why-us" className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
         
         {/* Large Rounded Container Card */}
         <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-8 sm:p-12 lg:p-16 text-center shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
@@ -436,9 +436,9 @@ export function App() {
 
 
       {/* =========================================================================
-          5. "WHAT OUR USERS ARE SAYING" (TESTIMONIALS)
+          5. "WHAT OUR USERS ARE SAYING" (TESTIMONIALS DIRECTLY ON BG)
          ========================================================================= */}
-      <section id="reviews" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+      <section id="reviews" className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
         
         {/* Section Header */}
         <div className="text-center mb-10 space-y-2">
@@ -537,12 +537,11 @@ export function App() {
 
 
       {/* =========================================================================
-          6. "BUILT AGAINST GHOSTING." (DARK/CHARCOAL SECTION)
+          6. "BUILT AGAINST GHOSTING." (100% FULL-WIDTH EDGE-TO-EDGE DARK BAND)
          ========================================================================= */}
-      <section id="safety" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+      <section id="safety" className="w-full bg-[#141414] text-white py-16 sm:py-20 lg:py-24 relative z-20">
         
-        {/* Dark Container Card */}
-        <div className="bg-[#171716] border border-[#2A2928] rounded-[32px] p-8 sm:p-12 lg:p-16 text-white shadow-2xl">
+        <div className="max-w-4xl mx-auto px-6 sm:px-10">
           
           {/* Top Label */}
           <div className="flex items-center gap-2 mb-3">
@@ -553,20 +552,20 @@ export function App() {
           </div>
 
           {/* Section Headline */}
-          <h2 className="font-serif font-extrabold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-8">
+          <h2 className="font-serif font-extrabold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-10">
             Built Against Ghosting.
           </h2>
 
-          {/* 4 Feature Items Stacked Vertically */}
-          <div className="space-y-4">
+          {/* 4 Feature Items (Minimalist rows with red circle icon badges) */}
+          <div className="space-y-8">
             
             {/* Feature 1: Chat Opens After Yes */}
-            <div className="bg-[#1F1E1D] border border-[#2B2A29] rounded-2xl p-5 sm:p-6 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full border border-[#961C23]/40 bg-[#961C23]/15 flex items-center justify-center shrink-0 text-[#E63946]">
+            <div className="flex items-start gap-4">
+              <div className="w-9 h-9 rounded-full border border-[#961C23] bg-transparent flex items-center justify-center shrink-0 text-[#E63946] mt-0.5">
                 <MessageSquare className="w-4 h-4" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-serif font-bold text-base sm:text-lg text-white">
+                <h3 className="font-serif font-bold text-lg text-white">
                   Chat Opens After Yes
                 </h3>
                 <p className="text-[#8E8A83] text-xs sm:text-sm leading-relaxed">
@@ -576,12 +575,12 @@ export function App() {
             </div>
 
             {/* Feature 2: Offers Expire In 48 Hours */}
-            <div className="bg-[#1F1E1D] border border-[#2B2A29] rounded-2xl p-5 sm:p-6 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full border border-[#961C23]/40 bg-[#961C23]/15 flex items-center justify-center shrink-0 text-[#E63946]">
+            <div className="flex items-start gap-4">
+              <div className="w-9 h-9 rounded-full border border-[#961C23] bg-transparent flex items-center justify-center shrink-0 text-[#E63946] mt-0.5">
                 <Clock className="w-4 h-4" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-serif font-bold text-base sm:text-lg text-white">
+                <h3 className="font-serif font-bold text-lg text-white">
                   Offers Expire In 48 Hours
                 </h3>
                 <p className="text-[#8E8A83] text-xs sm:text-sm leading-relaxed">
@@ -591,12 +590,12 @@ export function App() {
             </div>
 
             {/* Feature 3: Confirm The Day Before */}
-            <div className="bg-[#1F1E1D] border border-[#2B2A29] rounded-2xl p-5 sm:p-6 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full border border-[#961C23]/40 bg-[#961C23]/15 flex items-center justify-center shrink-0 text-[#E63946]">
+            <div className="flex items-start gap-4">
+              <div className="w-9 h-9 rounded-full border border-[#961C23] bg-transparent flex items-center justify-center shrink-0 text-[#E63946] mt-0.5">
                 <CalendarCheck className="w-4 h-4" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-serif font-bold text-base sm:text-lg text-white">
+                <h3 className="font-serif font-bold text-lg text-white">
                   Confirm The Day Before
                 </h3>
                 <p className="text-[#8E8A83] text-xs sm:text-sm leading-relaxed">
@@ -606,12 +605,12 @@ export function App() {
             </div>
 
             {/* Feature 4: Verified, Public, Reliable */}
-            <div className="bg-[#1F1E1D] border border-[#2B2A29] rounded-2xl p-5 sm:p-6 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full border border-[#961C23]/40 bg-[#961C23]/15 flex items-center justify-center shrink-0 text-[#E63946]">
+            <div className="flex items-start gap-4">
+              <div className="w-9 h-9 rounded-full border border-[#961C23] bg-transparent flex items-center justify-center shrink-0 text-[#E63946] mt-0.5">
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-serif font-bold text-base sm:text-lg text-white">
+                <h3 className="font-serif font-bold text-lg text-white">
                   Verified, Public, Reliable
                 </h3>
                 <p className="text-[#8E8A83] text-xs sm:text-sm leading-relaxed">
@@ -630,7 +629,7 @@ export function App() {
       {/* =========================================================================
           7. "FREQUENTLY ASKED QUESTIONS" (FAQ SECTION)
          ========================================================================= */}
-      <section id="faq" className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+      <section id="faq" className="relative z-20 max-w-4xl mx-auto w-full px-6 sm:px-10 py-16 sm:py-20">
         
         {/* Top Label */}
         <div className="flex items-center gap-2 mb-3">
@@ -680,7 +679,7 @@ export function App() {
       {/* =========================================================================
           8. CALL TO ACTION BANNER (MAKE THE FIRST MOVE WORTH ANSWERING)
          ========================================================================= */}
-      <section className="relative z-20 max-w-[1440px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-14 sm:pb-20">
+      <section className="relative z-20 max-w-[1360px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-16 sm:pb-20">
         
         <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[32px] p-10 sm:p-14 lg:p-16 text-center shadow-sm">
           
@@ -748,10 +747,10 @@ export function App() {
 
 
       {/* =========================================================================
-          9. FOOTER
+          9. FOOTER (100% FULL-WIDTH)
          ========================================================================= */}
-      <footer className="w-full border-t border-[#ECE3D4] py-8 bg-[#FAF7F2]">
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-14 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="w-full border-t border-[#ECE3D4] py-8 bg-[#FAF7F2] relative z-20">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 flex flex-col sm:flex-row items-center justify-between gap-4">
           
           {/* Left: Wax Seal + Copyright */}
           <div className="flex items-center gap-2.5">
