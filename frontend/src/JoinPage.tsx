@@ -4,16 +4,18 @@ import { ArrowLeft } from 'lucide-react';
 interface JoinPageProps {
   initialRole?: 'host' | 'guest';
   onBack: () => void;
+  onContinueToStep2?: () => void;
 }
 
-export function JoinPage({ initialRole = 'host', onBack }: JoinPageProps) {
+export function JoinPage({ initialRole = 'host', onBack, onContinueToStep2 }: JoinPageProps) {
   const [selectedRole, setSelectedRole] = useState<'host' | 'guest'>(initialRole);
   const [whoYouAre, setWhoYouAre] = useState<'Men' | 'Women' | 'Everyone'>('Men');
   const [whoToMeet, setWhoToMeet] = useState<'Men' | 'Women' | 'Everyone'>('Women');
-  const [submitted, setSubmitted] = useState(false);
 
   const handleContinue = () => {
-    setSubmitted(true);
+    if (onContinueToStep2) {
+      onContinueToStep2();
+    }
   };
 
   return (
@@ -88,6 +90,7 @@ export function JoinPage({ initialRole = 'host', onBack }: JoinPageProps) {
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedRole('host');
+                if (onContinueToStep2) onContinueToStep2();
               }}
               className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs py-3.5 px-4 rounded-full transition-colors mt-4 text-center shadow-xs"
             >
@@ -176,22 +179,13 @@ export function JoinPage({ initialRole = 'host', onBack }: JoinPageProps) {
 
         {/* Continue Button & ID verification note */}
         <div className="mt-6 sm:mt-8 pt-1 text-center">
-          {submitted ? (
-            <div className="p-4 rounded-2xl bg-[#EDE5D6] border border-[#DDD3C2] text-xs text-[#1A1816] space-y-1 animate-in fade-in text-left">
-              <p className="font-bold">Step 1 complete!</p>
-              <p className="text-[#6E6860]">
-                Proceeding to Step 2: ID verification for {selectedRole === 'host' ? 'Host' : 'Guest of Honor'} ({whoYouAre} seeking {whoToMeet}).
-              </p>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={handleContinue}
-              className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs py-4 sm:py-3.5 px-10 rounded-full transition-colors shadow-sm text-center"
-            >
-              Continue
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleContinue}
+            className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs py-4 sm:py-3.5 px-10 rounded-full transition-colors shadow-sm text-center"
+          >
+            Continue
+          </button>
 
           <p className="text-xs text-[#8E8880] mt-3 font-normal">
             ID verification comes next

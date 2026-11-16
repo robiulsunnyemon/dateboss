@@ -13,25 +13,35 @@ import {
   X,
 } from 'lucide-react';
 import { JoinPage } from './JoinPage';
+import { Step2Page } from './Step2Page';
 
 export function App() {
-  // View routing state: 'landing' | 'join'
-  const [currentView, setCurrentView] = useState<'landing' | 'join'>(() => {
+  // View routing state: 'landing' | 'join-step1' | 'join-step2'
+  const [currentView, setCurrentView] = useState<'landing' | 'join-step1' | 'join-step2'>(() => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/join' || hash === '#join') return 'join';
+      if (path === '/step2' || hash === '#step2' || hash === '#host') return 'join-step2';
+      if (path === '/join' || hash === '#join') return 'join-step1';
     }
     return 'landing';
   });
 
   const [joinInitialRole, setJoinInitialRole] = useState<'host' | 'guest'>('host');
 
-  const navigateToJoin = (role: 'host' | 'guest' = 'host') => {
+  const navigateToJoinStep1 = (role: 'host' | 'guest' = 'host') => {
     setJoinInitialRole(role);
-    setCurrentView('join');
+    setCurrentView('join-step1');
     if (typeof window !== 'undefined') {
-      window.history.pushState({ view: 'join' }, '', '#join');
+      window.history.pushState({ view: 'join-step1' }, '', '#join');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const navigateToJoinStep2 = () => {
+    setCurrentView('join-step2');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'join-step2' }, '', '#step2');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -49,8 +59,10 @@ export function App() {
     const handlePopState = () => {
       const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/join' || hash === '#join') {
-        setCurrentView('join');
+      if (path === '/step2' || hash === '#step2' || hash === '#host') {
+        setCurrentView('join-step2');
+      } else if (path === '/join' || hash === '#join') {
+        setCurrentView('join-step1');
       } else {
         setCurrentView('landing');
       }
@@ -173,11 +185,21 @@ export function App() {
     },
   ];
 
-  if (currentView === 'join') {
+  if (currentView === 'join-step1') {
     return (
       <JoinPage
         initialRole={joinInitialRole}
         onBack={navigateToLanding}
+        onContinueToStep2={navigateToJoinStep2}
+      />
+    );
+  }
+
+  if (currentView === 'join-step2') {
+    return (
+      <Step2Page
+        onBack={() => navigateToJoinStep1('host')}
+        onContinue={navigateToLanding}
       />
     );
   }
@@ -255,7 +277,7 @@ export function App() {
             {/* Right: Join now Button */}
             <button
               type="button"
-              onClick={() => navigateToJoin('host')}
+              onClick={() => navigateToJoinStep1('host')}
               className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-4 sm:px-6 py-2 sm:py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0"
             >
               Join now
@@ -358,7 +380,7 @@ export function App() {
 
                 <button
                   type="button"
-                  onClick={() => navigateToJoin('host')}
+                  onClick={() => navigateToJoinStep2()}
                   className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
                 >
                   Join as a Host
@@ -379,7 +401,7 @@ export function App() {
 
                 <button
                   type="button"
-                  onClick={() => navigateToJoin('guest')}
+                  onClick={() => navigateToJoinStep1('guest')}
                   className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
                 >
                   Join as a Guest of Honor
@@ -846,14 +868,14 @@ export function App() {
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2 sm:pt-3 w-full justify-center">
               <button
                 type="button"
-                onClick={() => navigateToJoin('host')}
+                onClick={() => navigateToJoinStep2()}
                 className="w-full sm:w-auto bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
               >
                 Join as a Host
               </button>
               <button
                 type="button"
-                onClick={() => navigateToJoin('guest')}
+                onClick={() => navigateToJoinStep1('guest')}
                 className="w-full sm:w-auto bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
               >
                 Join as a Guest of Honor
