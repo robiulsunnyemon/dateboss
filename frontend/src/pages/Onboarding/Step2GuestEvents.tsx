@@ -17,12 +17,14 @@ import {
   Store,
   Sparkles,
   Compass,
-  Check,
 } from 'lucide-react';
 
 interface Step2GuestEventsProps {
   onBack: () => void;
-  onContinue: (selectedEvents: string[]) => void;
+  onContinue: (data: {
+    selectedEvents: string[];
+    customIdeas: Array<{ title: string; description: string }>;
+  }) => void;
 }
 
 interface OutingOption {
@@ -128,10 +130,28 @@ const DEFAULT_EVENTS: OutingOption[] = [
 ];
 
 export function Step2GuestEvents({ onBack, onContinue }: Step2GuestEventsProps) {
-  const [events, setEvents] = useState<OutingOption[]>(DEFAULT_EVENTS);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // Pre-selected 5 events matching the screenshot (Weddings, Coffee, Museums, Cooking, Day Trips)
+  const [selectedIds, setSelectedIds] = useState<string[]>([
+    'weddings',
+    'coffee',
+    'museums',
+    'cooking',
+    'day-trips',
+  ]);
+
+  const [customIdeas, setCustomIdeas] = useState<
+    Array<{ title: string; description: string }>
+  >([
+    {
+      title: 'Rooftop Sunset Picnic',
+      description:
+        'Blankets, good snacks and a view of the city as the lights come on.',
+    },
+  ]);
+
   const [showAddCustom, setShowAddCustom] = useState(false);
-  const [customEventName, setCustomEventName] = useState('');
+  const [customTitle, setCustomTitle] = useState('');
+  const [customDesc, setCustomDesc] = useState('');
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -139,29 +159,33 @@ export function Step2GuestEvents({ onBack, onContinue }: Step2GuestEventsProps) 
     );
   };
 
-  const handleAddCustom = (e: React.FormEvent) => {
+  const handleAddCustomIdea = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = customEventName.trim();
-    if (!trimmed) return;
+    const trimmedTitle = customTitle.trim();
+    if (!trimmedTitle) return;
 
-    const newId = `custom-${Date.now()}`;
-    const newOption: OutingOption = {
-      id: newId,
-      name: trimmed,
-      icon: <Sparkles className="w-5 h-5 text-[#9F1E19]" />,
-    };
-
-    setEvents((prev) => [...prev, newOption]);
-    setSelectedIds((prev) => [...prev, newId]);
-    setCustomEventName('');
+    setCustomIdeas((prev) => [
+      ...prev,
+      {
+        title: trimmedTitle,
+        description:
+          customDesc.trim() || 'A personalized custom date experience.',
+      },
+    ]);
+    setCustomTitle('');
+    setCustomDesc('');
     setShowAddCustom(false);
   };
 
   const handleContinue = () => {
-    const selectedNames = events
-      .filter((ev) => selectedIds.includes(ev.id))
-      .map((ev) => ev.name);
-    onContinue(selectedNames);
+    const selectedNames = DEFAULT_EVENTS.filter((ev) =>
+      selectedIds.includes(ev.id)
+    ).map((ev) => ev.name);
+
+    onContinue({
+      selectedEvents: selectedNames,
+      customIdeas,
+    });
   };
 
   return (
@@ -174,7 +198,7 @@ export function Step2GuestEvents({ onBack, onContinue }: Step2GuestEventsProps) 
           <button
             type="button"
             onClick={onBack}
-            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95"
+            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -196,28 +220,32 @@ export function Step2GuestEvents({ onBack, onContinue }: Step2GuestEventsProps) 
           </a>
         </div>
 
-        {/* Section Badge: Events */}
+        {/* Step Badge: Step 2 of 3 */}
         <div className="flex items-center gap-2 mt-5 sm:mt-6">
           <span className="w-5 h-[1.5px] bg-[#9F1E19]"></span>
           <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
-            Events
+            Step 2 of 3
           </span>
         </div>
 
-        {/* Headline */}
+        {/* Headline: Invite Me To... */}
         <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#16120F] tracking-tight leading-tight mt-1.5">
-          Where Should The Offer <br className="hidden sm:inline" />
-          Take Them?
+          Invite Me To...
         </h1>
 
         {/* Subtitle */}
-        <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-1 mb-5 sm:mb-6 leading-relaxed">
-          Pick a kind of outing, or write your own.
+        <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-1 leading-relaxed max-w-[580px]">
+          Choose the outings you&apos;d love to be asked on. Hosts see these on your profile and can send an offer for any of them.
         </p>
+
+        {/* Dynamic Chosen Counter */}
+        <div className="text-[#9F1E19] text-xs font-semibold my-2.5">
+          {selectedIds.length} chosen
+        </div>
 
         {/* Events Outing Grid: 2 columns on Mobile, 4 columns on Desktop */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5">
-          {events.map((option) => {
+          {DEFAULT_EVENTS.map((option) => {
             const isSelected = selectedIds.includes(option.id);
             return (
               <div
@@ -225,19 +253,12 @@ export function Step2GuestEvents({ onBack, onContinue }: Step2GuestEventsProps) 
                 onClick={() => toggleSelect(option.id)}
                 className={`rounded-[18px] sm:rounded-[22px] p-3.5 sm:p-4 flex flex-col justify-between min-h-[90px] sm:min-h-[105px] cursor-pointer transition-all active:scale-[0.98] select-none ${
                   isSelected
-                    ? 'bg-[#F5F1E6] border-2 border-[#9F1E19] shadow-xs ring-1 ring-[#9F1E19]/20'
-                    : 'bg-[#F5F1E6] border border-[#E8DFD0] hover:border-[#9F1E19]/50'
+                    ? 'bg-[#F5F1E6] border-[1.5px] border-[#9F1E19] shadow-xs'
+                    : 'bg-[#F5F1E6] border border-[#E8DFD0] hover:border-[#9F1E19]/40'
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                    {option.icon}
-                  </div>
-                  {isSelected && (
-                    <span className="w-4 h-4 rounded-full bg-[#9F1E19] text-white flex items-center justify-center">
-                      <Check className="w-2.5 h-2.5 stroke-[3]" />
-                    </span>
-                  )}
+                <div className="w-8 h-8 rounded-full flex items-center justify-start">
+                  {option.icon}
                 </div>
 
                 <h3 className="font-sans font-medium text-xs sm:text-[13px] text-[#16120F] leading-snug mt-2">
@@ -251,34 +272,56 @@ export function Step2GuestEvents({ onBack, onContinue }: Step2GuestEventsProps) 
         {/* Add custom event trigger / form */}
         <div className="mt-4 sm:mt-5">
           {showAddCustom ? (
-            <form onSubmit={handleAddCustom} className="flex items-center gap-2 max-w-[340px]">
-              <input
-                type="text"
-                autoFocus
-                value={customEventName}
-                onChange={(e) => setCustomEventName(e.target.value)}
-                placeholder="Enter event name..."
-                className="w-full bg-[#F5F1E6] border border-[#9F1E19] rounded-full px-4 py-2 text-xs sm:text-sm text-[#16120F] placeholder:text-[#6E6A63] focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="bg-[#9F1E19] hover:bg-[#851713] text-white text-xs px-4 py-2 rounded-full font-medium shrink-0"
-              >
-                Add
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowAddCustom(false)}
-                className="text-xs text-[#6E6A63] hover:text-[#16120F] px-1"
-              >
-                Cancel
-              </button>
+            <form
+              onSubmit={handleAddCustomIdea}
+              className="bg-[#FAF7F2] border border-[#E8DFD0] rounded-[22px] p-4 space-y-3 max-w-[540px]"
+            >
+              <div>
+                <label className="block text-xs font-semibold text-[#16120F] mb-1">
+                  Idea Title
+                </label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={customTitle}
+                  onChange={(e) => setCustomTitle(e.target.value)}
+                  placeholder="e.g. Vintage Bookstore & Jazz Lounge"
+                  className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-full px-4 py-2 text-xs sm:text-sm text-[#16120F] focus:outline-none focus:border-[#9F1E19]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#16120F] mb-1">
+                  Description
+                </label>
+                <input
+                  type="text"
+                  value={customDesc}
+                  onChange={(e) => setCustomDesc(e.target.value)}
+                  placeholder="e.g. Browsing old classics and listening to vinyl over tea."
+                  className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-full px-4 py-2 text-xs sm:text-sm text-[#16120F] focus:outline-none focus:border-[#9F1E19]"
+                />
+              </div>
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="submit"
+                  className="bg-[#9F1E19] hover:bg-[#851713] text-white text-xs px-5 py-2 rounded-full font-medium"
+                >
+                  Save idea
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddCustom(false)}
+                  className="text-xs text-[#6E6A63] hover:text-[#16120F] px-2 py-2"
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           ) : (
             <button
               type="button"
               onClick={() => setShowAddCustom(true)}
-              className="w-full sm:w-auto border border-dashed border-[#E09094] bg-[#FBEFF0]/40 hover:bg-[#FBEFF0] text-[#9F1E19] rounded-full py-2.5 px-5 text-xs font-medium inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              className="w-full sm:w-auto border border-dashed border-[#E09094] bg-[#FBEFF0]/40 hover:bg-[#FBEFF0] text-[#9F1E19] rounded-full py-2.5 px-6 text-xs font-medium inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add custom event</span>
@@ -286,15 +329,41 @@ export function Step2GuestEvents({ onBack, onContinue }: Step2GuestEventsProps) 
           )}
         </div>
 
-        {/* Action Button: Continue */}
+        {/* My Own Ideas Section */}
+        <div className="mt-5 sm:mt-6">
+          <h4 className="font-serif font-bold text-sm sm:text-base text-[#16120F] mb-2.5">
+            My Own Ideas
+          </h4>
+          <div className="space-y-2.5">
+            {customIdeas.map((idea, index) => (
+              <div
+                key={index}
+                className="bg-[#F5F1E6] border border-[#E8DFD0] rounded-[20px] p-4 sm:p-5 text-left"
+              >
+                <h5 className="font-serif font-bold text-xs sm:text-sm text-[#16120F]">
+                  {idea.title}
+                </h5>
+                <p className="text-xs text-[#6E6A63] mt-1 leading-relaxed">
+                  {idea.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Button: Continue & Footer note */}
         <div className="pt-6 sm:pt-7">
           <button
             type="button"
             onClick={handleContinue}
-            className="w-full sm:w-auto bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 sm:py-2.5 px-8 rounded-full shadow-sm transition-all active:scale-[0.99] cursor-pointer"
+            className="w-full sm:w-auto bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 sm:py-2.5 px-10 rounded-full shadow-sm transition-all active:scale-[0.99] cursor-pointer"
           >
             Continue
           </button>
+
+          <p className="text-xs text-[#6E6A63] mt-3 font-normal text-center sm:text-left">
+            You can change it any time
+          </p>
         </div>
 
       </div>
