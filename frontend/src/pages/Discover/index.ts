@@ -6,3 +6,5 @@ export { OfferEventsView } from './OfferEventsView';
 export type { OfferEventsViewProps } from './OfferEventsView';
 export { OffersView } from './OffersView';
 export type { OfferFilterType, OfferItem, CounterOfferItem, PassOfferItem } from './OffersView';
+export { ConfirmedDatesView } from './ConfirmedDatesView';
+export type { ConfirmedDateItem } from './ConfirmedDatesView';

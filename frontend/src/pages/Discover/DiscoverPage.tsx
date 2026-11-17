@@ -21,6 +21,7 @@ import {
 import { SearchPreferenceModal, SearchPreferenceFilters } from './SearchPreferenceModal';
 import { OfferEventsView } from './OfferEventsView';
 import { OffersView } from './OffersView';
+import { ConfirmedDatesView } from './ConfirmedDatesView';
 
 export interface DiscoverProfile {
   id: string;
@@ -134,6 +135,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
   const [activeTab, setActiveTab] = useState<'explore' | 'offers' | 'dates' | 'profile'>(() => {
     if (typeof window !== 'undefined') {
       if (window.location.hash === '#offers') return 'offers';
+      if (window.location.hash === '#dates') return 'dates';
     }
     return 'explore';
   });
@@ -343,6 +345,8 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       <main className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1">
         {activeTab === 'offers' ? (
           <OffersView onNavigateExplore={() => setActiveTab('explore')} />
+        ) : activeTab === 'dates' ? (
+          <ConfirmedDatesView />
         ) : (
           <>
             {/* Search Bar + Filter Button (Pill Container) */}
