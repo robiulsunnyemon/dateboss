@@ -214,8 +214,11 @@ export function App() {
       <Step1Begin
         initialRole={initialRole}
         onBack={navigateToLanding}
+        onJoinAsHostDirect={() => navigateToStep2()}
+        onJoinAsGuestDirect={() => navigateToGuestEvents()}
         onContinueToStep2={(data) => {
-          // If role is guest OR who you are is Women -> navigate to Where Should The Offer Take Them (Guest Events)
+          // 1. If role is guest OR who you are is Women -> navigate to Guest Events (Where Should The Offer Take Them?)
+          // 2. If men and not guest -> navigate to Step 2 Interests
           if (data.role === 'guest' || data.whoYouAre === 'Women') {
             navigateToGuestEvents();
           } else {

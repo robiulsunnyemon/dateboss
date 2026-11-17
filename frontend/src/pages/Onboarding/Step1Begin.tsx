@@ -10,24 +10,45 @@ interface Step1BeginProps {
     whoYouAre: GenderIdentity;
     whoToMeet: GenderPreference;
   }) => void;
+  onJoinAsHostDirect?: () => void;
+  onJoinAsGuestDirect?: () => void;
 }
 
 export function Step1Begin({
   initialRole = 'host',
   onBack,
   onContinueToStep2,
+  onJoinAsHostDirect,
+  onJoinAsGuestDirect,
 }: Step1BeginProps) {
   const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
   const [whoYouAre, setWhoYouAre] = useState<GenderIdentity>('Men');
   const [whoToMeet, setWhoToMeet] = useState<GenderPreference>('Women');
 
   const handleContinue = () => {
-    if (onContinueToStep2) {
-      onContinueToStep2({
-        role: selectedRole,
-        whoYouAre,
-        whoToMeet,
-      });
+    // Exact user navigation rules:
+    // 1. If user is 'Women' OR role is 'guest' -> navigate to Guest Events (Where Should The Offer Take Them?)
+    // 2. If user is 'Men' (or Everyone) and role is 'host' -> navigate to Step 2 Interests
+    if (whoYouAre === 'Women' || selectedRole === 'guest') {
+      if (onJoinAsGuestDirect) {
+        onJoinAsGuestDirect();
+      } else if (onContinueToStep2) {
+        onContinueToStep2({
+          role: 'guest',
+          whoYouAre,
+          whoToMeet,
+        });
+      }
+    } else {
+      if (onJoinAsHostDirect) {
+        onJoinAsHostDirect();
+      } else if (onContinueToStep2) {
+        onContinueToStep2({
+          role: 'host',
+          whoYouAre,
+          whoToMeet,
+        });
+      }
     }
   };
 
@@ -42,7 +63,7 @@ export function Step1Begin({
           <button
             type="button"
             onClick={onBack}
-            className="w-10 h-10 rounded-2xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
+            className="w-10 h-10 rounded-2xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
             aria-label="Go back to landing page"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -84,13 +105,13 @@ export function Step1Begin({
             onClick={() => setSelectedRole('host')}
             className={`bg-[#F5F1E6] rounded-[22px] sm:rounded-[24px] p-5 flex flex-col justify-between min-h-[185px] sm:min-h-[195px] cursor-pointer transition-all ${
               selectedRole === 'host'
-                ? 'border-[1.5px] border-[#9F1E19] shadow-xs'
+                ? 'border-[1.5px] border-[#9F1E19] shadow-xs ring-1 ring-[#9F1E19]/10'
                 : 'border border-[#E8DFD0] hover:border-[#9F1E19]/60'
             }`}
           >
             <div className="space-y-2">
-              <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
-                <span className="text-[#F3A83B] text-sm leading-none">👑</span>
+              <div className="flex items-center gap-1.5 text-xs text-[#6E6A63]">
+                <span className="text-[#FCB943] text-sm leading-none">👑</span>
                 <span className="font-medium">Host</span>
               </div>
               <h3 className="font-serif font-bold text-[#16120F] text-base sm:text-lg leading-snug">
@@ -98,12 +119,15 @@ export function Step1Begin({
               </h3>
             </div>
 
+            {/* Direct Join as Host button -> directly navigates to Step 2 Interests */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedRole('host');
-                if (onContinueToStep2) {
+                if (onJoinAsHostDirect) {
+                  onJoinAsHostDirect();
+                } else if (onContinueToStep2) {
                   onContinueToStep2({
                     role: 'host',
                     whoYouAre,
@@ -111,7 +135,7 @@ export function Step1Begin({
                   });
                 }
               }}
-              className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#16120F] font-bold text-xs py-3.5 px-4 rounded-full transition-colors mt-4 text-center shadow-xs"
+              className="w-full bg-[#FCB943] hover:bg-[#E09C2C] text-[#16120F] font-bold text-xs py-3.5 px-4 rounded-full transition-colors mt-4 text-center shadow-xs cursor-pointer active:scale-[0.99]"
             >
               Join as a Host
             </button>
@@ -122,12 +146,12 @@ export function Step1Begin({
             onClick={() => setSelectedRole('guest')}
             className={`bg-[#F5F1E6] rounded-[22px] sm:rounded-[24px] p-5 flex flex-col justify-between min-h-[185px] sm:min-h-[195px] cursor-pointer transition-all ${
               selectedRole === 'guest'
-                ? 'border-[1.5px] border-[#9F1E19] shadow-xs'
+                ? 'border-[1.5px] border-[#9F1E19] shadow-xs ring-1 ring-[#9F1E19]/10'
                 : 'border border-[#E8DFD0] hover:border-[#9F1E19]/60'
             }`}
           >
             <div className="space-y-2">
-              <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
+              <div className="flex items-center gap-1.5 text-xs text-[#6E6A63]">
                 <span className="text-[#8E8A83] text-sm leading-none">👑</span>
                 <span className="font-medium">Guest of Honor</span>
               </div>
@@ -136,13 +160,23 @@ export function Step1Begin({
               </h3>
             </div>
 
+            {/* Direct Join as Guest button -> directly navigates to Guest Events */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedRole('guest');
+                if (onJoinAsGuestDirect) {
+                  onJoinAsGuestDirect();
+                } else if (onContinueToStep2) {
+                  onContinueToStep2({
+                    role: 'guest',
+                    whoYouAre,
+                    whoToMeet,
+                  });
+                }
               }}
-              className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-3.5 px-4 rounded-full transition-colors mt-4 text-center shadow-xs"
+              className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-3.5 px-4 rounded-full transition-colors mt-4 text-center shadow-xs cursor-pointer active:scale-[0.99]"
             >
               Join as a Guest of Honor
             </button>
@@ -161,10 +195,10 @@ export function Step1Begin({
                 key={option}
                 type="button"
                 onClick={() => setWhoYouAre(option)}
-                className={`w-full sm:w-auto text-center text-xs font-medium py-3 sm:py-2.5 sm:px-6 rounded-full transition-all ${
+                className={`w-full sm:w-auto text-center text-xs font-medium py-3 sm:py-2.5 sm:px-6 rounded-full transition-all cursor-pointer ${
                   whoYouAre === option
                     ? 'bg-[#16120F] text-white shadow-xs'
-                    : 'bg-transparent border border-[#E5DECF] text-[#5F5B54] hover:border-[#16120F]'
+                    : 'bg-transparent border border-[#E5DECF] text-[#6E6A63] hover:border-[#16120F]'
                 }`}
               >
                 {option}
@@ -184,10 +218,10 @@ export function Step1Begin({
                 key={option}
                 type="button"
                 onClick={() => setWhoToMeet(option)}
-                className={`w-full sm:w-auto text-center text-xs font-medium py-3 sm:py-2.5 sm:px-6 rounded-full transition-all ${
+                className={`w-full sm:w-auto text-center text-xs font-medium py-3 sm:py-2.5 sm:px-6 rounded-full transition-all cursor-pointer ${
                   whoToMeet === option
                     ? 'bg-[#16120F] text-white shadow-xs'
-                    : 'bg-transparent border border-[#E5DECF] text-[#5F5B54] hover:border-[#16120F]'
+                    : 'bg-transparent border border-[#E5DECF] text-[#6E6A63] hover:border-[#16120F]'
                 }`}
               >
                 {option}
@@ -201,7 +235,7 @@ export function Step1Begin({
           <button
             type="button"
             onClick={handleContinue}
-            className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-4 sm:py-3.5 px-10 rounded-full transition-colors shadow-sm text-center"
+            className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-4 sm:py-3.5 px-10 rounded-full transition-colors shadow-sm text-center cursor-pointer active:scale-[0.99]"
           >
             Continue
           </button>
