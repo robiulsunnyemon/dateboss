@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { UserRole, GenderIdentity, GenderPreference } from '../../types/onboarding';
 
 interface Step1BeginProps {
-  initialRole?: UserRole;
+  initialRole?: UserRole | null;
   onBack: () => void;
   onContinueToStep2?: (data: {
     role: UserRole;
@@ -15,28 +15,40 @@ interface Step1BeginProps {
 }
 
 export function Step1Begin({
-  initialRole = 'host',
+  initialRole = null,
   onBack,
   onContinueToStep2,
   onJoinAsHostDirect,
   onJoinAsGuestDirect,
 }: Step1BeginProps) {
-  const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
-  const [whoYouAre, setWhoYouAre] = useState<GenderIdentity>('Men');
-  const [whoToMeet, setWhoToMeet] = useState<GenderPreference>('Women');
+  // Start with nothing pre-selected so the user chooses explicitly
+  const [selectedRole, setSelectedRole] = useState<UserRole | null>(initialRole || null);
+  const [whoYouAre, setWhoYouAre] = useState<GenderIdentity | null>(null);
+  const [whoToMeet, setWhoToMeet] = useState<GenderPreference | null>(null);
+  const [hasPromptError, setHasPromptError] = useState(false);
 
   const handleContinue = () => {
+    // If user hasn't selected a role or gender yet, show subtle guidance
+    if (!selectedRole && !whoYouAre) {
+      setHasPromptError(true);
+      return;
+    }
+
+    const effectiveRole: UserRole = selectedRole || (whoYouAre === 'Women' ? 'guest' : 'host');
+    const effectiveWhoYouAre: GenderIdentity = whoYouAre || (effectiveRole === 'guest' ? 'Women' : 'Men');
+    const effectiveWhoToMeet: GenderPreference = whoToMeet || (effectiveWhoYouAre === 'Women' ? 'Men' : 'Women');
+
     // Exact user navigation rules:
     // 1. If user is 'Women' OR role is 'guest' -> navigate to Guest Events (Where Should The Offer Take Them?)
     // 2. If user is 'Men' (or Everyone) and role is 'host' -> navigate to Step 2 Interests
-    if (whoYouAre === 'Women' || selectedRole === 'guest') {
+    if (effectiveWhoYouAre === 'Women' || effectiveRole === 'guest') {
       if (onJoinAsGuestDirect) {
         onJoinAsGuestDirect();
       } else if (onContinueToStep2) {
         onContinueToStep2({
           role: 'guest',
-          whoYouAre,
-          whoToMeet,
+          whoYouAre: effectiveWhoYouAre,
+          whoToMeet: effectiveWhoToMeet,
         });
       }
     } else {
@@ -45,8 +57,8 @@ export function Step1Begin({
       } else if (onContinueToStep2) {
         onContinueToStep2({
           role: 'host',
-          whoYouAre,
-          whoToMeet,
+          whoYouAre: effectiveWhoYouAre,
+          whoToMeet: effectiveWhoToMeet,
         });
       }
     }
@@ -102,7 +114,10 @@ export function Step1Begin({
           
           {/* Card 1: Host */}
           <div
-            onClick={() => setSelectedRole('host')}
+            onClick={() => {
+              setSelectedRole('host');
+              setHasPromptError(false);
+            }}
             className={`bg-[#F5F1E6] rounded-[22px] sm:rounded-[24px] p-5 flex flex-col justify-between min-h-[185px] sm:min-h-[195px] cursor-pointer transition-all ${
               selectedRole === 'host'
                 ? 'border-[1.5px] border-[#9F1E19] shadow-xs ring-1 ring-[#9F1E19]/10'
@@ -130,8 +145,8 @@ export function Step1Begin({
                 } else if (onContinueToStep2) {
                   onContinueToStep2({
                     role: 'host',
-                    whoYouAre,
-                    whoToMeet,
+                    whoYouAre: whoYouAre || 'Men',
+                    whoToMeet: whoToMeet || 'Women',
                   });
                 }
               }}
@@ -143,7 +158,10 @@ export function Step1Begin({
 
           {/* Card 2: Guest of Honor */}
           <div
-            onClick={() => setSelectedRole('guest')}
+            onClick={() => {
+              setSelectedRole('guest');
+              setHasPromptError(false);
+            }}
             className={`bg-[#F5F1E6] rounded-[22px] sm:rounded-[24px] p-5 flex flex-col justify-between min-h-[185px] sm:min-h-[195px] cursor-pointer transition-all ${
               selectedRole === 'guest'
                 ? 'border-[1.5px] border-[#9F1E19] shadow-xs ring-1 ring-[#9F1E19]/10'
@@ -171,8 +189,8 @@ export function Step1Begin({
                 } else if (onContinueToStep2) {
                   onContinueToStep2({
                     role: 'guest',
-                    whoYouAre,
-                    whoToMeet,
+                    whoYouAre: whoYouAre || 'Women',
+                    whoToMeet: whoToMeet || 'Men',
                   });
                 }
               }}
@@ -194,7 +212,10 @@ export function Step1Begin({
               <button
                 key={option}
                 type="button"
-                onClick={() => setWhoYouAre(option)}
+                onClick={() => {
+                  setWhoYouAre(option);
+                  setHasPromptError(false);
+                }}
                 className={`w-full sm:w-auto text-center text-xs font-medium py-3 sm:py-2.5 sm:px-6 rounded-full transition-all cursor-pointer ${
                   whoYouAre === option
                     ? 'bg-[#16120F] text-white shadow-xs'
@@ -217,7 +238,10 @@ export function Step1Begin({
               <button
                 key={option}
                 type="button"
-                onClick={() => setWhoToMeet(option)}
+                onClick={() => {
+                  setWhoToMeet(option);
+                  setHasPromptError(false);
+                }}
                 className={`w-full sm:w-auto text-center text-xs font-medium py-3 sm:py-2.5 sm:px-6 rounded-full transition-all cursor-pointer ${
                   whoToMeet === option
                     ? 'bg-[#16120F] text-white shadow-xs'
@@ -232,6 +256,12 @@ export function Step1Begin({
 
         {/* Continue Button & ID verification note */}
         <div className="mt-6 sm:mt-8 pt-1 text-center">
+          {hasPromptError && (
+            <p className="text-xs text-[#9F1E19] font-medium mb-3 animate-in fade-in">
+              Please select a role or who you are to continue.
+            </p>
+          )}
+
           <button
             type="button"
             onClick={handleContinue}

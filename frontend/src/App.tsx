@@ -58,7 +58,7 @@ export function App() {
     return 'landing';
   });
 
-  const [initialRole, setInitialRole] = useState<UserRole>('host');
+  const [initialRole, setInitialRole] = useState<UserRole | null>(null);
   const [step2Source, setStep2Source] = useState<'events' | 'host'>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash;
@@ -68,8 +68,8 @@ export function App() {
     return 'events';
   });
 
-  const navigateToStep1 = (role: UserRole = 'host') => {
-    setInitialRole(role);
+  const navigateToStep1 = (role?: UserRole | null) => {
+    setInitialRole(role || null);
     setCurrentView('onboarding-step1');
     if (typeof window !== 'undefined') {
       window.history.pushState({ view: 'onboarding-step1' }, '', '#join');
