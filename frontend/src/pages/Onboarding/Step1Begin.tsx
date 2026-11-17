@@ -27,28 +27,29 @@ export function Step1Begin({
   const [whoToMeet, setWhoToMeet] = useState<GenderPreference | null>(null);
   const [hasPromptError, setHasPromptError] = useState(false);
 
+  const canContinue = Boolean(whoYouAre && whoToMeet);
+
   const handleContinue = () => {
-    // If user hasn't selected a role or gender yet, show subtle guidance
-    if (!selectedRole && !whoYouAre) {
+    // Both 'Who You Are' and 'Who Would You Like To Meet' MUST be selected for Continue button navigation
+    if (!whoYouAre || !whoToMeet) {
       setHasPromptError(true);
       return;
     }
 
+    setHasPromptError(false);
     const effectiveRole: UserRole = selectedRole || (whoYouAre === 'Women' ? 'guest' : 'host');
-    const effectiveWhoYouAre: GenderIdentity = whoYouAre || (effectiveRole === 'guest' ? 'Women' : 'Men');
-    const effectiveWhoToMeet: GenderPreference = whoToMeet || (effectiveWhoYouAre === 'Women' ? 'Men' : 'Women');
 
     // Exact user navigation rules:
     // 1. If user is 'Women' OR role is 'guest' -> navigate to Guest Events (Where Should The Offer Take Them?)
     // 2. If user is 'Men' (or Everyone) and role is 'host' -> navigate to Step 2 Interests
-    if (effectiveWhoYouAre === 'Women' || effectiveRole === 'guest') {
+    if (whoYouAre === 'Women' || effectiveRole === 'guest') {
       if (onJoinAsGuestDirect) {
         onJoinAsGuestDirect();
       } else if (onContinueToStep2) {
         onContinueToStep2({
           role: 'guest',
-          whoYouAre: effectiveWhoYouAre,
-          whoToMeet: effectiveWhoToMeet,
+          whoYouAre,
+          whoToMeet,
         });
       }
     } else {
@@ -57,8 +58,8 @@ export function Step1Begin({
       } else if (onContinueToStep2) {
         onContinueToStep2({
           role: 'host',
-          whoYouAre: effectiveWhoYouAre,
-          whoToMeet: effectiveWhoToMeet,
+          whoYouAre,
+          whoToMeet,
         });
       }
     }
@@ -256,16 +257,20 @@ export function Step1Begin({
 
         {/* Continue Button & ID verification note */}
         <div className="mt-6 sm:mt-8 pt-1 text-center">
-          {hasPromptError && (
+          {hasPromptError && (!whoYouAre || !whoToMeet) && (
             <p className="text-xs text-[#9F1E19] font-medium mb-3 animate-in fade-in">
-              Please select a role or who you are to continue.
+              Please select who you are and who you would like to meet to continue.
             </p>
           )}
 
           <button
             type="button"
             onClick={handleContinue}
-            className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-4 sm:py-3.5 px-10 rounded-full transition-colors shadow-sm text-center cursor-pointer active:scale-[0.99]"
+            className={`w-full font-bold text-xs py-4 sm:py-3.5 px-10 rounded-full transition-all text-center shadow-sm ${
+              canContinue
+                ? 'bg-[#9F1E19] hover:bg-[#851713] text-white cursor-pointer active:scale-[0.99]'
+                : 'bg-[#9F1E19]/45 text-white/80 cursor-not-allowed'
+            }`}
           >
             Continue
           </button>
