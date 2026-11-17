@@ -22,6 +22,7 @@ import { SearchPreferenceModal, SearchPreferenceFilters } from './SearchPreferen
 import { OfferEventsView } from './OfferEventsView';
 import { OffersView } from './OffersView';
 import { ConfirmedDatesView } from './ConfirmedDatesView';
+import { ProfileView } from './ProfileView';
 
 export interface DiscoverProfile {
   id: string;
@@ -136,6 +137,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
     if (typeof window !== 'undefined') {
       if (window.location.hash === '#offers') return 'offers';
       if (window.location.hash === '#dates') return 'dates';
+      if (window.location.hash === '#profile') return 'profile';
     }
     return 'explore';
   });
@@ -329,10 +331,14 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             <button
               type="button"
               onClick={() => setActiveTab('profile')}
-              className="w-10 h-10 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#16120F] hover:bg-[#F5F1E6] hover:border-[#9F1E19]/30 transition-all shadow-xs cursor-pointer"
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-xs cursor-pointer ${
+                activeTab === 'profile'
+                  ? 'bg-[#9F1E19] text-white'
+                  : 'bg-[#FAF7F2] border border-[#EADBCA] text-[#16120F] hover:bg-[#F5F1E6]'
+              }`}
               aria-label="My Profile"
             >
-              <User className="w-4 h-4 text-[#16120F]" />
+              <User className="w-4 h-4" />
             </button>
           </div>
 
@@ -347,6 +353,8 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
           <OffersView onNavigateExplore={() => setActiveTab('explore')} />
         ) : activeTab === 'dates' ? (
           <ConfirmedDatesView />
+        ) : activeTab === 'profile' ? (
+          <ProfileView />
         ) : (
           <>
             {/* Search Bar + Filter Button (Pill Container) */}

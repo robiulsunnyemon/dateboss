@@ -8,3 +8,4 @@ export { OffersView } from './OffersView';
 export type { OfferFilterType, OfferItem, CounterOfferItem, PassOfferItem } from './OffersView';
 export { ConfirmedDatesView } from './ConfirmedDatesView';
 export type { ConfirmedDateItem } from './ConfirmedDatesView';
+export { ProfileView } from './ProfileView';
