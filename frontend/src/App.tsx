@@ -8,11 +8,12 @@ import {
   Step5Lifestyle,
   Step6Career,
   Step7Prompts,
+  Step8Photos,
 } from './pages/Onboarding';
 import { UserRole } from './types/onboarding';
 
 export function App() {
-  // Routing view state: 'landing' | 'onboarding-step1' | 'onboarding-step2' | 'onboarding-step3' | 'onboarding-step4' | 'onboarding-step5' | 'onboarding-step6' | 'onboarding-step7'
+  // Routing view state: 'landing' | 'onboarding-step1' .. 'onboarding-step8'
   const [currentView, setCurrentView] = useState<
     | 'landing'
     | 'onboarding-step1'
@@ -22,10 +23,12 @@ export function App() {
     | 'onboarding-step5'
     | 'onboarding-step6'
     | 'onboarding-step7'
+    | 'onboarding-step8'
   >(() => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       const hash = window.location.hash;
+      if (path === '/step8' || hash === '#step8' || hash === '#photos') return 'onboarding-step8';
       if (path === '/step7' || hash === '#step7' || hash === '#prompts') return 'onboarding-step7';
       if (path === '/step6' || hash === '#step6' || hash === '#career') return 'onboarding-step6';
       if (path === '/step5' || hash === '#step5' || hash === '#lifestyle') return 'onboarding-step5';
@@ -96,6 +99,14 @@ export function App() {
     }
   };
 
+  const navigateToStep8 = () => {
+    setCurrentView('onboarding-step8');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'onboarding-step8' }, '', '#step8');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const navigateToLanding = () => {
     setCurrentView('landing');
     if (typeof window !== 'undefined') {
@@ -109,7 +120,9 @@ export function App() {
     const handlePopState = () => {
       const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/step7' || hash === '#step7' || hash === '#prompts') {
+      if (path === '/step8' || hash === '#step8' || hash === '#photos') {
+        setCurrentView('onboarding-step8');
+      } else if (path === '/step7' || hash === '#step7' || hash === '#prompts') {
         setCurrentView('onboarding-step7');
       } else if (path === '/step6' || hash === '#step6' || hash === '#career') {
         setCurrentView('onboarding-step6');
@@ -191,8 +204,17 @@ export function App() {
     return (
       <Step7Prompts
         onBack={() => navigateToStep6()}
-        onSkip={() => navigateToLanding()}
-        onContinue={(_data) => {
+        onSkip={() => navigateToStep8()}
+        onContinue={() => navigateToStep8()}
+      />
+    );
+  }
+
+  if (currentView === 'onboarding-step8') {
+    return (
+      <Step8Photos
+        onBack={() => navigateToStep7()}
+        onContinue={(_photos) => {
           navigateToLanding();
         }}
       />
