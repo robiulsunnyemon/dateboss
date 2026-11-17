@@ -18,6 +18,7 @@ import {
   ArrowRight,
   ShieldCheck,
 } from 'lucide-react';
+import { SearchPreferenceModal, SearchPreferenceFilters } from './SearchPreferenceModal';
 
 export interface DiscoverProfile {
   id: string;
@@ -148,10 +149,11 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
   // View Profile Modal state
   const [viewProfileModal, setViewProfileModal] = useState<DiscoverProfile | null>(null);
 
-  // Filter Drawer / Modal
+  // Filter Drawer / Modal & Search Preferences
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [maxDistance, setMaxDistance] = useState<number>(20);
   const [minReliability, setMinReliability] = useState<number>(4.5);
+  const [searchPreferences, setSearchPreferences] = useState<Partial<SearchPreferenceFilters>>({});
 
   // Filtered profiles list
   const filteredProfiles = useMemo(() => {
@@ -168,6 +170,28 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       if (profile.reliability < minReliability) {
         return false;
       }
+      // Search Preference filters (Age, Location, Keywords)
+      if (searchPreferences.minAge && profile.age < searchPreferences.minAge) {
+        return false;
+      }
+      if (searchPreferences.maxAge && profile.age > searchPreferences.maxAge) {
+        return false;
+      }
+      if (searchPreferences.location && searchPreferences.location.trim()) {
+        const loc = searchPreferences.location.toLowerCase();
+        if (profile.location && !profile.location.toLowerCase().includes(loc)) {
+          return false;
+        }
+      }
+      if (searchPreferences.keywords && searchPreferences.keywords.trim()) {
+        const kw = searchPreferences.keywords.toLowerCase();
+        const matchName = profile.name.toLowerCase().includes(kw);
+        const matchBio = profile.bio.toLowerCase().includes(kw);
+        const matchInterests = profile.interests?.some((i) => i.toLowerCase().includes(kw));
+        if (!matchName && !matchBio && !matchInterests) {
+          return false;
+        }
+      }
       // Search filter
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
@@ -180,7 +204,22 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       }
       return true;
     });
-  }, [selectedCategory, maxDistance, minReliability, searchQuery]);
+  }, [selectedCategory, maxDistance, minReliability, searchQuery, searchPreferences]);
+
+  const handleApplyPreferences = (filters: SearchPreferenceFilters) => {
+    setSearchPreferences(filters);
+    if (filters.keywords) {
+      setSearchQuery(filters.keywords);
+    }
+    setIsFilterModalOpen(false);
+  };
+
+  const handleResetPreferences = () => {
+    setSearchPreferences({});
+    setSearchQuery('');
+    setSelectedCategory(null);
+    setIsFilterModalOpen(false);
+  };
 
   const handleSendOfferSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -902,80 +941,15 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       )}
 
       {/* ============================================================ */}
-      {/* 8. QUICK FILTER MODAL                                        */}
+      {/* 8. SEARCH PREFERENCE MODAL (FIGMA / ATTACHMENT DESIGN)        */}
       {/* ============================================================ */}
-      {isFilterModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[28px] max-w-[420px] w-full p-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-4 border-b border-[#EADBCA]">
-              <h3 className="font-serif font-bold text-lg text-[#16120F]">
-                Filter Discover
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsFilterModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-[#F5F1E6] hover:bg-[#EADBCA] text-[#16120F] flex items-center justify-center cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="py-4 space-y-5">
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5">
-                  <span>Max Distance</span>
-                  <span className="text-[#9F1E19]">{maxDistance} km</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="50"
-                  value={maxDistance}
-                  onChange={(e) => setMaxDistance(Number(e.target.value))}
-                  className="w-full accent-[#9F1E19]"
-                />
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1.5">
-                  <span>Min Reliability Score</span>
-                  <span className="text-[#9F1E19]">{minReliability.toFixed(1)}+</span>
-                </div>
-                <input
-                  type="range"
-                  min="4.0"
-                  max="5.0"
-                  step="0.1"
-                  value={minReliability}
-                  onChange={(e) => setMinReliability(Number(e.target.value))}
-                  className="w-full accent-[#9F1E19]"
-                />
-              </div>
-            </div>
-
-            <div className="pt-2 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setIsFilterModalOpen(false)}
-                className="flex-1 bg-[#9F1E19] hover:bg-[#851713] text-white text-xs py-2.5 rounded-full font-medium"
-              >
-                Apply Filters
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMaxDistance(50);
-                  setMinReliability(4.0);
-                  setIsFilterModalOpen(false);
-                }}
-                className="px-4 py-2.5 text-xs text-[#6E6A63] hover:text-[#16120F]"
-              >
-                Reset
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SearchPreferenceModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        onApply={handleApplyPreferences}
+        onReset={handleResetPreferences}
+        initialFilters={searchPreferences}
+      />
 
       {/* ============================================================ */}
       {/* 9. SUCCESS TOAST NOTIFICATION                                */}
