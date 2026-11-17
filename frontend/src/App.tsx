@@ -10,11 +10,12 @@ import {
   Step7Prompts,
   Step8Photos,
   Step9SelfieVerification,
+  Step10FaceCenterStage,
 } from './pages/Onboarding';
 import { UserRole } from './types/onboarding';
 
 export function App() {
-  // Routing view state: 'landing' | 'onboarding-step1' .. 'onboarding-step9'
+  // Routing view state: 'landing' | 'onboarding-step1' .. 'onboarding-step10'
   const [currentView, setCurrentView] = useState<
     | 'landing'
     | 'onboarding-step1'
@@ -26,10 +27,12 @@ export function App() {
     | 'onboarding-step7'
     | 'onboarding-step8'
     | 'onboarding-step9'
+    | 'onboarding-step10'
   >(() => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       const hash = window.location.hash;
+      if (path === '/step10' || hash === '#step10' || hash === '#face' || hash === '#video-check') return 'onboarding-step10';
       if (path === '/step9' || hash === '#step9' || hash === '#verification' || hash === '#selfie') return 'onboarding-step9';
       if (path === '/step8' || hash === '#step8' || hash === '#photos') return 'onboarding-step8';
       if (path === '/step7' || hash === '#step7' || hash === '#prompts') return 'onboarding-step7';
@@ -118,6 +121,14 @@ export function App() {
     }
   };
 
+  const navigateToStep10 = () => {
+    setCurrentView('onboarding-step10');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'onboarding-step10' }, '', '#step10');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const navigateToLanding = () => {
     setCurrentView('landing');
     if (typeof window !== 'undefined') {
@@ -131,7 +142,9 @@ export function App() {
     const handlePopState = () => {
       const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/step9' || hash === '#step9' || hash === '#verification' || hash === '#selfie') {
+      if (path === '/step10' || hash === '#step10' || hash === '#face' || hash === '#video-check') {
+        setCurrentView('onboarding-step10');
+      } else if (path === '/step9' || hash === '#step9' || hash === '#verification' || hash === '#selfie') {
         setCurrentView('onboarding-step9');
       } else if (path === '/step8' || hash === '#step8' || hash === '#photos') {
         setCurrentView('onboarding-step8');
@@ -240,6 +253,17 @@ export function App() {
         onBack={() => navigateToStep8()}
         onSkip={() => navigateToLanding()}
         onContinue={() => {
+          navigateToStep10();
+        }}
+      />
+    );
+  }
+
+  if (currentView === 'onboarding-step10') {
+    return (
+      <Step10FaceCenterStage
+        onBack={() => navigateToStep9()}
+        onStartVideoCheck={() => {
           navigateToLanding();
         }}
       />
