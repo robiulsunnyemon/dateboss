@@ -130,14 +130,8 @@ const DEFAULT_EVENTS: OutingOption[] = [
 ];
 
 export function Step2GuestEvents({ onBack, onContinue }: Step2GuestEventsProps) {
-  // Pre-selected 5 events matching the screenshot (Weddings, Coffee, Museums, Cooking, Day Trips)
-  const [selectedIds, setSelectedIds] = useState<string[]>([
-    'weddings',
-    'coffee',
-    'museums',
-    'cooking',
-    'day-trips',
-  ]);
+  // Start with empty selection so no cards are selected initially (0 chosen)
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const [customIdeas, setCustomIdeas] = useState<
     Array<{ title: string; description: string }>
