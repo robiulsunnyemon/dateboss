@@ -6,3 +6,4 @@ export { Step5Lifestyle } from './Step5Lifestyle';
 export { Step6Career } from './Step6Career';
 export { Step7Prompts } from './Step7Prompts';
 export { Step8Photos } from './Step8Photos';
+export { Step9SelfieVerification } from './Step9SelfieVerification';
