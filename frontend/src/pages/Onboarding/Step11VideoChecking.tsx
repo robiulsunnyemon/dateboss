@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
 interface Step11VideoCheckingProps {
@@ -26,6 +26,17 @@ export function Step11VideoChecking({
   onBack,
   onComplete,
 }: Step11VideoCheckingProps) {
+  // Automatically advance to Step 12 when loading completes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (onComplete) {
+        onComplete();
+      }
+    }, 2400);
+
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
   return (
     <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#1E1C1A]">
       {/* Container: Edge-to-edge on mobile, centered card on desktop matching Figma */}
