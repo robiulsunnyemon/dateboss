@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { SearchPreferenceModal, SearchPreferenceFilters } from './SearchPreferenceModal';
 import { OfferEventsView } from './OfferEventsView';
+import { OffersView } from './OffersView';
 
 export interface DiscoverProfile {
   id: string;
@@ -237,44 +238,6 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
     }, 3500);
   };
 
-  // If Offers tab is selected, render the Where Should The Offer Take Them screen
-  if (activeTab === 'offers') {
-    return (
-      <div className="relative">
-        <OfferEventsView
-          onBack={() => {
-            setActiveTab('explore');
-            if (typeof window !== 'undefined') {
-              window.location.hash = '#discover';
-            }
-          }}
-          onContinue={(events) => {
-            setShowOfferSuccessToast(true);
-            setActiveTab('explore');
-            if (typeof window !== 'undefined') {
-              window.location.hash = '#discover';
-            }
-            setTimeout(() => {
-              setShowOfferSuccessToast(false);
-            }, 3500);
-          }}
-        />
-
-        {showOfferSuccessToast && (
-          <div className="fixed bottom-6 right-6 z-50 bg-[#16120F] text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10 animate-in slide-in-from-bottom-5 duration-300">
-            <div className="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center shrink-0">
-              <Check className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-white">Offer created successfully!</p>
-              <p className="text-[11px] text-white/70">Preferences have been updated.</p>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen w-full bg-[#EFE7DA] font-sans antialiased text-[#16120F] flex flex-col justify-between selection:bg-[#9F1E19]/15 pb-20 sm:pb-0">
       
@@ -329,7 +292,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
               type="button"
               onClick={() => setActiveTab('offers')}
               className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer ${
-                (activeTab as string) === 'offers'
+                activeTab === 'offers'
                   ? 'bg-[#9F1E19] text-white shadow-xs'
                   : 'text-[#6E6A63] hover:text-[#16120F] hover:bg-[#F5F1E6]'
               }`}
@@ -378,9 +341,12 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       {/* 2. MAIN CONTENT AREA                                        */}
       {/* ============================================================ */}
       <main className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1">
-        
-        {/* Search Bar + Filter Button (Pill Container) */}
-        <div className="w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-full p-1.5 sm:p-2 flex items-center shadow-xs transition-shadow focus-within:shadow-md focus-within:border-[#9F1E19]/40">
+        {activeTab === 'offers' ? (
+          <OffersView />
+        ) : (
+          <>
+            {/* Search Bar + Filter Button (Pill Container) */}
+            <div className="w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-full p-1.5 sm:p-2 flex items-center shadow-xs transition-shadow focus-within:shadow-md focus-within:border-[#9F1E19]/40">
           <div className="pl-3 sm:pl-4 pr-2 text-[#6E6A63]">
             <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#6E6A63]" />
           </div>
@@ -559,6 +525,8 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             </div>
           )}
         </section>
+        </>
+      )}
 
       </main>
 
@@ -632,7 +600,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
           type="button"
           onClick={() => setActiveTab('offers')}
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
-            (activeTab as string) === 'offers' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
+            activeTab === 'offers' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
           }`}
         >
           <Send className="w-5 h-5 rotate-45" />

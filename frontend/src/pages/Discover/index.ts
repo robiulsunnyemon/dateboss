@@ -4,3 +4,5 @@ export { SearchPreferenceModal } from './SearchPreferenceModal';
 export type { SearchPreferenceFilters } from './SearchPreferenceModal';
 export { OfferEventsView } from './OfferEventsView';
 export type { OfferEventsViewProps } from './OfferEventsView';
+export { OffersView } from './OffersView';
+export type { OfferFilterType, OfferItem } from './OffersView';
