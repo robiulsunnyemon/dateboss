@@ -20,8 +20,6 @@ export function Step1Begin({
   onJoinAsHostDirect,
   onJoinAsGuestDirect,
 }: Step1BeginProps) {
-  // Always start with nothing pre-selected (even on browser Back navigation)
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [whoYouAre, setWhoYouAre] = useState<GenderIdentity | null>(null);
   const [whoToMeet, setWhoToMeet] = useState<GenderPreference | null>(null);
   const [hasPromptError, setHasPromptError] = useState(false);
@@ -36,12 +34,11 @@ export function Step1Begin({
     }
 
     setHasPromptError(false);
-    const effectiveRole: UserRole = selectedRole || (whoYouAre === 'Women' ? 'guest' : 'host');
 
     // Exact user navigation rules:
-    // 1. If user is 'Women' OR role is 'guest' -> navigate to Guest Events (Where Should The Offer Take Them?)
-    // 2. If user is 'Men' (or Everyone) and role is 'host' -> navigate to Step 2 Interests
-    if (whoYouAre === 'Women' || effectiveRole === 'guest') {
+    // 1. If user is 'Women' -> navigate to Guest Events (Where Should The Offer Take Them?)
+    // 2. If user is 'Men' (or Everyone) -> navigate to Step 2 Interests
+    if (whoYouAre === 'Women') {
       if (onJoinAsGuestDirect) {
         onJoinAsGuestDirect();
       } else if (onContinueToStep2) {
@@ -112,18 +109,8 @@ export function Step1Begin({
         {/* Two Role Cards (Stacked on mobile, side-by-side on desktop) */}
         <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3.5 sm:gap-4 my-5 sm:my-6">
           
-          {/* Card 1: Host */}
-          <div
-            onClick={() => {
-              setSelectedRole('host');
-              setHasPromptError(false);
-            }}
-            className={`bg-[#F5F1E6] rounded-[22px] sm:rounded-[24px] p-5 flex flex-col justify-between min-h-[185px] sm:min-h-[195px] cursor-pointer transition-all ${
-              selectedRole === 'host'
-                ? 'border-[1.5px] border-[#9F1E19] shadow-xs ring-1 ring-[#9F1E19]/10'
-                : 'border border-[#E8DFD0] hover:border-[#9F1E19]/60'
-            }`}
-          >
+          {/* Card 1: Host (Hover effect only, not selectable as a card) */}
+          <div className="bg-[#F5F1E6] rounded-[22px] sm:rounded-[24px] p-5 flex flex-col justify-between min-h-[185px] sm:min-h-[195px] border border-[#E8DFD0] hover:border-[#9F1E19]/40 hover:shadow-xs transition-all">
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 text-xs text-[#6E6A63]">
                 <span className="text-[#FCB943] text-sm leading-none">👑</span>
@@ -137,9 +124,7 @@ export function Step1Begin({
             {/* Direct Join as Host button -> directly navigates to Step 2 Interests */}
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedRole('host');
+              onClick={() => {
                 if (onJoinAsHostDirect) {
                   onJoinAsHostDirect();
                 } else if (onContinueToStep2) {
@@ -156,18 +141,8 @@ export function Step1Begin({
             </button>
           </div>
 
-          {/* Card 2: Guest of Honor */}
-          <div
-            onClick={() => {
-              setSelectedRole('guest');
-              setHasPromptError(false);
-            }}
-            className={`bg-[#F5F1E6] rounded-[22px] sm:rounded-[24px] p-5 flex flex-col justify-between min-h-[185px] sm:min-h-[195px] cursor-pointer transition-all ${
-              selectedRole === 'guest'
-                ? 'border-[1.5px] border-[#9F1E19] shadow-xs ring-1 ring-[#9F1E19]/10'
-                : 'border border-[#E8DFD0] hover:border-[#9F1E19]/60'
-            }`}
-          >
+          {/* Card 2: Guest of Honor (Hover effect only, not selectable as a card) */}
+          <div className="bg-[#F5F1E6] rounded-[22px] sm:rounded-[24px] p-5 flex flex-col justify-between min-h-[185px] sm:min-h-[195px] border border-[#E8DFD0] hover:border-[#9F1E19]/40 hover:shadow-xs transition-all">
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 text-xs text-[#6E6A63]">
                 <span className="text-[#8E8A83] text-sm leading-none">👑</span>
@@ -181,9 +156,7 @@ export function Step1Begin({
             {/* Direct Join as Guest button -> directly navigates to Guest Events */}
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedRole('guest');
+              onClick={() => {
                 if (onJoinAsGuestDirect) {
                   onJoinAsGuestDirect();
                 } else if (onContinueToStep2) {
