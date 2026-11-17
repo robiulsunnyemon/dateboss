@@ -7,9 +7,9 @@ interface Step8PhotosProps {
 }
 
 export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
-  // Slots: slot 0 is the main photo (initial guy profile photo matching Figma)
+  // Slots: initially NO photo selected (all 6 slots are null as requested)
   const [photos, setPhotos] = useState<(string | null)[]>([
-    '/assets/profile-sample.jpg',
+    null,
     null,
     null,
     null,
@@ -59,7 +59,7 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#1E1C1A]">
+    <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#1E1C1A]">
       {/* Hidden file input for uploading */}
       <input
         type="file"
@@ -70,7 +70,7 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
       />
 
       {/* Container: Edge-to-edge on mobile, centered card on desktop matching Figma */}
-      <div className="w-full max-w-[760px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
+      <div className="w-full max-w-[720px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-7 lg:p-9 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
         
         {/* Top Header: Dark Red Rounded Back Button + Official thedateboss Logo */}
         <div className="flex items-center gap-3 pt-1 sm:pt-0">
@@ -100,25 +100,25 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
         </div>
 
         {/* Main Headline */}
-        <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#1A1816] tracking-tight leading-tight mt-6 sm:mt-7">
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#1A1816] tracking-tight leading-tight mt-5 sm:mt-6">
           Make Your Profile Shine!
         </h1>
 
         {/* Subtitles */}
-        <p className="text-[#6E6860] text-xs sm:text-sm font-normal mt-1.5 leading-relaxed">
+        <p className="text-[#6E6860] text-xs sm:text-sm font-normal mt-1 leading-relaxed">
           Add at least <span className="font-semibold text-[#1A1816]">1 photos</span> to get started.
         </p>
-        <p className="text-[#8E8880] text-[11px] sm:text-xs font-normal mt-2 mb-6 sm:mb-8 leading-relaxed max-w-[620px]">
+        <p className="text-[#8E8880] text-[11px] sm:text-xs font-normal mt-1.5 mb-5 sm:mb-6 leading-relaxed max-w-[580px]">
           Profiles with multiple photos attract more attention and messages! Upload up to 6 photos at a time. You can add up to 20 photos and videos to your profile in total.
         </p>
 
         {/* Photo Grid: 3-column layout where Slot 1 spans 2 cols & 2 rows */}
-        <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 max-w-[620px]">
+        <div className="grid grid-cols-3 gap-2.5 sm:gap-3 max-w-[520px]">
           
           {/* Slot 0: Main Profile Photo (col-span-2 row-span-2) */}
           <div
             onClick={() => handleSlotClick(0)}
-            className="col-span-2 row-span-2 relative aspect-[4/4.3] sm:aspect-square bg-[#FAF4EB] border border-[#B3262E]/70 rounded-[20px] sm:rounded-[24px] overflow-hidden cursor-pointer group shadow-xs"
+            className="col-span-2 row-span-2 relative aspect-[4/4.3] sm:aspect-square bg-[#FAF4EB] border border-[#B3262E]/70 rounded-[20px] sm:rounded-[24px] overflow-hidden cursor-pointer group shadow-xs transition-all hover:border-[#961C23]"
           >
             {photos[0] ? (
               <>
@@ -145,9 +145,9 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
                 </button>
               </>
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-[#961C23] hover:text-[#7D141A] transition-colors">
-                <CameraPlusIcon className="w-8 h-8 sm:w-10 sm:h-10" />
-                <span className="text-[11px] font-medium mt-2 text-[#8E8880]">Add main photo</span>
+              <div className="w-full h-full flex flex-col items-center justify-center text-[#961C23] group-hover:scale-105 transition-transform p-4">
+                <CameraPlusIcon className="w-8 h-8 sm:w-9 sm:h-9" />
+                <span className="text-[10px] sm:text-[11px] font-normal mt-2 text-[#8E8880]">Add main photo</span>
               </div>
             )}
           </div>
@@ -197,7 +197,7 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
         {/* Footer Actions:
             Mobile: Full width Upload button on top, Back text below.
             Desktop: Back text on left, compact red Upload button on right. */}
-        <div className="pt-8 sm:pt-10">
+        <div className="pt-6 sm:pt-7">
           {/* Desktop Layout: Back + Continue button side-by-side */}
           <div className="hidden sm:flex items-center gap-4">
             <button
