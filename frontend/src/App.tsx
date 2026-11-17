@@ -3,6 +3,7 @@ import { LandingPage } from './pages/Landing';
 import {
   Step1Begin,
   Step2Interests,
+  Step2GuestEvents,
   Step3Account,
   Step4Details,
   Step5Lifestyle,
@@ -17,10 +18,11 @@ import {
 import { UserRole } from './types/onboarding';
 
 export function App() {
-  // Routing view state: 'landing' | 'onboarding-step1' .. 'onboarding-step12'
+  // Routing view state: 'landing' | 'onboarding-step1' | 'onboarding-guest-events' | 'onboarding-step2' .. 'onboarding-step12'
   const [currentView, setCurrentView] = useState<
     | 'landing'
     | 'onboarding-step1'
+    | 'onboarding-guest-events'
     | 'onboarding-step2'
     | 'onboarding-step3'
     | 'onboarding-step4'
@@ -46,6 +48,7 @@ export function App() {
       if (path === '/step5' || hash === '#step5' || hash === '#lifestyle') return 'onboarding-step5';
       if (path === '/step4' || hash === '#step4' || hash === '#details') return 'onboarding-step4';
       if (path === '/step3' || hash === '#step3' || hash === '#account') return 'onboarding-step3';
+      if (path === '/events' || hash === '#events' || hash === '#guest-events') return 'onboarding-guest-events';
       if (path === '/step2' || hash === '#step2' || hash === '#host') return 'onboarding-step2';
       if (path === '/join' || hash === '#join') return 'onboarding-step1';
     }
@@ -59,6 +62,14 @@ export function App() {
     setCurrentView('onboarding-step1');
     if (typeof window !== 'undefined') {
       window.history.pushState({ view: 'onboarding-step1' }, '', '#join');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const navigateToGuestEvents = () => {
+    setCurrentView('onboarding-guest-events');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'onboarding-guest-events' }, '', '#events');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -184,6 +195,8 @@ export function App() {
         setCurrentView('onboarding-step4');
       } else if (path === '/step3' || hash === '#step3' || hash === '#account') {
         setCurrentView('onboarding-step3');
+      } else if (path === '/events' || hash === '#events' || hash === '#guest-events') {
+        setCurrentView('onboarding-guest-events');
       } else if (path === '/step2' || hash === '#step2' || hash === '#host') {
         setCurrentView('onboarding-step2');
       } else if (path === '/join' || hash === '#join') {
@@ -201,7 +214,23 @@ export function App() {
       <Step1Begin
         initialRole={initialRole}
         onBack={navigateToLanding}
-        onContinueToStep2={() => navigateToStep2()}
+        onContinueToStep2={(data) => {
+          // If role is guest OR who you are is Women -> navigate to Where Should The Offer Take Them (Guest Events)
+          if (data.role === 'guest' || data.whoYouAre === 'Women') {
+            navigateToGuestEvents();
+          } else {
+            navigateToStep2();
+          }
+        }}
+      />
+    );
+  }
+
+  if (currentView === 'onboarding-guest-events') {
+    return (
+      <Step2GuestEvents
+        onBack={() => navigateToStep1(initialRole)}
+        onContinue={(_events) => navigateToStep3()}
       />
     );
   }
@@ -218,7 +247,7 @@ export function App() {
   if (currentView === 'onboarding-step3') {
     return (
       <Step3Account
-        onBack={() => navigateToStep2()}
+        onBack={() => navigateToStep1(initialRole)}
         onComplete={() => navigateToStep4()}
         onSignIn={navigateToLanding}
       />
