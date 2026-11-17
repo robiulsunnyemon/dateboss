@@ -15,6 +15,25 @@
   }
 }
 
+@layer utilities {
+  /* Brand Typography Utilities (Adhering to Brand Guide) */
+  .font-brand-display {
+    font-family: 'Lora', Georgia, serif;
+    font-weight: 600;
+    font-style: italic;
+  }
+
+  .font-brand-heading {
+    font-family: 'Lora', Georgia, serif;
+    font-weight: 600;
+  }
+
+  .font-brand-body {
+    font-family: 'Raleway', system-ui, sans-serif;
+    font-weight: 400;
+  }
+}
+
 /* Custom scrollbar matching Brand Guide */
 ::-webkit-scrollbar {
   width: 8px;
