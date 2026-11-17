@@ -15,14 +15,13 @@ interface Step1BeginProps {
 }
 
 export function Step1Begin({
-  initialRole = null,
   onBack,
   onContinueToStep2,
   onJoinAsHostDirect,
   onJoinAsGuestDirect,
 }: Step1BeginProps) {
-  // Start with nothing pre-selected so the user chooses explicitly
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>(initialRole || null);
+  // Always start with nothing pre-selected (even on browser Back navigation)
+  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [whoYouAre, setWhoYouAre] = useState<GenderIdentity | null>(null);
   const [whoToMeet, setWhoToMeet] = useState<GenderPreference | null>(null);
   const [hasPromptError, setHasPromptError] = useState(false);

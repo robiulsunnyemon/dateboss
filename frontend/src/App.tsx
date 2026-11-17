@@ -225,6 +225,7 @@ export function App() {
         setStep2Source('host');
         setCurrentView('onboarding-step2');
       } else if (path === '/join' || hash === '#join') {
+        setInitialRole(null);
         setCurrentView('onboarding-step1');
       } else {
         setCurrentView('landing');
@@ -257,7 +258,7 @@ export function App() {
   if (currentView === 'onboarding-guest-events') {
     return (
       <Step2GuestEvents
-        onBack={() => navigateToStep1(initialRole)}
+        onBack={() => navigateToStep1()}
         onContinue={(_events) => {
           navigateToStep3();
         }}
@@ -268,7 +269,7 @@ export function App() {
   if (currentView === 'onboarding-step2') {
     return (
       <Step2Interests
-        onBack={() => navigateToStep1('host')}
+        onBack={() => navigateToStep1()}
         onContinue={() => navigateToStep3()}
       />
     );
