@@ -9,10 +9,17 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
   "dependencies": {
+    "@prisma/client": "^7.10.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "thedateinc-monorepo": "file:.."
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^7.10.1",
+    "thedateinc-monorepo": "file:..",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

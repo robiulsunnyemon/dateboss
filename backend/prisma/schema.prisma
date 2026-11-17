@@ -1,0 +1,217 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  HOST
+  GUEST
+}
+
+enum Gender {
+  MAN
+  WOMAN
+  OTHER
+}
+
+enum TargetGender {
+  MEN
+  WOMEN
+  EVERYONE
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  COUNTERED
+  PASSED
+  CANCELLED
+  COMPLETED
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+model User {
+  id               String       @id @default(uuid())
+  email            String       @unique
+  passwordHash     String?
+  role             Role         @default(HOST)
+  gender           Gender?
+  targetGender     TargetGender?
+  nickname         String?
+  locationCity     String?
+  latitude         Float?
+  longitude        Float?
+  isVerified       Boolean      @default(false)
+  isActive         Boolean      @default(true)
+  onboardingStep   Int          @default(1)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  // Profile Relations
+  hostProfile      HostProfile?
+  guestProfile     GuestProfile?
+
+  // Date Offer Relations
+  sentOffers       DateOffer[]  @relation("HostSentOffers")
+  receivedOffers   DateOffer[]  @relation("GuestReceivedOffers")
+
+  // Verification & Safety
+  verificationRequests VerificationRequest[] @relation("UserVerifications")
+  reviewedVerifications VerificationRequest[] @relation("AdminReviewedVerifications")
+
+  // Subscription & Payments
+  subscription     Subscription?
+
+  // Messaging
+  sentMessages     Message[]    @relation("SentMessages")
+  receivedMessages Message[]    @relation("ReceivedMessages")
+
+  @@map("users")
+}
+
+model HostProfile {
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  interests      String[]  @default([])
+  occupation     String?
+  education      String?
+  annualIncome   String?
+  netWorth       String?
+  smoking        String?
+  drinking       String?
+  children       String?
+  bio            String?
+  idealDate      String?
+  photos         String[]  @default([])
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("host_profiles")
+}
+
+model GuestProfile {
+  id                String    @id @default(uuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  inviteMeToEvents  String[]  @default([])
+  customDateIdeas   Json?     @default("[]")
+  occupation        String?
+  education         String?
+  smoking           String?
+  drinking          String?
+  children          String?
+  bio               String?
+  idealDate         String?
+  photos            String[]  @default([])
+  reliabilityScore  Float     @default(5.0)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("guest_profiles")
+}
+
+model DateOffer {
+  id                     String      @id @default(uuid())
+  hostId                 String
+  host                   User        @relation("HostSentOffers", fields: [hostId], references: [id], onDelete: Cascade)
+  
+  guestId                String
+  guest                  User        @relation("GuestReceivedOffers", fields: [guestId], references: [id], onDelete: Cascade)
+  
+  activityType           String
+  venueName              String
+  venueAddress           String?
+  proposedDateTime       DateTime
+  hospitalityGuarantee   String?     @default("Host covers all dining & hospitality")
+  personalMessage        String?
+  
+  status                 OfferStatus @default(PENDING)
+  counterNote            String?
+  counterTime            DateTime?
+  counterVenue           String?
+  
+  expiresAt              DateTime
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+
+  messages               Message[]
+
+  @@map("date_offers")
+}
+
+model VerificationRequest {
+  id                String             @id @default(uuid())
+  userId            String
+  user              User               @relation("UserVerifications", fields: [userId], references: [id], onDelete: Cascade)
+  
+  selfieUrl         String
+  faceSnapshotUrl   String
+  status            VerificationStatus @default(PENDING)
+  
+  reviewedById      String?
+  reviewedBy        User?              @relation("AdminReviewedVerifications", fields: [reviewedById], references: [id])
+  rejectionReason   String?
+  
+  createdAt         DateTime           @default(now())
+  reviewedAt        DateTime?
+
+  @@map("verification_requests")
+}
+
+model Subscription {
+  id                     String             @id @default(uuid())
+  userId                 String             @unique
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  plan                   String             @default("HOST_MONTHLY_PRO")
+  priceCents             Int                @default(999)
+  status                 SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId       String?
+  stripeSubscriptionId   String?
+  currentPeriodEnd       DateTime?
+  
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  @@map("subscriptions")
+}
+
+model Message {
+  id          String     @id @default(uuid())
+  offerId     String?
+  offer       DateOffer? @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  
+  senderId    String
+  sender      User       @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  receiverId  String
+  receiver    User       @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  
+  content     String
+  isRead      Boolean    @default(false)
+  
+  createdAt   DateTime   @default(now())
+
+  @@map("messages")
+}
