@@ -278,6 +278,7 @@ export function App() {
   if (currentView === 'onboarding-step3') {
     return (
       <Step3Account
+        userRole={step2Source === 'events' ? 'guest' : 'host'}
         onBack={() => {
           if (step2Source === 'events' || initialRole === 'guest') {
             navigateToGuestEvents();
@@ -286,7 +287,7 @@ export function App() {
           }
         }}
         onComplete={() => navigateToStep4()}
-        onSignIn={navigateToLanding}
+        onSignIn={() => navigateToDiscover()}
       />
     );
   }

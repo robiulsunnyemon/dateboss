@@ -175,4 +175,66 @@ export class AuthController {
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
   }
+
+  // POST /api/auth/social (Google & Apple auth integration)
+  static async socialAuth(req: Request, res: Response): Promise<void> {
+    try {
+      const { provider, email, name, avatar, role, gender, targetGender } = req.body;
+
+      if (!email) {
+        res.status(400).json({ success: false, message: 'Email is required' });
+        return;
+      }
+
+      const userRole: Role = role === 'GUEST' ? Role.GUEST : Role.HOST;
+
+      let user = await prisma.user.findUnique({
+        where: { email },
+        include: { hostProfile: true, guestProfile: true },
+      });
+
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email,
+            role: userRole,
+            gender: gender as Gender,
+            targetGender: targetGender as TargetGender,
+            nickname: name || (userRole === Role.HOST ? 'Host' : 'Guest'),
+            onboardingStep: 4,
+            ...(userRole === Role.HOST
+              ? { hostProfile: { create: { photos: avatar ? [avatar] : [] } } }
+              : { guestProfile: { create: { photos: avatar ? [avatar] : [] } } }),
+          },
+          include: { hostProfile: true, guestProfile: true },
+        });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        JWT_SECRET,
+        { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions
+      );
+
+      res.json({
+        success: true,
+        message: `${provider || 'Social'} login successful`,
+        data: {
+          token,
+          user: {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            nickname: user.nickname,
+            onboardingStep: user.onboardingStep,
+            isVerified: user.isVerified,
+            profile: user.role === Role.HOST ? user.hostProfile : user.guestProfile,
+          },
+        },
+      });
+    } catch (error: any) {
+      console.error('Social auth error:', error);
+      res.status(500).json({ success: false, message: error.message || 'Internal server error' });
+    }
+  }
 }
