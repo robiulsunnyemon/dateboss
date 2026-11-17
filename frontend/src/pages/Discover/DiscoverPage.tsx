@@ -342,7 +342,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       {/* ============================================================ */}
       <main className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1">
         {activeTab === 'offers' ? (
-          <OffersView />
+          <OffersView onNavigateExplore={() => setActiveTab('explore')} />
         ) : (
           <>
             {/* Search Bar + Filter Button (Pill Container) */}

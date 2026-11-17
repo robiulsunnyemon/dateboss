@@ -56,6 +56,19 @@ export interface CounterOfferItem {
   suggestedLocation: string;
 }
 
+export interface PassOfferItem {
+  id: string;
+  statusHeader: string;
+  refundBadge: string;
+  userName: string;
+  userAvatar: string;
+  reliability: number;
+  isVerified: boolean;
+  note: string;
+  registryNote: string;
+  buttonLabel: 'Explore' | 'Discover' | 'See More';
+}
+
 const SAMPLE_SENT_OFFERS: OfferItem[] = [
   {
     id: 'off-1',
@@ -176,12 +189,52 @@ const SAMPLE_COUNTER_OFFERS: CounterOfferItem[] = [
   },
 ];
 
+const SAMPLE_PASS_OFFERS: PassOfferItem[] = [
+  {
+    id: 'pass-1',
+    statusHeader: 'Invitation Graciously Declined',
+    refundBadge: 'Deposit Fully Returned',
+    userName: 'Liam Chen',
+    userAvatar: '/assets/discover-card-2.jpg',
+    reliability: 4.85,
+    isVerified: true,
+    note: 'Guest responded: "Regrettably, I have prior commitments at the tech conference this weekend."',
+    registryNote: 'Logged for user experience analysis',
+    buttonLabel: 'Explore',
+  },
+  {
+    id: 'pass-2',
+    statusHeader: 'Offer Courteously Passed',
+    refundBadge: 'Escrow 100% Refunded',
+    userName: 'Sophia Laurent',
+    userAvatar: '/assets/discover-card-1.jpg',
+    reliability: 4.97,
+    isVerified: true,
+    note: 'Guest was unable to accept this invitation: "Thank you for the thoughtful proposal, Julian. My schedule is occupied with Paris Fashion Week previews this weekend."',
+    registryNote: 'Record kept for personal dating registry',
+    buttonLabel: 'Discover',
+  },
+  {
+    id: 'pass-3',
+    statusHeader: 'Proposal Politely Refused',
+    refundBadge: 'Full Escrow Released',
+    userName: 'Amara Singh',
+    userAvatar: '/assets/discover-card-3.jpg',
+    reliability: 4.92,
+    isVerified: true,
+    note: 'Guest\'s message: "Appreciate the invite, but I\'m attending a family event out of town."',
+    registryNote: 'Entry archived for matchmaking records',
+    buttonLabel: 'See More',
+  },
+];
+
 interface OffersViewProps {
   onOpenChat?: (offer: OfferItem) => void;
+  onNavigateExplore?: () => void;
 }
 
-export function OffersView({ onOpenChat }: OffersViewProps) {
-  const [activeFilter, setActiveFilter] = useState<OfferFilterType>('counter');
+export function OffersView({ onOpenChat, onNavigateExplore }: OffersViewProps) {
+  const [activeFilter, setActiveFilter] = useState<OfferFilterType>('pass');
   const [counterList, setCounterList] = useState<CounterOfferItem[]>(SAMPLE_COUNTER_OFFERS);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -282,7 +335,80 @@ export function OffersView({ onOpenChat }: OffersViewProps) {
       </div>
 
       {/* ============================================================ */}
-      {/* 1. COUNTER TAB VIEW                                          */}
+      {/* 1. PASS TAB VIEW (FIGMA ATTACHMENT: Liam, Sophia, Amara)     */}
+      {/* ============================================================ */}
+      {activeFilter === 'pass' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 animate-in fade-in duration-150">
+          {SAMPLE_PASS_OFFERS.map((item) => (
+            <div
+              key={item.id}
+              className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
+            >
+              <div>
+                {/* Top Status Header */}
+                <div className="flex items-center justify-between text-[11px] pb-3 mb-3 border-b border-[#EADBCA]/60">
+                  <span className="font-medium text-[#6E6A63]">
+                    {item.statusHeader}
+                  </span>
+                  <span className="text-emerald-600 font-semibold text-[11px]">
+                    {item.refundBadge}
+                  </span>
+                </div>
+
+                {/* User Row: Avatar + Name + Reliability & Verification */}
+                <div className="flex items-center gap-3 mb-3.5">
+                  <img
+                    src={item.userAvatar}
+                    alt={item.userName}
+                    className="w-10 h-10 rounded-full object-cover border border-[#EADBCA]"
+                  />
+                  <div>
+                    <h3 className="font-serif font-bold text-sm text-[#16120F] leading-tight">
+                      {item.userName}
+                    </h3>
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#8A857D] mt-0.5">
+                      <span>{item.reliability} Reliability</span>
+                      <span>·</span>
+                      <span className="inline-flex items-center gap-0.5 text-[#3B82F6]">
+                        <ShieldCheck className="w-3 h-3" />
+                        <span>ID Verified</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Note Section */}
+                <div className="text-xs mb-4">
+                  <div className="font-semibold text-[#16120F] mb-1">Note:</div>
+                  <p className="text-[#6E6A63] text-[11px] leading-relaxed">
+                    {item.note}
+                  </p>
+                </div>
+              </div>
+
+              {/* Bottom Row: Registry Note + Action Button */}
+              <div className="pt-3 flex items-center justify-between border-t border-[#EADBCA]/60 mt-1">
+                <span className="text-[11px] text-[#8A857D] pr-2">
+                  {item.registryNote}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onNavigateExplore) onNavigateExplore();
+                    else showToast(`Navigating to ${item.buttonLabel}...`);
+                  }}
+                  className="bg-[#9F1E19] hover:bg-[#851713] text-white text-xs font-semibold px-5 py-2 rounded-full transition-all active:scale-95 cursor-pointer shadow-xs shrink-0"
+                >
+                  {item.buttonLabel}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 2. COUNTER TAB VIEW                                          */}
       {/* ============================================================ */}
       {activeFilter === 'counter' && (
         <>
@@ -292,7 +418,7 @@ export function OffersView({ onOpenChat }: OffersViewProps) {
               <p className="text-xs">Counter proposals from guests will appear here for review.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 animate-in fade-in duration-150">
               {counterList.map((item) => (
                 <div
                   key={item.id}
@@ -449,10 +575,10 @@ export function OffersView({ onOpenChat }: OffersViewProps) {
       )}
 
       {/* ============================================================ */}
-      {/* 2. SENT TAB VIEW                                             */}
+      {/* 3. SENT TAB VIEW                                             */}
       {/* ============================================================ */}
       {activeFilter === 'sent' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 animate-in fade-in duration-150">
           {SAMPLE_SENT_OFFERS.map((offer) => (
             <div
               key={offer.id}
@@ -564,10 +690,10 @@ export function OffersView({ onOpenChat }: OffersViewProps) {
       )}
 
       {/* ============================================================ */}
-      {/* 3. OTHER TABS (PASS, RECEIVED, EXPIRED)                      */}
+      {/* 4. OTHER TABS (RECEIVED, EXPIRED)                            */}
       {/* ============================================================ */}
-      {['pass', 'received', 'expired'].includes(activeFilter) && (
-        <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] p-8 text-center text-[#6E6A63] my-8">
+      {['received', 'expired'].includes(activeFilter) && (
+        <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] p-8 text-center text-[#6E6A63] my-8 animate-in fade-in duration-150">
           <p className="font-serif text-lg text-[#16120F] mb-1">
             No offers in {activeFilter}
           </p>
