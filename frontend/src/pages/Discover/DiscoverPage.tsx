@@ -248,7 +248,9 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       {/* ============================================================ */}
       {/* 1. TOP NAVBAR / HEADER                                      */}
       {/* ============================================================ */}
-      <header className="w-full bg-[#EFE7DA]/95 sticky top-0 z-40 backdrop-blur-md border-b border-[#EADBCA]/60 transition-all">
+      <header className={`w-full bg-[#EFE7DA]/95 sticky top-0 z-40 backdrop-blur-md border-b border-[#EADBCA]/60 transition-all ${
+        activeTab === 'profile' ? 'hidden sm:block' : ''
+      }`}>
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
           
           {/* Mobile: Left Hamburger Button */}
@@ -348,7 +350,11 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       {/* ============================================================ */}
       {/* 2. MAIN CONTENT AREA                                        */}
       {/* ============================================================ */}
-      <main className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1">
+      <main className={`max-w-[1240px] w-full mx-auto flex-1 ${
+        activeTab === 'profile'
+          ? 'px-4 sm:px-6 lg:px-8 pt-4 pb-24 sm:py-8'
+          : 'px-4 sm:px-6 lg:px-8 py-5 sm:py-8'
+      }`}>
         {activeTab === 'offers' ? (
           <OffersView onNavigateExplore={() => setActiveTab('explore')} />
         ) : activeTab === 'dates' ? (
