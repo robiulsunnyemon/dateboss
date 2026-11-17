@@ -139,14 +139,14 @@ export function LandingPage({
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-[#1E1C1A] font-sans antialiased selection:bg-[#961C23] selection:text-white flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen bg-[#F5F1E6] text-[#16120F] font-sans antialiased selection:bg-[#9F1E19] selection:text-white flex flex-col justify-between overflow-x-hidden">
       
       {/* =========================================================================
           HERO SECTION WRAPPER
           - Desktop: Header + Left Content + Right Sweeping Curved Couple Photo
           - Mobile: Clean header with hamburger menu, stacked cards, photo hidden
          ========================================================================= */}
-      <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-0 lg:h-[730px] xl:h-[770px] flex flex-col justify-between">
+      <section className="relative w-full bg-[#F5F1E6] overflow-hidden min-h-0 lg:h-[730px] xl:h-[770px] flex flex-col justify-between">
         
         {/* SVG ClipPath Definition matching the exact user-drawn sweeping arc */}
         <svg width="0" height="0" className="absolute">
@@ -185,7 +185,7 @@ export function LandingPage({
             {/* Mobile Hamburger Menu Button (visible on mobile only) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-1.5 -ml-1 text-[#1E1C1A] hover:text-[#961C23] focus:outline-none transition-colors"
+              className="md:hidden p-1.5 -ml-1 text-[#16120F] hover:text-[#9F1E19] focus:outline-none transition-colors"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -202,17 +202,17 @@ export function LandingPage({
 
             {/* Center Desktop: Nav Capsule on clean cream background */}
             <nav className="bg-[#EFE9DF]/85 backdrop-blur-md border border-[#E5DECF] rounded-full px-7 py-2.5 hidden md:flex items-center gap-7 text-xs font-medium text-[#5F5B54] shadow-sm">
-              <a href="#how-it-works" className="hover:text-[#961C23] transition-colors">How it works</a>
-              <a href="#roles" className="hover:text-[#961C23] transition-colors">Roles</a>
-              <a href="#safety" className="hover:text-[#961C23] transition-colors">Safety</a>
-              <a href="#faq" className="hover:text-[#961C23] transition-colors">FAQ</a>
+              <a href="#how-it-works" className="hover:text-[#9F1E19] transition-colors">How it works</a>
+              <a href="#roles" className="hover:text-[#9F1E19] transition-colors">Roles</a>
+              <a href="#safety" className="hover:text-[#9F1E19] transition-colors">Safety</a>
+              <a href="#faq" className="hover:text-[#9F1E19] transition-colors">FAQ</a>
             </nav>
 
             {/* Right: Join now Button */}
             <button
               type="button"
               onClick={onJoinNow}
-              className="bg-[#961C23] hover:bg-[#7D141A] text-white text-xs font-semibold px-4 sm:px-6 py-2 sm:py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0"
+              className="bg-[#9F1E19] hover:bg-[#851713] text-white text-xs font-semibold px-4 sm:px-6 py-2 sm:py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0"
             >
               Join now
             </button>
@@ -222,14 +222,14 @@ export function LandingPage({
 
         {/* Mobile Navigation Fullscreen Backdrop Overlay */}
         {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-50 bg-[#141414]/90 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-start animate-in fade-in duration-200">
+          <div className="md:hidden fixed inset-0 z-50 bg-[#16120F]/90 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-start animate-in fade-in duration-200">
             
             {/* Top row: Red square close button on top-right */}
             <div className="w-full flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-10 h-10 rounded-xl bg-[#961C23] hover:bg-[#7D141A] text-white flex items-center justify-center transition-colors shadow-lg"
+                className="w-10 h-10 rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-lg"
                 aria-label="Close navigation overlay"
               >
                 <X className="w-5 h-5" />
@@ -280,16 +280,16 @@ export function LandingPage({
             
             {/* Label: Gifted dating */}
             <div className="flex items-center gap-2">
-              <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
-              <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+              <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
+              <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
                 Gifted dating
               </span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="font-serif font-extrabold text-3xl sm:text-5xl md:text-6xl xl:text-[68px] leading-[1.12] sm:leading-[1.08] tracking-tight text-[#1A1816]">
+            <h1 className="font-serif font-extrabold text-3xl sm:text-5xl md:text-6xl xl:text-[68px] leading-[1.12] sm:leading-[1.08] tracking-tight text-[#16120F]">
               THE DATE STARTS <br />
-              WITH AN <span className="text-[#961C23] font-serif">OFFER.</span>
+              WITH AN <span className="text-[#9F1E19] font-serif">OFFER.</span>
             </h1>
 
             {/* Subtitle */}
@@ -301,7 +301,7 @@ export function LandingPage({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-1 max-w-xl">
               
               {/* Card 1: Host */}
-              <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#F3A83B] transition-colors">
+              <div className="bg-[#F5F1E6] border border-[#E8E1D3] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#F3A83B] transition-colors">
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
                     <span className="text-[#F3A83B] text-sm leading-none">👑</span>
@@ -315,14 +315,14 @@ export function LandingPage({
                 <button
                   type="button"
                   onClick={onJoinAsHost}
-                  className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
+                  className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#16120F] font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
                 >
                   Join as a Host
                 </button>
               </div>
 
               {/* Card 2: Guest of Honor */}
-              <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#961C23] transition-colors">
+              <div className="bg-[#F5F1E6] border border-[#E8E1D3] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#9F1E19] transition-colors">
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
                     <span className="text-[#8E8A83] text-sm leading-none">👑</span>
@@ -336,7 +336,7 @@ export function LandingPage({
                 <button
                   type="button"
                   onClick={onJoinAsGuest}
-                  className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
+                  className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
                 >
                   Join as a Guest of Honor
                 </button>
@@ -347,13 +347,13 @@ export function LandingPage({
             {/* Trust Checkmarks */}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#6D6760] font-normal pt-1">
               <span className="inline-flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#8E8880]" /> ID-verified members
+                <Check className="w-3.5 h-3.5 text-[#6E6A63]" /> ID-verified members
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#8E8880]" /> Public venues only
+                <Check className="w-3.5 h-3.5 text-[#6E6A63]" /> Public venues only
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#8E8880]" /> Offers expire in 48h
+                <Check className="w-3.5 h-3.5 text-[#6E6A63]" /> Offers expire in 48h
               </span>
             </div>
 
@@ -377,20 +377,20 @@ export function LandingPage({
           
           {/* Top Label */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
-            <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+            <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
+            <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
               How it works
             </span>
           </div>
 
           {/* Section Headline */}
-          <h2 className="font-serif font-extrabold text-2xl sm:text-4xl lg:text-5xl text-[#1A1816] leading-[1.15] sm:leading-[1.12] tracking-tight mb-3 sm:mb-4">
+          <h2 className="font-serif font-extrabold text-2xl sm:text-4xl lg:text-5xl text-[#16120F] leading-[1.15] sm:leading-[1.12] tracking-tight mb-3 sm:mb-4">
             Less Chat. <br />
             More Chemistry.
           </h2>
 
           {/* Subtitle */}
-          <p className="text-[#6E6860] text-xs sm:text-base leading-relaxed max-w-2xl font-normal mb-6 sm:mb-10">
+          <p className="text-[#6E6A63] text-xs sm:text-base leading-relaxed max-w-2xl font-normal mb-6 sm:mb-10">
             A direct, graceful rhythm for meeting someone — with enough information to say yes, no, or perhaps another time.
           </p>
 
@@ -399,33 +399,33 @@ export function LandingPage({
             
             {/* Step 01 */}
             <div className="border-b border-[#E3D9C8]/80 pb-3 sm:pb-4">
-              <span className="text-xs font-semibold text-[#961C23]">01</span>
-              <h3 className="font-serif font-bold text-base sm:text-lg text-[#1A1816] mt-0.5">
+              <span className="text-xs font-semibold text-[#9F1E19]">01</span>
+              <h3 className="font-serif font-bold text-base sm:text-lg text-[#16120F] mt-0.5">
                 Set The Scene
               </h3>
-              <p className="text-xs sm:text-sm text-[#6E6860] mt-1 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#6E6A63] mt-1 leading-relaxed">
                 Choose the venue, the time and the gesture. Every place is public and thoughtfully selected.
               </p>
             </div>
 
             {/* Step 02 */}
             <div className="border-b border-[#E3D9C8]/80 pb-3 sm:pb-4">
-              <span className="text-xs font-semibold text-[#961C23]">02</span>
-              <h3 className="font-serif font-bold text-base sm:text-lg text-[#1A1816] mt-0.5">
+              <span className="text-xs font-semibold text-[#9F1E19]">02</span>
+              <h3 className="font-serif font-bold text-base sm:text-lg text-[#16120F] mt-0.5">
                 Get An Answer
               </h3>
-              <p className="text-xs sm:text-sm text-[#6E6860] mt-1 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#6E6A63] mt-1 leading-relaxed">
                 They have 48 hours to accept, decline, or suggest another time. No hanging conversations.
               </p>
             </div>
 
             {/* Step 03 */}
             <div className="pb-1">
-              <span className="text-xs font-semibold text-[#961C23]">03</span>
-              <h3 className="font-serif font-bold text-base sm:text-lg text-[#1A1816] mt-0.5">
+              <span className="text-xs font-semibold text-[#9F1E19]">03</span>
+              <h3 className="font-serif font-bold text-base sm:text-lg text-[#16120F] mt-0.5">
                 Connect Before You Meet
               </h3>
-              <p className="text-xs sm:text-sm text-[#6E6860] mt-1 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#6E6A63] mt-1 leading-relaxed">
                 Once accepted, private chat opens. A check-in before the date keeps plans on track.
               </p>
             </div>
@@ -436,10 +436,10 @@ export function LandingPage({
           <div className="bg-[#EDE5D6] border border-[#DDD3C2] rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-sm">
             
             <div className="mb-3 sm:mb-4">
-              <span className="text-xs text-[#8E8880] font-normal block">
+              <span className="text-xs text-[#6E6A63] font-normal block">
                 An offer for you
               </span>
-              <h4 className="font-serif font-bold text-xl sm:text-2xl text-[#1A1816] mt-0.5 sm:mt-1">
+              <h4 className="font-serif font-bold text-xl sm:text-2xl text-[#16120F] mt-0.5 sm:mt-1">
                 Dinner For Two
               </h4>
             </div>
@@ -448,38 +448,38 @@ export function LandingPage({
             <div className="divide-y divide-[#D8CDBC] text-xs mb-5 sm:mb-6">
               
               <div className="flex items-center justify-between py-2 sm:py-2.5">
-                <span className="text-[#8E8880] font-normal">When</span>
-                <span className="font-medium text-[#1A1816] text-xs sm:text-sm">Thu, Nov 9, 8:00 PM</span>
+                <span className="text-[#6E6A63] font-normal">When</span>
+                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Thu, Nov 9, 8:00 PM</span>
               </div>
 
               <div className="flex items-center justify-between py-2 sm:py-2.5">
-                <span className="text-[#8E8880] font-normal">Where</span>
-                <span className="font-medium text-[#1A1816] text-xs sm:text-sm">Osteria Verde, Downtown</span>
+                <span className="text-[#6E6A63] font-normal">Where</span>
+                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Osteria Verde, Downtown</span>
               </div>
 
               <div className="flex items-center justify-between py-2 sm:py-2.5">
-                <span className="text-[#8E8880] font-normal">The gift</span>
-                <span className="font-medium text-[#1A1816] text-xs sm:text-sm">Dinner is on Alex</span>
+                <span className="text-[#6E6A63] font-normal">The gift</span>
+                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Dinner is on Alex</span>
               </div>
 
               <div className="flex items-center justify-between py-2 sm:py-2.5">
-                <span className="text-[#8E8880] font-normal">Expires in</span>
-                <span className="font-bold text-[#961C23] text-xs sm:text-sm">47h 12min</span>
+                <span className="text-[#6E6A63] font-normal">Expires in</span>
+                <span className="font-bold text-[#9F1E19] text-xs sm:text-sm">47h 12min</span>
               </div>
 
             </div>
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2.5 sm:gap-3">
-              <button className="bg-[#961C23] hover:bg-[#7D141A] text-white font-semibold text-xs px-5 sm:px-6 py-2 rounded-full shadow-sm transition-colors">
+              <button className="bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs px-5 sm:px-6 py-2 rounded-full shadow-sm transition-colors">
                 Accept
               </button>
 
-              <button className="bg-white hover:bg-stone-50 border border-[#D5CEC2] text-[#1E1C1A] font-semibold text-xs px-5 sm:px-6 py-2 rounded-full transition-colors">
+              <button className="bg-white hover:bg-stone-50 border border-[#D5CEC2] text-[#16120F] font-semibold text-xs px-5 sm:px-6 py-2 rounded-full transition-colors">
                 Counter
               </button>
 
-              <button className="text-[#7A756D] hover:text-[#1E1C1A] text-xs font-medium px-3 sm:px-4 py-2 transition-colors">
+              <button className="text-[#7A756D] hover:text-[#16120F] text-xs font-medium px-3 sm:px-4 py-2 transition-colors">
                 Pass
               </button>
             </div>
@@ -503,20 +503,20 @@ export function LandingPage({
           
           {/* Top Label */}
           <div className="flex items-center justify-center gap-2 mb-3">
-            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
-            <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+            <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
+            <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
               The Thedateboss Advantage
             </span>
-            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+            <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
           </div>
 
           {/* Section Headline */}
-          <h2 className="font-serif font-extrabold text-2xl sm:text-4xl lg:text-5xl text-[#1A1816] tracking-tight mb-3 sm:mb-4">
+          <h2 className="font-serif font-extrabold text-2xl sm:text-4xl lg:text-5xl text-[#16120F] tracking-tight mb-3 sm:mb-4">
             What Makes Thedateboss Different?
           </h2>
 
           {/* Subtitle */}
-          <p className="text-[#6E6860] text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl mx-auto font-normal mb-8 sm:mb-12 lg:mb-16">
+          <p className="text-[#6E6A63] text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl mx-auto font-normal mb-8 sm:mb-12 lg:mb-16">
             Thedateboss is like a fast lane for dating. Ditch endless messaging. Get noticed and get to the good stuff — real dates — way quicker. Check out these impressive numbers:
           </p>
 
@@ -538,17 +538,17 @@ export function LandingPage({
                   onClick={() => setActiveMetricSlide(idx)}
                   aria-label={`Go to metric slide ${idx + 1}`}
                   className={`h-2 rounded-full transition-all ${
-                    activeMetricSlide === idx ? 'bg-[#961C23] w-4' : 'bg-[#D5CEC2] w-2'
+                    activeMetricSlide === idx ? 'bg-[#9F1E19] w-4' : 'bg-[#D5CEC2] w-2'
                   }`}
                 />
               ))}
             </div>
 
-            <h3 className="font-serif font-bold text-4xl text-[#1A1816]">
+            <h3 className="font-serif font-bold text-4xl text-[#16120F]">
               {metrics[activeMetricSlide].value}
             </h3>
 
-            <p className="text-[#6E6860] text-xs leading-relaxed max-w-xs">
+            <p className="text-[#6E6A63] text-xs leading-relaxed max-w-xs">
               {metrics[activeMetricSlide].desc}
             </p>
           </div>
@@ -565,11 +565,11 @@ export function LandingPage({
                   />
                 </div>
 
-                <h3 className="font-serif font-bold text-4xl sm:text-5xl text-[#1A1816]">
+                <h3 className="font-serif font-bold text-4xl sm:text-5xl text-[#16120F]">
                   {m.value}
                 </h3>
 
-                <p className="text-[#6E6860] text-xs sm:text-sm leading-relaxed max-w-xs">
+                <p className="text-[#6E6A63] text-xs sm:text-sm leading-relaxed max-w-xs">
                   {m.desc}
                 </p>
               </div>
@@ -591,22 +591,22 @@ export function LandingPage({
         {/* Section Header */}
         <div className="text-center mb-6 sm:mb-10 space-y-2">
           <div className="flex items-center justify-center gap-2">
-            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
-            <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+            <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
+            <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
               Testimonials
             </span>
-            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
+            <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
           </div>
 
-          <h2 className="font-serif font-extrabold text-2xl sm:text-4xl text-[#1A1816] tracking-tight">
+          <h2 className="font-serif font-extrabold text-2xl sm:text-4xl text-[#16120F] tracking-tight">
             What Our Users Are Saying
           </h2>
         </div>
 
         {/* MOBILE SINGLE CARD VIEW (< md) */}
         <div className="md:hidden mb-6">
-          <div className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-2xl p-5 shadow-sm flex flex-col justify-between min-h-[220px]">
-            <p className="text-[#6E6860] text-xs leading-relaxed mb-5 font-normal">
+          <div className="bg-[#F5F1E6] border border-[#E8E1D3] rounded-2xl p-5 shadow-sm flex flex-col justify-between min-h-[220px]">
+            <p className="text-[#6E6A63] text-xs leading-relaxed mb-5 font-normal">
               {testimonials[activeReviewSlide].quote}
             </p>
 
@@ -614,13 +614,13 @@ export function LandingPage({
               <img
                 src={testimonials[activeReviewSlide].avatar}
                 alt={testimonials[activeReviewSlide].name}
-                className="w-9 h-9 rounded-full object-cover border border-[#961C23]/30"
+                className="w-9 h-9 rounded-full object-cover border border-[#9F1E19]/30"
               />
               <div>
-                <h4 className="font-bold text-xs text-[#1A1816]">
+                <h4 className="font-bold text-xs text-[#16120F]">
                   {testimonials[activeReviewSlide].name}
                 </h4>
-                <p className="text-[10px] text-[#8E8880]">
+                <p className="text-[10px] text-[#6E6A63]">
                   {testimonials[activeReviewSlide].role}
                 </p>
               </div>
@@ -633,9 +633,9 @@ export function LandingPage({
           {testimonials.map((t) => (
             <div
               key={t.id}
-              className="bg-[#FAF7F2] border border-[#E8E1D3] rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[240px]"
+              className="bg-[#F5F1E6] border border-[#E8E1D3] rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[240px]"
             >
-              <p className="text-[#6E6860] text-xs sm:text-[13px] leading-relaxed mb-6 font-normal">
+              <p className="text-[#6E6A63] text-xs sm:text-[13px] leading-relaxed mb-6 font-normal">
                 {t.quote}
               </p>
 
@@ -643,11 +643,11 @@ export function LandingPage({
                 <img
                   src={t.avatar}
                   alt={t.name}
-                  className="w-10 h-10 rounded-full object-cover border border-[#961C23]/30"
+                  className="w-10 h-10 rounded-full object-cover border border-[#9F1E19]/30"
                 />
                 <div>
-                  <h4 className="font-bold text-xs text-[#1A1816]">{t.name}</h4>
-                  <p className="text-[10px] text-[#8E8880]">{t.role}</p>
+                  <h4 className="font-bold text-xs text-[#16120F]">{t.name}</h4>
+                  <p className="text-[10px] text-[#6E6A63]">{t.role}</p>
                 </div>
               </div>
             </div>
@@ -659,14 +659,14 @@ export function LandingPage({
           <button
             onClick={handlePrevReview}
             aria-label="Previous review"
-            className="w-9 h-9 rounded-full bg-white border border-[#D5CEC2] flex items-center justify-center text-[#6E6860] hover:bg-stone-50 transition-colors shadow-sm"
+            className="w-9 h-9 rounded-full bg-white border border-[#D5CEC2] flex items-center justify-center text-[#6E6A63] hover:bg-stone-50 transition-colors shadow-sm"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={handleNextReview}
             aria-label="Next review"
-            className="w-9 h-9 rounded-full bg-[#961C23] text-white flex items-center justify-center hover:bg-[#7D141A] transition-colors shadow-sm"
+            className="w-9 h-9 rounded-full bg-[#9F1E19] text-white flex items-center justify-center hover:bg-[#851713] transition-colors shadow-sm"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -680,14 +680,14 @@ export function LandingPage({
           - Mobile: Each item is a distinct card with rounded border matching Figma
           - Desktop: Elegant full-width dark section
          ========================================================================= */}
-      <section id="safety" className="w-full bg-[#141414] text-white py-12 sm:py-20 lg:py-24">
+      <section id="safety" className="w-full bg-[#16120F] text-white py-12 sm:py-20 lg:py-24">
         
         <div className="max-w-4xl mx-auto px-4 sm:px-10">
           
           {/* Top Label */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
-            <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+            <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
+            <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
               Safety
             </span>
           </div>
@@ -704,7 +704,7 @@ export function LandingPage({
                 key={i}
                 className="bg-[#1C1C1C] md:bg-transparent border border-white/10 md:border-transparent rounded-2xl md:rounded-none p-4 md:p-0 flex items-start gap-3.5 sm:gap-4 transition-colors"
               >
-                <div className="w-9 h-9 rounded-full border border-[#961C23] bg-transparent flex items-center justify-center shrink-0 text-[#E63946] mt-0.5">
+                <div className="w-9 h-9 rounded-full border border-[#9F1E19] bg-transparent flex items-center justify-center shrink-0 text-[#E63946] mt-0.5">
                   {f.icon}
                 </div>
                 <div className="space-y-1">
@@ -731,14 +731,14 @@ export function LandingPage({
         
         {/* Top Label */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="w-6 h-[1.5px] bg-[#961C23]"></span>
-          <span className="text-xs font-semibold text-[#961C23] tracking-wide">
+          <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
+          <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
             FAQ
           </span>
         </div>
 
         {/* Section Headline */}
-        <h2 className="font-serif font-extrabold text-2xl sm:text-4xl text-[#1A1816] tracking-tight mb-6 sm:mb-8">
+        <h2 className="font-serif font-extrabold text-2xl sm:text-4xl text-[#16120F] tracking-tight mb-6 sm:mb-8">
           Frequently Asked Questions
         </h2>
 
@@ -753,16 +753,16 @@ export function LandingPage({
                   onClick={() => toggleFaq(index)}
                   className="w-full flex items-center justify-between text-left gap-4 focus:outline-none group"
                 >
-                  <span className="font-serif font-bold text-sm sm:text-lg text-[#1A1816] group-hover:text-[#961C23] transition-colors">
+                  <span className="font-serif font-bold text-sm sm:text-lg text-[#16120F] group-hover:text-[#9F1E19] transition-colors">
                     {faq.question}
                   </span>
-                  <span className="shrink-0 text-stone-500 group-hover:text-[#961C23] transition-colors">
+                  <span className="shrink-0 text-stone-500 group-hover:text-[#9F1E19] transition-colors">
                     {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                   </span>
                 </button>
 
                 {isOpen && (
-                  <p className="mt-2 text-xs sm:text-sm text-[#6E6860] leading-relaxed pr-6 sm:pr-8">
+                  <p className="mt-2 text-xs sm:text-sm text-[#6E6A63] leading-relaxed pr-6 sm:pr-8">
                     {faq.answer}
                   </p>
                 )}
@@ -793,9 +793,9 @@ export function LandingPage({
             </div>
 
             {/* Headline */}
-            <h2 className="font-serif font-extrabold text-xl sm:text-3xl md:text-4xl text-[#1A1816] tracking-tight leading-tight">
+            <h2 className="font-serif font-extrabold text-xl sm:text-3xl md:text-4xl text-[#16120F] tracking-tight leading-tight">
               MAKE THE FIRST MOVE <br />
-              <span className="text-[#961C23]">WORTH ANSWERING</span>
+              <span className="text-[#9F1E19]">WORTH ANSWERING</span>
             </h2>
 
             {/* Two Action Buttons (Stacked full-width on mobile, side-by-side on sm+) */}
@@ -803,14 +803,14 @@ export function LandingPage({
               <button
                 type="button"
                 onClick={onJoinAsHost}
-                className="w-full sm:w-auto bg-[#F3A83B] hover:bg-[#DE952B] text-[#1E1C1A] font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
+                className="w-full sm:w-auto bg-[#F3A83B] hover:bg-[#DE952B] text-[#16120F] font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
               >
                 Join as a Host
               </button>
               <button
                 type="button"
                 onClick={onJoinAsGuest}
-                className="w-full sm:w-auto bg-[#961C23] hover:bg-[#7D141A] text-white font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
+                className="w-full sm:w-auto bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
               >
                 Join as a Guest of Honor
               </button>
@@ -826,7 +826,7 @@ export function LandingPage({
       {/* =========================================================================
           9. FOOTER (SECTION 8)
          ========================================================================= */}
-      <footer className="w-full border-t border-[#ECE3D4] py-6 sm:py-8 bg-[#FAF7F2]">
+      <footer className="w-full border-t border-[#ECE3D4] py-6 sm:py-8 bg-[#F5F1E6]">
         <div className="max-w-[1360px] mx-auto px-4 sm:px-10 lg:px-14 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           
           {/* Left: Official Wax Seal + Copyright */}
@@ -843,10 +843,10 @@ export function LandingPage({
 
           {/* Right: Legal Links */}
           <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-5 gap-y-2 text-xs text-[#5F5B54]">
-            <a href="#terms" className="hover:text-[#961C23] transition-colors">Terms & Conditions</a>
-            <a href="#safety-tips" className="hover:text-[#961C23] transition-colors">Safety Tips</a>
-            <a href="#disclaimer" className="hover:text-[#961C23] transition-colors">Disclaimer</a>
-            <a href="#privacy" className="hover:text-[#961C23] transition-colors">Privacy Policy</a>
+            <a href="#terms" className="hover:text-[#9F1E19] transition-colors">Terms & Conditions</a>
+            <a href="#safety-tips" className="hover:text-[#9F1E19] transition-colors">Safety Tips</a>
+            <a href="#disclaimer" className="hover:text-[#9F1E19] transition-colors">Disclaimer</a>
+            <a href="#privacy" className="hover:text-[#9F1E19] transition-colors">Privacy Policy</a>
           </div>
 
         </div>

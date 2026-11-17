@@ -45,17 +45,17 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#1E1C1A]">
+    <div className="min-h-screen w-full bg-[#F5F1E6] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#16120F]">
       
       {/* Container: Edge-to-edge on mobile, centered card on desktop matching Figma */}
-      <div className="w-full max-w-[760px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
+      <div className="w-full max-w-[760px] bg-[#F5F1E6] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
         
         {/* Top Header: Dark Red Rounded Back Button + Official thedateboss Logo */}
         <div className="flex items-center gap-3 pt-1 sm:pt-0">
           <button
             type="button"
             onClick={onBack}
-            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#961C23] hover:bg-[#7D141A] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
+            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -71,12 +71,12 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
         </div>
 
         {/* Main Headline */}
-        <h1 className="font-serif font-bold text-2xl sm:text-3xl md:text-4xl text-[#1A1816] tracking-tight leading-tight mt-6 sm:mt-7">
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl md:text-4xl text-[#16120F] tracking-tight leading-tight mt-6 sm:mt-7">
           Great! You&apos;re Almost There
         </h1>
 
         {/* Subtitle */}
-        <p className="text-[#6E6860] text-xs sm:text-sm font-normal mt-2 mb-6 sm:mb-8 leading-relaxed">
+        <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-2 mb-6 sm:mb-8 leading-relaxed">
           Let&apos;s start with a few essential details.
         </p>
 
@@ -86,7 +86,7 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
           <div>
             <label
               htmlFor="nickname-input"
-              className="block font-serif font-bold text-sm text-[#1A1816] mb-2"
+              className="block font-serif font-bold text-sm text-[#16120F] mb-2"
             >
               First Name/Nickname
             </label>
@@ -96,7 +96,7 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               placeholder="Type your Nickname here.."
-              className="w-full bg-[#FAF7F2] border border-[#E5DECF] rounded-full px-5 py-3.5 text-xs sm:text-sm text-[#1A1816] placeholder:text-[#8E8880] focus:outline-none focus:border-[#961C23] focus:ring-1 focus:ring-[#961C23] transition-colors"
+              className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-full px-5 py-3.5 text-xs sm:text-sm text-[#16120F] placeholder:text-[#6E6A63] focus:outline-none focus:border-[#9F1E19] focus:ring-1 focus:ring-[#9F1E19] transition-colors"
             />
           </div>
 
@@ -104,7 +104,7 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
           <div>
             <label
               htmlFor="location-input"
-              className="block font-serif font-bold text-sm text-[#1A1816] mb-2"
+              className="block font-serif font-bold text-sm text-[#16120F] mb-2"
             >
               Location
             </label>
@@ -115,17 +115,17 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Type your location"
-                className="w-full bg-[#FAF7F2] border border-[#E5DECF] rounded-full pl-5 pr-12 py-3.5 text-xs sm:text-sm text-[#1A1816] placeholder:text-[#8E8880] focus:outline-none focus:border-[#961C23] focus:ring-1 focus:ring-[#961C23] transition-colors"
+                className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-full pl-5 pr-12 py-3.5 text-xs sm:text-sm text-[#16120F] placeholder:text-[#6E6A63] focus:outline-none focus:border-[#9F1E19] focus:ring-1 focus:ring-[#9F1E19] transition-colors"
               />
               <button
                 type="button"
                 onClick={handleDetectLocation}
                 title="Detect current location"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8E8880] hover:text-[#961C23] transition-colors p-1"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6E6A63] hover:text-[#9F1E19] transition-colors p-1"
               >
                 {/* 4-point diamond crosshair icon matching screenshot */}
                 <svg
-                  className={`w-4 h-4 ${isLocating ? 'animate-spin text-[#961C23]' : ''}`}
+                  className={`w-4 h-4 ${isLocating ? 'animate-spin text-[#9F1E19]' : ''}`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -147,19 +147,19 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
           <div className="pt-2 sm:pt-4">
             <button
               type="submit"
-              className="w-full sm:w-auto bg-[#961C23] hover:bg-[#7D141A] text-white font-medium text-xs sm:text-sm py-3.5 sm:py-3 px-8 rounded-full shadow-sm transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 sm:py-3 px-8 rounded-full shadow-sm transition-all active:scale-[0.99] flex items-center justify-center gap-2"
             >
               <span>Create account</span>
               {submitted && <CheckCircle2 className="w-4 h-4 text-white" />}
             </button>
 
             {/* Terms of Use Notice */}
-            <p className="text-center sm:text-left text-xs text-[#8E8880] mt-3 sm:mt-3.5 leading-relaxed">
+            <p className="text-center sm:text-left text-xs text-[#6E6A63] mt-3 sm:mt-3.5 leading-relaxed">
               By creating an account, you agree to{' '}
               <a
                 href="#terms"
                 onClick={(e) => e.preventDefault()}
-                className="underline hover:text-[#961C23] transition-colors"
+                className="underline hover:text-[#9F1E19] transition-colors"
               >
                 Terms of Use.
               </a>

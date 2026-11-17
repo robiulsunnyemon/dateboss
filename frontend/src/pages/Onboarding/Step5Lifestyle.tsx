@@ -22,16 +22,16 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#1E1C1A]">
+    <div className="min-h-screen w-full bg-[#F5F1E6] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#16120F]">
       {/* Container: Edge-to-edge on mobile, centered card on desktop matching Figma */}
-      <div className="w-full max-w-[760px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
+      <div className="w-full max-w-[760px] bg-[#F5F1E6] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
         
         {/* Top Header: Dark Red Rounded Back Button + Official thedateboss Logo */}
         <div className="flex items-center gap-3 pt-1 sm:pt-0">
           <button
             type="button"
             onClick={onBack}
-            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#961C23] hover:bg-[#7D141A] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
+            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -54,12 +54,12 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
         </div>
 
         {/* Main Headline */}
-        <h1 className="font-serif font-bold text-2xl sm:text-3xl md:text-4xl text-[#1A1816] tracking-tight leading-tight mt-6 sm:mt-7">
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl md:text-4xl text-[#16120F] tracking-tight leading-tight mt-6 sm:mt-7">
           Great!
         </h1>
 
         {/* Subtitle */}
-        <p className="text-[#6E6860] text-xs sm:text-sm font-normal mt-2 pb-5 border-b border-[#EAE3D6] leading-relaxed">
+        <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-2 pb-5 border-b border-[#EAE3D6] leading-relaxed">
           Now we need some details about you
         </p>
 
@@ -67,7 +67,7 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
         <div className="space-y-6 pt-5">
           {/* Question 1: Do You Have Any Children? */}
           <div>
-            <h2 className="font-serif font-bold text-sm sm:text-base text-[#1A1816] mb-3">
+            <h2 className="font-serif font-bold text-sm sm:text-base text-[#16120F] mb-3">
               Do You Have Any Children?
             </h2>
             <div className="flex items-center gap-2.5 flex-wrap">
@@ -80,8 +80,8 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
                     onClick={() => setChildren(option)}
                     className={`inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
                       isSelected
-                        ? 'bg-[#1A1816] text-white shadow-sm'
-                        : 'bg-[#FAF7F2] border border-[#E5DECF] text-[#6E6860] hover:border-[#1A1816]/30'
+                        ? 'bg-[#16120F] text-white shadow-sm'
+                        : 'bg-[#F5F1E6] border border-[#E5DECF] text-[#6E6A63] hover:border-[#16120F]/30'
                     }`}
                   >
                     {isSelected && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
@@ -94,7 +94,7 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
 
           {/* Question 2: Do You Smoke */}
           <div>
-            <h2 className="font-serif font-bold text-sm sm:text-base text-[#1A1816] mb-3">
+            <h2 className="font-serif font-bold text-sm sm:text-base text-[#16120F] mb-3">
               Do You Smoke
             </h2>
             <div className="flex items-center gap-2.5 flex-wrap">
@@ -107,8 +107,8 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
                     onClick={() => setSmoke(option)}
                     className={`inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
                       isSelected
-                        ? 'bg-[#1A1816] text-white shadow-sm'
-                        : 'bg-[#FAF7F2] border border-[#E5DECF] text-[#6E6860] hover:border-[#1A1816]/30'
+                        ? 'bg-[#16120F] text-white shadow-sm'
+                        : 'bg-[#F5F1E6] border border-[#E5DECF] text-[#6E6A63] hover:border-[#16120F]/30'
                     }`}
                   >
                     {isSelected && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
@@ -121,7 +121,7 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
 
           {/* Question 3: Do You Drink */}
           <div>
-            <h2 className="font-serif font-bold text-sm sm:text-base text-[#1A1816] mb-3">
+            <h2 className="font-serif font-bold text-sm sm:text-base text-[#16120F] mb-3">
               Do You Drink
             </h2>
             <div className="flex items-center gap-2.5 flex-wrap">
@@ -134,8 +134,8 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
                     onClick={() => setDrink(option)}
                     className={`inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
                       isSelected
-                        ? 'bg-[#1A1816] text-white shadow-sm'
-                        : 'bg-[#FAF7F2] border border-[#E5DECF] text-[#6E6860] hover:border-[#1A1816]/30'
+                        ? 'bg-[#16120F] text-white shadow-sm'
+                        : 'bg-[#F5F1E6] border border-[#E5DECF] text-[#6E6A63] hover:border-[#16120F]/30'
                     }`}
                   >
                     {isSelected && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
@@ -156,14 +156,14 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
             <button
               type="button"
               onClick={onBack}
-              className="text-[#8E8880] hover:text-[#1A1816] text-sm font-normal px-2 py-2 transition-colors cursor-pointer"
+              className="text-[#6E6A63] hover:text-[#16120F] text-sm font-normal px-2 py-2 transition-colors cursor-pointer"
             >
               Back
             </button>
             <button
               type="button"
               onClick={handleContinue}
-              className="bg-[#961C23] hover:bg-[#7D141A] text-white font-medium text-xs sm:text-sm py-2.5 px-8 rounded-full shadow-sm transition-all active:scale-[0.99]"
+              className="bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-2.5 px-8 rounded-full shadow-sm transition-all active:scale-[0.99]"
             >
               Continue
             </button>
@@ -174,14 +174,14 @@ export function Step5Lifestyle({ onBack, onContinue }: Step5LifestyleProps) {
             <button
               type="button"
               onClick={handleContinue}
-              className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-medium text-xs sm:text-sm py-3.5 rounded-full shadow-sm transition-all active:scale-[0.99]"
+              className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 rounded-full shadow-sm transition-all active:scale-[0.99]"
             >
               Continue
             </button>
             <button
               type="button"
               onClick={onBack}
-              className="text-[#8E8880] hover:text-[#1A1816] text-sm font-normal py-3 text-center transition-colors cursor-pointer"
+              className="text-[#6E6A63] hover:text-[#16120F] text-sm font-normal py-3 text-center transition-colors cursor-pointer"
             >
               Back
             </button>

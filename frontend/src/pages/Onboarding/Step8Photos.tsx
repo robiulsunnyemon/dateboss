@@ -59,7 +59,7 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#1E1C1A]">
+    <div className="min-h-screen w-full bg-[#F5F1E6] sm:bg-[#EFE7DA] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#16120F]">
       {/* Hidden file input for uploading */}
       <input
         type="file"
@@ -70,14 +70,14 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
       />
 
       {/* Container: Edge-to-edge on mobile, centered card on desktop matching Figma */}
-      <div className="w-full max-w-[720px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-7 lg:p-9 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
+      <div className="w-full max-w-[720px] bg-[#F5F1E6] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-7 lg:p-9 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
         
         {/* Top Header: Dark Red Rounded Back Button + Official thedateboss Logo */}
         <div className="flex items-center gap-3 pt-1 sm:pt-0">
           <button
             type="button"
             onClick={onBack}
-            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#961C23] hover:bg-[#7D141A] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
+            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -100,15 +100,15 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
         </div>
 
         {/* Main Headline */}
-        <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#1A1816] tracking-tight leading-tight mt-5 sm:mt-6">
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#16120F] tracking-tight leading-tight mt-5 sm:mt-6">
           Make Your Profile Shine!
         </h1>
 
         {/* Subtitles */}
-        <p className="text-[#6E6860] text-xs sm:text-sm font-normal mt-1 leading-relaxed">
-          Add at least <span className="font-semibold text-[#1A1816]">1 photos</span> to get started.
+        <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-1 leading-relaxed">
+          Add at least <span className="font-semibold text-[#16120F]">1 photos</span> to get started.
         </p>
-        <p className="text-[#8E8880] text-[11px] sm:text-xs font-normal mt-1.5 mb-5 sm:mb-6 leading-relaxed max-w-[580px]">
+        <p className="text-[#6E6A63] text-[11px] sm:text-xs font-normal mt-1.5 mb-5 sm:mb-6 leading-relaxed max-w-[580px]">
           Profiles with multiple photos attract more attention and messages! Upload up to 6 photos at a time. You can add up to 20 photos and videos to your profile in total.
         </p>
 
@@ -118,7 +118,7 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
           {/* Slot 0: Main Profile Photo (col-span-2 row-span-2) */}
           <div
             onClick={() => handleSlotClick(0)}
-            className="col-span-2 row-span-2 relative aspect-[4/4.3] sm:aspect-square bg-[#FAF4EB] border border-[#B3262E]/70 rounded-[20px] sm:rounded-[24px] overflow-hidden cursor-pointer group shadow-xs transition-all hover:border-[#961C23]"
+            className="col-span-2 row-span-2 relative aspect-[4/4.3] sm:aspect-square bg-[#F5F1E6] border border-[#9F1E19]/70 rounded-[20px] sm:rounded-[24px] overflow-hidden cursor-pointer group shadow-xs transition-all hover:border-[#9F1E19]"
           >
             {photos[0] ? (
               <>
@@ -129,7 +129,7 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
                 />
                 
                 {/* Main profile label pill */}
-                <div className="absolute bottom-2.5 left-2.5 bg-[#961C23] text-white text-[10px] sm:text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-md">
+                <div className="absolute bottom-2.5 left-2.5 bg-[#9F1E19] text-white text-[10px] sm:text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-md">
                   <Smile className="w-3 h-3 text-white" />
                   <span>Main profile</span>
                 </div>
@@ -138,16 +138,16 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
                 <button
                   type="button"
                   onClick={(e) => handleRemovePhoto(0, e)}
-                  className="absolute bottom-2.5 right-2.5 w-6 h-6 rounded-full bg-[#961C23] hover:bg-[#7D141A] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-md"
+                  className="absolute bottom-2.5 right-2.5 w-6 h-6 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-md"
                   aria-label="Remove photo"
                 >
                   <X className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
               </>
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-[#961C23] group-hover:scale-105 transition-transform p-4">
+              <div className="w-full h-full flex flex-col items-center justify-center text-[#9F1E19] group-hover:scale-105 transition-transform p-4">
                 <CameraPlusIcon className="w-8 h-8 sm:w-9 sm:h-9" />
-                <span className="text-[10px] sm:text-[11px] font-normal mt-2 text-[#8E8880]">Add main photo</span>
+                <span className="text-[10px] sm:text-[11px] font-normal mt-2 text-[#6E6A63]">Add main photo</span>
               </div>
             )}
           </div>
@@ -203,14 +203,14 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
             <button
               type="button"
               onClick={onBack}
-              className="text-[#8E8880] hover:text-[#1A1816] text-sm font-normal px-2 py-2 transition-colors cursor-pointer"
+              className="text-[#6E6A63] hover:text-[#16120F] text-sm font-normal px-2 py-2 transition-colors cursor-pointer"
             >
               Back
             </button>
             <button
               type="button"
               onClick={handleContinue}
-              className="bg-[#961C23] hover:bg-[#7D141A] text-white font-medium text-xs sm:text-sm py-2.5 px-6 rounded-full shadow-sm transition-all active:scale-[0.99]"
+              className="bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-2.5 px-6 rounded-full shadow-sm transition-all active:scale-[0.99]"
             >
               Upload ({uploadedCount}) file &amp; continue
             </button>
@@ -221,14 +221,14 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
             <button
               type="button"
               onClick={handleContinue}
-              className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-medium text-xs sm:text-sm py-3.5 rounded-full shadow-sm transition-all active:scale-[0.99]"
+              className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 rounded-full shadow-sm transition-all active:scale-[0.99]"
             >
               Upload ({uploadedCount}) file &amp; continue
             </button>
             <button
               type="button"
               onClick={onBack}
-              className="text-[#8E8880] hover:text-[#1A1816] text-sm font-normal py-3 text-center transition-colors cursor-pointer"
+              className="text-[#6E6A63] hover:text-[#16120F] text-sm font-normal py-3 text-center transition-colors cursor-pointer"
             >
               Back
             </button>
@@ -254,7 +254,7 @@ function PhotoSlot({
   return (
     <div
       onClick={onClick}
-      className="relative aspect-square bg-[#FAF4EB] border border-[#B3262E]/50 rounded-[18px] sm:rounded-[22px] flex items-center justify-center cursor-pointer hover:border-[#961C23] transition-all overflow-hidden group shadow-xs"
+      className="relative aspect-square bg-[#F5F1E6] border border-[#9F1E19]/50 rounded-[18px] sm:rounded-[22px] flex items-center justify-center cursor-pointer hover:border-[#9F1E19] transition-all overflow-hidden group shadow-xs"
     >
       {photo ? (
         <>
@@ -262,14 +262,14 @@ function PhotoSlot({
           <button
             type="button"
             onClick={onRemove}
-            className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#961C23] hover:bg-[#7D141A] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-md"
+            className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-transform hover:scale-110 shadow-md"
             aria-label="Remove photo"
           >
             <X className="w-3 h-3 stroke-[2.5]" />
           </button>
         </>
       ) : (
-        <CameraPlusIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#961C23] group-hover:scale-105 transition-transform" />
+        <CameraPlusIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#9F1E19] group-hover:scale-105 transition-transform" />
       )}
     </div>
   );

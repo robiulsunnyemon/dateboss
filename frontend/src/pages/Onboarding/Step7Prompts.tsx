@@ -32,16 +32,16 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#1E1C1A]">
+    <div className="min-h-screen w-full bg-[#F5F1E6] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#16120F]">
       {/* Container: Edge-to-edge on mobile, centered card on desktop matching Figma */}
-      <div className="w-full max-w-[760px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
+      <div className="w-full max-w-[760px] bg-[#F5F1E6] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200">
         
         {/* Top Header: Dark Red Rounded Back Button + Official thedateboss Logo */}
         <div className="flex items-center gap-3 pt-1 sm:pt-0">
           <button
             type="button"
             onClick={onBack}
-            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#961C23] hover:bg-[#7D141A] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
+            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -64,12 +64,12 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
         </div>
 
         {/* Main Headline */}
-        <h1 className="font-serif font-bold text-2xl sm:text-3xl md:text-4xl text-[#1A1816] tracking-tight leading-tight mt-6 sm:mt-7">
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl md:text-4xl text-[#16120F] tracking-tight leading-tight mt-6 sm:mt-7">
           Perfect!
         </h1>
 
         {/* Subtitle */}
-        <p className="text-[#6E6860] text-xs sm:text-sm font-normal mt-2 mb-6 sm:mb-8 leading-relaxed">
+        <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-2 mb-6 sm:mb-8 leading-relaxed">
           Answer a few more questions to help others understand what you&apos;re looking for.
         </p>
 
@@ -79,7 +79,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
           <div>
             <label
               htmlFor="bio-input"
-              className="block font-serif font-bold text-sm sm:text-base text-[#1A1816] mb-2.5"
+              className="block font-serif font-bold text-sm sm:text-base text-[#16120F] mb-2.5"
             >
               Introduce Yourself To The Community
             </label>
@@ -89,7 +89,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Share your passions, lifestyle, and what intrigues you. Give your potential matches the perfect way to start a conversation."
-              className="w-full bg-[#FAF7F2] border border-[#E5DECF] rounded-[22px] p-4 sm:p-5 text-xs sm:text-sm text-[#1A1816] placeholder:text-[#8E8880] focus:outline-none focus:border-[#961C23] focus:ring-1 focus:ring-[#961C23] transition-colors resize-none leading-relaxed"
+              className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-[22px] p-4 sm:p-5 text-xs sm:text-sm text-[#16120F] placeholder:text-[#6E6A63] focus:outline-none focus:border-[#9F1E19] focus:ring-1 focus:ring-[#9F1E19] transition-colors resize-none leading-relaxed"
             />
           </div>
 
@@ -97,7 +97,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
           <div>
             <label
               htmlFor="date-input"
-              className="block font-serif font-bold text-sm sm:text-base text-[#1A1816] mb-2.5"
+              className="block font-serif font-bold text-sm sm:text-base text-[#16120F] mb-2.5"
             >
               Envision Your Ideal First Date
             </label>
@@ -107,7 +107,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
               value={idealFirstDate}
               onChange={(e) => setIdealFirstDate(e.target.value)}
               placeholder="Fine dining, curated drinks, or a scenic walk under the city lights? Share what sets the right mood for you."
-              className="w-full bg-[#FAF7F2] border border-[#E5DECF] rounded-[22px] p-4 sm:p-5 text-xs sm:text-sm text-[#1A1816] placeholder:text-[#8E8880] focus:outline-none focus:border-[#961C23] focus:ring-1 focus:ring-[#961C23] transition-colors resize-none leading-relaxed"
+              className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-[22px] p-4 sm:p-5 text-xs sm:text-sm text-[#16120F] placeholder:text-[#6E6A63] focus:outline-none focus:border-[#9F1E19] focus:ring-1 focus:ring-[#9F1E19] transition-colors resize-none leading-relaxed"
             />
           </div>
         </div>
@@ -122,7 +122,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
               <button
                 type="button"
                 onClick={onBack}
-                className="text-[#8E8880] hover:text-[#1A1816] font-normal transition-colors cursor-pointer"
+                className="text-[#6E6A63] hover:text-[#16120F] font-normal transition-colors cursor-pointer"
               >
                 Back
               </button>
@@ -130,7 +130,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
               <button
                 type="button"
                 onClick={handleSkip}
-                className="text-[#8E8880] hover:text-[#1A1816] font-normal transition-colors cursor-pointer"
+                className="text-[#6E6A63] hover:text-[#16120F] font-normal transition-colors cursor-pointer"
               >
                 Skip
               </button>
@@ -139,7 +139,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
             <button
               type="button"
               onClick={handleContinue}
-              className="bg-[#961C23] hover:bg-[#7D141A] text-white font-medium text-xs sm:text-sm py-2.5 px-8 rounded-full shadow-sm transition-all active:scale-[0.99] ml-2"
+              className="bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-2.5 px-8 rounded-full shadow-sm transition-all active:scale-[0.99] ml-2"
             >
               Continue
             </button>
@@ -150,7 +150,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
             <button
               type="button"
               onClick={handleContinue}
-              className="w-full bg-[#961C23] hover:bg-[#7D141A] text-white font-medium text-xs sm:text-sm py-3.5 rounded-full shadow-sm transition-all active:scale-[0.99]"
+              className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 rounded-full shadow-sm transition-all active:scale-[0.99]"
             >
               Continue
             </button>
@@ -158,7 +158,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
               <button
                 type="button"
                 onClick={onBack}
-                className="text-[#8E8880] hover:text-[#1A1816] font-normal transition-colors cursor-pointer"
+                className="text-[#6E6A63] hover:text-[#16120F] font-normal transition-colors cursor-pointer"
               >
                 Back
               </button>
@@ -166,7 +166,7 @@ export function Step7Prompts({ onBack, onSkip, onContinue }: Step7PromptsProps) 
               <button
                 type="button"
                 onClick={handleSkip}
-                className="text-[#8E8880] hover:text-[#1A1816] font-normal transition-colors cursor-pointer"
+                className="text-[#6E6A63] hover:text-[#16120F] font-normal transition-colors cursor-pointer"
               >
                 Skip
               </button>

@@ -6,20 +6,20 @@ interface Step11VideoCheckingProps {
   onComplete?: () => void;
 }
 
-// 12 petals with shades transitioning from deep brand red to soft blush
+// 12 petals with shades transitioning from deep brand red (#9F1E19) to soft blush
 const PETAL_COLORS = [
-  '#8B171E', // 12 o'clock (darkest)
-  '#9C1C24',
-  '#AE252D',
-  '#BE343B',
-  '#CC484F',
-  '#D96167',
-  '#E47D82',
-  '#ED9B9F',
-  '#F3B6B9',
-  '#F8CDCF',
-  '#FCE1E3',
-  '#FDF1F2', // 11 o'clock (lightest)
+  '#9F1E19', // 12 o'clock (brand primary)
+  '#AB2C27',
+  '#B93C37',
+  '#C64E49',
+  '#D3625E',
+  '#DF7975',
+  '#EA918E',
+  '#F2AAA8',
+  '#F8C3C2',
+  '#FCDCDC',
+  '#FDF0F0',
+  '#FFF8F8', // 11 o'clock (lightest)
 ];
 
 export function Step11VideoChecking({
@@ -38,16 +38,16 @@ export function Step11VideoChecking({
   }, [onComplete]);
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#1E1C1A]">
+    <div className="min-h-screen w-full bg-[#F5F1E6] sm:bg-[#EFE7DA] py-5 sm:py-12 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#16120F]">
       {/* Container: Edge-to-edge on mobile, centered card on desktop matching Figma */}
-      <div className="w-full max-w-[760px] min-h-[440px] sm:min-h-[380px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200 flex flex-col justify-between">
+      <div className="w-full max-w-[760px] min-h-[440px] sm:min-h-[380px] bg-[#F5F1E6] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-2 sm:p-10 lg:p-12 shadow-none sm:shadow-[0_10px_40px_rgba(0,0,0,0.04)] animate-in fade-in duration-200 flex flex-col justify-between">
         
         {/* Top Header: Dark Red Rounded Back Button + Official thedateboss Logo */}
         <div className="flex items-center gap-3 pt-1 sm:pt-0">
           <button
             type="button"
             onClick={onBack}
-            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#961C23] hover:bg-[#7D141A] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
+            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -96,7 +96,7 @@ export function Step11VideoChecking({
           </div>
 
           {/* Checking Label */}
-          <p className="text-[#6E6860] text-xs sm:text-sm font-normal mt-5 tracking-wide">
+          <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-5 tracking-wide">
             Checking...
           </p>
         </div>

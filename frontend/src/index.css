@@ -4,30 +4,30 @@
 
 @layer base {
   body {
-    background-color: #FBF8F3;
-    color: #1A1815;
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background-color: #EFE7DA;
+    color: #16120F;
+    font-family: 'Raleway', system-ui, sans-serif;
   }
 
-  h1, h2, h3, h4, .font-serif-heading {
-    font-family: 'Playfair Display', Georgia, serif;
-    letter-spacing: -0.02em;
+  h1, h2, h3, h4, h5, h6, .font-serif, .font-display {
+    font-family: 'Lora', Georgia, serif;
+    letter-spacing: -0.015em;
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar matching Brand Guide */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #F4EFE6;
+  background: #EFE7DA;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D5CBBA;
+  background: #D9D0C1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #B8AC98;
+  background: #C4BAA9;
 }
 
 /* Subtle animations */

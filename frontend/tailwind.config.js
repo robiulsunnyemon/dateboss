@@ -7,29 +7,27 @@ export default {
   theme: {
     extend: {
       colors: {
-        cream: {
-          50: '#FDFBF7',
-          100: '#FBF8F3',
-          200: '#F4EFE6',
-          300: '#E9E2D5',
-          400: '#DDD4C4'
-        },
         brand: {
-          red: '#8A1B22',
-          redDark: '#6E1118',
-          redLight: '#A3242C',
-          gold: '#E8A738',
-          goldDark: '#CF8E20',
-          dark: '#141414',
-          charcoal: '#21201E',
-          muted: '#6B6760',
-          card: '#F6F2EA'
-        }
+          primary: '#9F1E19',     // Primary
+          secondary: '#FCB943',   // Secondary
+          bg: '#EFE7DA',          // BG
+          surface: '#F5F1E6',     // Surface
+          black: '#16120F',       // Black (100)
+          muted: '#6E6A63',       // Muted / Neutral Gray
+          success: '#199F22',     // Success color
+
+          // Aliases for convenience
+          red: '#9F1E19',
+          gold: '#FCB943',
+          dark: '#16120F',
+          card: '#F5F1E6',
+        },
       },
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        cormorant: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['Lora', 'Georgia', 'serif'],
+        display: ['Lora', 'Georgia', 'serif'],
+        sans: ['Raleway', 'system-ui', 'sans-serif'],
+        body: ['Raleway', 'system-ui', 'sans-serif'],
       }
     },
   },
