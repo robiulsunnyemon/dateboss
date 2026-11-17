@@ -19,6 +19,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { SearchPreferenceModal, SearchPreferenceFilters } from './SearchPreferenceModal';
+import { OfferEventsView } from './OfferEventsView';
 
 export interface DiscoverProfile {
   id: string;
@@ -129,7 +130,12 @@ interface DiscoverPageProps {
 
 export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
   // Navigation tabs: 'explore' | 'offers' | 'dates' | 'profile'
-  const [activeTab, setActiveTab] = useState<'explore' | 'offers' | 'dates' | 'profile'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'offers' | 'dates' | 'profile'>(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hash === '#offers') return 'offers';
+    }
+    return 'explore';
+  });
 
   // Filter category: 'dinner' | 'lunch' | 'events' | null
   const [selectedCategory, setSelectedCategory] = useState<'dinner' | 'lunch' | 'events' | null>('dinner');
@@ -231,6 +237,44 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
     }, 3500);
   };
 
+  // If Offers tab is selected, render the Where Should The Offer Take Them screen
+  if (activeTab === 'offers') {
+    return (
+      <div className="relative">
+        <OfferEventsView
+          onBack={() => {
+            setActiveTab('explore');
+            if (typeof window !== 'undefined') {
+              window.location.hash = '#discover';
+            }
+          }}
+          onContinue={(events) => {
+            setShowOfferSuccessToast(true);
+            setActiveTab('explore');
+            if (typeof window !== 'undefined') {
+              window.location.hash = '#discover';
+            }
+            setTimeout(() => {
+              setShowOfferSuccessToast(false);
+            }, 3500);
+          }}
+        />
+
+        {showOfferSuccessToast && (
+          <div className="fixed bottom-6 right-6 z-50 bg-[#16120F] text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10 animate-in slide-in-from-bottom-5 duration-300">
+            <div className="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center shrink-0">
+              <Check className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-white">Offer created successfully!</p>
+              <p className="text-[11px] text-white/70">Preferences have been updated.</p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full bg-[#EFE7DA] font-sans antialiased text-[#16120F] flex flex-col justify-between selection:bg-[#9F1E19]/15 pb-20 sm:pb-0">
       
@@ -285,7 +329,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
               type="button"
               onClick={() => setActiveTab('offers')}
               className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer ${
-                activeTab === 'offers'
+                (activeTab as string) === 'offers'
                   ? 'bg-[#9F1E19] text-white shadow-xs'
                   : 'text-[#6E6A63] hover:text-[#16120F] hover:bg-[#F5F1E6]'
               }`}
@@ -588,7 +632,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
           type="button"
           onClick={() => setActiveTab('offers')}
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
-            activeTab === 'offers' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
+            (activeTab as string) === 'offers' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
           }`}
         >
           <Send className="w-5 h-5 rotate-45" />
@@ -725,97 +769,21 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       )}
 
       {/* ============================================================ */}
-      {/* 6. SEND OFFER MODAL                                          */}
+      {/* 6. SEND OFFER MODAL (WHERE SHOULD THE OFFER TAKE THEM?)      */}
       {/* ============================================================ */}
       {offerModalProfile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[28px] max-w-[500px] w-full p-6 sm:p-7 shadow-2xl relative animate-in zoom-in-95 duration-200">
-            {/* Close button */}
-            <button
-              type="button"
-              onClick={() => setOfferModalProfile(null)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#F5F1E6] hover:bg-[#EADBCA] text-[#16120F] flex items-center justify-center transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* Recipient banner */}
-            <div className="flex items-center gap-3.5 mb-5">
-              <img
-                src={offerModalProfile.image}
-                alt={offerModalProfile.name}
-                className="w-13 h-13 rounded-2xl object-cover border border-[#EADBCA]"
-              />
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <h3 className="font-serif font-bold text-lg text-[#16120F]">
-                    Send Offer to {offerModalProfile.name}
-                  </h3>
-                  <span className="text-amber-500 text-sm">👑</span>
-                </div>
-                <p className="text-xs text-[#6E6A63]">
-                  {offerModalProfile.location} · Reliability {offerModalProfile.reliability.toFixed(1)}
-                </p>
-              </div>
-            </div>
-
-            <form onSubmit={handleSendOfferSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-[#16120F] mb-1.5">
-                  What outing would you like to invite them to?
-                </label>
-                <select
-                  value={selectedOfferOuting}
-                  onChange={(e) => setSelectedOfferOuting(e.target.value)}
-                  className="w-full bg-[#F5F1E6] border border-[#EADBCA] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#16120F] focus:outline-none focus:border-[#9F1E19]"
-                >
-                  <option value="Dinner at a fine restaurant">Dinner at a fine restaurant</option>
-                  <option value="Wine Tasting & Tapas">Wine Tasting & Tapas</option>
-                  <option value="Art Gallery & Rooftop Lounge">Art Gallery & Rooftop Lounge</option>
-                  <option value="Live Jazz & Cocktails">Live Jazz & Cocktails</option>
-                  <option value="Cooking Class for Two">Cooking Class for Two</option>
-                  <option value="Cozy Coffee & Walk">Cozy Coffee & Walk</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#16120F] mb-1.5">
-                  Personal message or venue idea (optional)
-                </label>
-                <textarea
-                  rows={3}
-                  value={offerMessage}
-                  onChange={(e) => setOfferMessage(e.target.value)}
-                  placeholder="e.g. I know a charming candlelit bistro near the waterfront, would love to host you this Friday."
-                  className="w-full bg-[#F5F1E6] border border-[#EADBCA] rounded-2xl p-3 text-xs sm:text-sm text-[#16120F] placeholder-[#6E6A63] focus:outline-none focus:border-[#9F1E19] resize-none"
-                />
-              </div>
-
-              <div className="bg-[#FAF0F1] border border-[#F3C5C7] rounded-xl p-3 text-[11px] text-[#9F1E19] flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 shrink-0" />
-                <span>
-                  As a Host, your offer includes dinner & reservation hospitality. Guests of honor review offers privately.
-                </span>
-              </div>
-
-              <div className="flex items-center gap-3 pt-2">
-                <button
-                  type="submit"
-                  className="flex-1 bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <Send className="w-3.5 h-3.5 rotate-45" />
-                  <span>Send Offer</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOfferModalProfile(null)}
-                  className="px-5 py-3 text-xs text-[#6E6A63] hover:text-[#16120F]"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <OfferEventsView
+            targetProfileName={offerModalProfile.name}
+            onBack={() => setOfferModalProfile(null)}
+            onContinue={(events) => {
+              setShowOfferSuccessToast(true);
+              setOfferModalProfile(null);
+              setTimeout(() => {
+                setShowOfferSuccessToast(false);
+              }, 3500);
+            }}
+          />
         </div>
       )}
 
