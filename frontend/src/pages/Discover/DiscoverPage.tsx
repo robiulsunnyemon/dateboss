@@ -1,0 +1,998 @@
+import React, { useState, useMemo } from 'react';
+import {
+  Search,
+  SlidersHorizontal,
+  Menu,
+  X,
+  MessageCircle,
+  User,
+  Compass,
+  Calendar,
+  Crown,
+  Heart,
+  Send,
+  Sparkles,
+  Check,
+  MapPin,
+  Clock,
+  ArrowRight,
+  ShieldCheck,
+} from 'lucide-react';
+
+export interface DiscoverProfile {
+  id: string;
+  name: string;
+  age: number;
+  image: string;
+  reliability: number;
+  distanceKm: number;
+  bio: string;
+  openTo: string[];
+  categories: Array<'dinner' | 'lunch' | 'events'>;
+  location?: string;
+  occupation?: string;
+  interests?: string[];
+}
+
+const SAMPLE_PROFILES: DiscoverProfile[] = [
+  {
+    id: '1',
+    name: 'Camila',
+    age: 29,
+    image: '/assets/discover-card-1.jpg',
+    reliability: 4.9,
+    distanceKm: 3,
+    bio: 'Long dinners, warm light, no rush.',
+    openTo: ['Dinner', 'Events'],
+    categories: ['dinner', 'events'],
+    location: 'Downtown, 3 km away',
+    occupation: 'Creative Producer',
+    interests: ['Fine Dining', 'Art Galleries', 'Wine Tasting', 'Cinema'],
+  },
+  {
+    id: '2',
+    name: 'Camila',
+    age: 29,
+    image: '/assets/discover-card-2.jpg',
+    reliability: 4.9,
+    distanceKm: 3,
+    bio: 'Long dinners, warm light, no rush.',
+    openTo: ['Dinner', 'Events'],
+    categories: ['dinner', 'lunch', 'events'],
+    location: 'West End, 3 km away',
+    occupation: 'Architectural Designer',
+    interests: ['Jazz Lounges', 'Coffee', 'Architecture', 'Cooking'],
+  },
+  {
+    id: '3',
+    name: 'Camila',
+    age: 18,
+    image: '/assets/discover-card-3.jpg',
+    reliability: 4.9,
+    distanceKm: 3,
+    bio: 'Long dinners, warm light, no rush.',
+    openTo: ['Dinner', 'Events'],
+    categories: ['dinner', 'events'],
+    location: 'Midtown, 3 km away',
+    occupation: 'Sound Designer & DJ',
+    interests: ['Live Concerts', 'Vinyl Bars', 'Rooftop Lounges', 'Sushi'],
+  },
+  {
+    id: '4',
+    name: 'Elena',
+    age: 27,
+    image: '/assets/discover-card-2.jpg',
+    reliability: 4.8,
+    distanceKm: 5,
+    bio: 'Slow Sunday brunches, vintage bookstores and great wine.',
+    openTo: ['Lunch', 'Events'],
+    categories: ['lunch', 'events'],
+    location: 'Old Town, 5 km away',
+    occupation: 'Curator',
+    interests: ['Bookstores', 'Museums', 'Botanical Gardens', 'Bistros'],
+  },
+  {
+    id: '5',
+    name: 'Maya',
+    age: 26,
+    image: '/assets/discover-card-1.jpg',
+    reliability: 5.0,
+    distanceKm: 2,
+    bio: 'Looking for thoughtful conversations and memorable evenings.',
+    openTo: ['Dinner', 'Lunch'],
+    categories: ['dinner', 'lunch'],
+    location: 'Harbor District, 2 km away',
+    occupation: 'Product Strategist',
+    interests: ['Tasting Menus', 'Opera', 'Day Trips', 'Farmers Market'],
+  },
+  {
+    id: '6',
+    name: 'Sophia',
+    age: 28,
+    image: '/assets/discover-card-3.jpg',
+    reliability: 4.9,
+    distanceKm: 4,
+    bio: 'Sunset terrace dining, acoustic sessions, and genuine laughs.',
+    openTo: ['Dinner', 'Events'],
+    categories: ['dinner', 'events'],
+    location: 'Hillside, 4 km away',
+    occupation: 'Brand Director',
+    interests: ['Cocktail Lounges', 'Modern Art', 'Boutique Hotels', 'Tennis'],
+  },
+];
+
+interface DiscoverPageProps {
+  onBackToLanding?: () => void;
+  onOpenProfile?: (profile: DiscoverProfile) => void;
+}
+
+export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
+  // Navigation tabs: 'explore' | 'offers' | 'dates' | 'profile'
+  const [activeTab, setActiveTab] = useState<'explore' | 'offers' | 'dates' | 'profile'>('explore');
+
+  // Filter category: 'dinner' | 'lunch' | 'events' | null
+  const [selectedCategory, setSelectedCategory] = useState<'dinner' | 'lunch' | 'events' | null>('dinner');
+
+  // Search query
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Mobile Side Menu Drawer
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+
+  // Send Offer Modal state
+  const [offerModalProfile, setOfferModalProfile] = useState<DiscoverProfile | null>(null);
+  const [selectedOfferOuting, setSelectedOfferOuting] = useState('Dinner at a fine restaurant');
+  const [offerMessage, setOfferMessage] = useState('');
+  const [showOfferSuccessToast, setShowOfferSuccessToast] = useState(false);
+
+  // View Profile Modal state
+  const [viewProfileModal, setViewProfileModal] = useState<DiscoverProfile | null>(null);
+
+  // Filter Drawer / Modal
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [maxDistance, setMaxDistance] = useState<number>(20);
+  const [minReliability, setMinReliability] = useState<number>(4.5);
+
+  // Filtered profiles list
+  const filteredProfiles = useMemo(() => {
+    return SAMPLE_PROFILES.filter((profile) => {
+      // Category filter
+      if (selectedCategory && !profile.categories.includes(selectedCategory)) {
+        return false;
+      }
+      // Distance filter
+      if (profile.distanceKm > maxDistance) {
+        return false;
+      }
+      // Reliability filter
+      if (profile.reliability < minReliability) {
+        return false;
+      }
+      // Search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchName = profile.name.toLowerCase().includes(query);
+        const matchBio = profile.bio.toLowerCase().includes(query);
+        const matchOpenTo = profile.openTo.some((item) =>
+          item.toLowerCase().includes(query)
+        );
+        return matchName || matchBio || matchOpenTo;
+      }
+      return true;
+    });
+  }, [selectedCategory, maxDistance, minReliability, searchQuery]);
+
+  const handleSendOfferSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowOfferSuccessToast(true);
+    setOfferModalProfile(null);
+    setOfferMessage('');
+    setTimeout(() => {
+      setShowOfferSuccessToast(false);
+    }, 3500);
+  };
+
+  return (
+    <div className="min-h-screen w-full bg-[#EFE7DA] font-sans antialiased text-[#16120F] flex flex-col justify-between selection:bg-[#9F1E19]/15 pb-20 sm:pb-0">
+      
+      {/* ============================================================ */}
+      {/* 1. TOP NAVBAR / HEADER                                      */}
+      {/* ============================================================ */}
+      <header className="w-full bg-[#EFE7DA]/95 sticky top-0 z-40 backdrop-blur-md border-b border-[#EADBCA]/60 transition-all">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+          
+          {/* Mobile: Left Hamburger Button */}
+          <div className="flex items-center gap-3 sm:hidden">
+            <button
+              type="button"
+              onClick={() => setIsSideMenuOpen(true)}
+              className="w-10 h-10 rounded-xl bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#16120F] hover:bg-[#F5F1E6] active:scale-95 transition-all shadow-xs cursor-pointer"
+              aria-label="Open side menu"
+            >
+              <Menu className="w-5 h-5 text-[#16120F]" />
+            </button>
+          </div>
+
+          {/* Logo (Left on desktop, right/center on mobile) */}
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              if (onBackToLanding) onBackToLanding();
+            }}
+            className="flex items-center gap-2 group cursor-pointer"
+          >
+            <img
+              src="/assets/logo.png"
+              alt="thedateboss"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+            />
+          </a>
+
+          {/* Center Navigation Tabs (Desktop only) */}
+          <nav className="hidden sm:flex items-center gap-1.5 bg-[#FAF7F2]/80 border border-[#EADBCA] p-1.5 rounded-full shadow-xs">
+            <button
+              type="button"
+              onClick={() => setActiveTab('explore')}
+              className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer ${
+                activeTab === 'explore'
+                  ? 'bg-[#9F1E19] text-white shadow-xs'
+                  : 'text-[#6E6A63] hover:text-[#16120F] hover:bg-[#F5F1E6]'
+              }`}
+            >
+              Explore
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('offers')}
+              className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer ${
+                activeTab === 'offers'
+                  ? 'bg-[#9F1E19] text-white shadow-xs'
+                  : 'text-[#6E6A63] hover:text-[#16120F] hover:bg-[#F5F1E6]'
+              }`}
+            >
+              Offers
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('dates')}
+              className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer ${
+                activeTab === 'dates'
+                  ? 'bg-[#9F1E19] text-white shadow-xs'
+                  : 'text-[#6E6A63] hover:text-[#16120F] hover:bg-[#F5F1E6]'
+              }`}
+            >
+              Dates
+            </button>
+          </nav>
+
+          {/* Right Icons: Messages + Profile (Desktop only) */}
+          <div className="hidden sm:flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsSideMenuOpen(true)}
+              className="w-10 h-10 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#16120F] hover:bg-[#F5F1E6] hover:border-[#9F1E19]/30 transition-all shadow-xs cursor-pointer relative"
+              aria-label="Messages"
+            >
+              <MessageCircle className="w-4 h-4 text-[#16120F]" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#9F1E19]"></span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('profile')}
+              className="w-10 h-10 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#16120F] hover:bg-[#F5F1E6] hover:border-[#9F1E19]/30 transition-all shadow-xs cursor-pointer"
+              aria-label="My Profile"
+            >
+              <User className="w-4 h-4 text-[#16120F]" />
+            </button>
+          </div>
+
+        </div>
+      </header>
+
+      {/* ============================================================ */}
+      {/* 2. MAIN CONTENT AREA                                        */}
+      {/* ============================================================ */}
+      <main className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1">
+        
+        {/* Search Bar + Filter Button (Pill Container) */}
+        <div className="w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-full p-1.5 sm:p-2 flex items-center shadow-xs transition-shadow focus-within:shadow-md focus-within:border-[#9F1E19]/40">
+          <div className="pl-3 sm:pl-4 pr-2 text-[#6E6A63]">
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#6E6A63]" />
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search"
+            className="flex-1 bg-transparent border-0 text-xs sm:text-sm text-[#16120F] placeholder-[#6E6A63] focus:outline-none focus:ring-0 font-sans"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="p-1 text-[#6E6A63] hover:text-[#16120F] text-xs font-semibold mr-1"
+            >
+              Clear
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setIsFilterModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#F5F1E6] hover:bg-[#EAE3D6] text-[#16120F] text-xs font-medium border border-[#E0D7C6] transition-colors cursor-pointer active:scale-95 shrink-0"
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5 text-[#16120F]" />
+            <span className="hidden sm:inline">Filter</span>
+          </button>
+        </div>
+
+        {/* Category Filter Pills (Dinner, Lunch, Events) */}
+        <div className="flex items-center gap-2 sm:gap-2.5 mt-4 sm:mt-5 overflow-x-auto pb-1 no-scrollbar">
+          <button
+            type="button"
+            onClick={() => setSelectedCategory(selectedCategory === 'dinner' ? null : 'dinner')}
+            className={`px-4 sm:px-5 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+              selectedCategory === 'dinner'
+                ? 'bg-[#16120F] text-white shadow-xs'
+                : 'bg-[#FAF7F2] text-[#16120F] border border-[#EADBCA] hover:border-[#16120F]/30'
+            }`}
+          >
+            Dinner
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSelectedCategory(selectedCategory === 'lunch' ? null : 'lunch')}
+            className={`px-4 sm:px-5 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+              selectedCategory === 'lunch'
+                ? 'bg-[#16120F] text-white shadow-xs'
+                : 'bg-[#FAF7F2] text-[#16120F] border border-[#EADBCA] hover:border-[#16120F]/30'
+            }`}
+          >
+            Lunch
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSelectedCategory(selectedCategory === 'events' ? null : 'events')}
+            className={`px-4 sm:px-5 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+              selectedCategory === 'events'
+                ? 'bg-[#16120F] text-white shadow-xs'
+                : 'bg-[#FAF7F2] text-[#16120F] border border-[#EADBCA] hover:border-[#16120F]/30'
+            }`}
+          >
+            Events
+          </button>
+
+          {selectedCategory && (
+            <button
+              type="button"
+              onClick={() => setSelectedCategory(null)}
+              className="text-xs text-[#9F1E19] hover:underline font-semibold ml-1 cursor-pointer"
+            >
+              Show all
+            </button>
+          )}
+        </div>
+
+        {/* ============================================================ */}
+        {/* CARDS FEED / GRID                                           */}
+        {/* ============================================================ */}
+        <section className="mt-6 sm:mt-8">
+          {filteredProfiles.length === 0 ? (
+            <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] p-10 text-center max-w-[480px] mx-auto my-12">
+              <Compass className="w-10 h-10 text-[#9F1E19]/60 mx-auto mb-3" />
+              <h3 className="font-serif font-bold text-lg text-[#16120F]">
+                No profiles match your filter
+              </h3>
+              <p className="text-xs text-[#6E6A63] mt-1.5 leading-relaxed">
+                Try clearing your search query or selecting another category to see more guests of honor.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setSearchQuery('');
+                  setMaxDistance(50);
+                }}
+                className="mt-4 bg-[#9F1E19] text-white text-xs px-5 py-2 rounded-full font-medium hover:bg-[#851713]"
+              >
+                Reset filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+              {filteredProfiles.map((profile) => (
+                <article
+                  key={profile.id}
+                  className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[24px] overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-md transition-all duration-200 group"
+                >
+                  {/* Card Image */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#E8DFD0]">
+                    <img
+                      src={profile.image}
+                      alt={profile.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 pointer-events-none" />
+                  </div>
+
+                  {/* Card Content Details */}
+                  <div className="p-4 sm:p-5 flex flex-col justify-between flex-1">
+                    <div>
+                      {/* Name, Age + Crown Icon */}
+                      <div className="flex items-center justify-between">
+                        <h2 className="font-serif font-bold text-lg sm:text-xl text-[#16120F] tracking-tight">
+                          {profile.name}, {profile.age}
+                        </h2>
+                        <span
+                          title="Verified Guest of Honor"
+                          className="text-[#B38E46] text-base"
+                        >
+                          👑
+                        </span>
+                      </div>
+
+                      {/* Reliability Score + Distance */}
+                      <div className="flex items-center gap-1.5 text-xs text-[#6E6A63] mt-0.5 font-normal">
+                        <span>Reliability {profile.reliability.toFixed(1)}</span>
+                        <span>·</span>
+                        <span>{profile.distanceKm} km away</span>
+                      </div>
+
+                      {/* Bio snippet */}
+                      <p className="text-xs sm:text-sm text-[#16120F] mt-2.5 font-normal leading-relaxed line-clamp-2">
+                        {profile.bio}
+                      </p>
+
+                      {/* Outings Open to */}
+                      <p className="text-[11px] sm:text-xs text-[#6E6A63] mt-2 font-medium">
+                        Open to {profile.openTo.join(' · ')}
+                      </p>
+                    </div>
+
+                    {/* Action Buttons: View Profile (outlined) & Send Offer (red solid) */}
+                    <div className="mt-5 pt-1 flex items-center gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => setViewProfileModal(profile)}
+                        className="flex-1 py-2.5 px-3 rounded-full border border-[#DED7C8] bg-[#FAF7F2] hover:bg-[#EFE7DA] text-[#16120F] font-semibold text-xs text-center transition-colors shadow-2xs active:scale-95 cursor-pointer"
+                      >
+                        View profile
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setOfferModalProfile(profile)}
+                        className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
+                      >
+                        Send offer
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+      </main>
+
+      {/* ============================================================ */}
+      {/* 3. DESKTOP FOOTER                                           */}
+      {/* ============================================================ */}
+      <footer className="w-full border-t border-[#EADBCA] mt-12 sm:mt-20 py-8 bg-[#EFE7DA]">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#6E6A63]">
+          
+          {/* Left: Copyright */}
+          <div className="flex items-center gap-2">
+            <img
+              src="/assets/seal.png"
+              alt="Seal"
+              className="w-4 h-4 object-contain opacity-80"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <span>© 2025 thedateboss - 18+ only</span>
+          </div>
+
+          {/* Center Links */}
+          <div className="flex items-center gap-5 sm:gap-6 font-medium">
+            <a href="#how-it-works" className="hover:text-[#16120F] transition-colors">
+              How it works
+            </a>
+            <a href="#roles" className="hover:text-[#16120F] transition-colors">
+              Roles
+            </a>
+            <a href="#safety" className="hover:text-[#16120F] transition-colors">
+              Safety
+            </a>
+            <a href="#faq" className="hover:text-[#16120F] transition-colors">
+              FAQ
+            </a>
+          </div>
+
+          {/* Right Links */}
+          <div className="flex items-center gap-5 sm:gap-6">
+            <a href="#terms" className="hover:text-[#16120F] transition-colors">
+              Terms & Conditions
+            </a>
+            <a href="#disclaimer" className="hover:text-[#16120F] transition-colors">
+              Disclaimer
+            </a>
+            <a href="#privacy" className="hover:text-[#16120F] transition-colors">
+              Privacy Policy
+            </a>
+          </div>
+
+        </div>
+      </footer>
+
+      {/* ============================================================ */}
+      {/* 4. MOBILE BOTTOM NAVIGATION BAR                              */}
+      {/* ============================================================ */}
+      <nav className="fixed bottom-0 left-0 right-0 z-30 sm:hidden bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#EADBCA] py-2 px-3 flex justify-around items-center shadow-lg">
+        <button
+          type="button"
+          onClick={() => setActiveTab('explore')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
+            activeTab === 'explore' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
+          }`}
+        >
+          <Compass className="w-5 h-5" />
+          <span className="text-[10px] font-semibold tracking-wide">Explore</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('offers')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
+            activeTab === 'offers' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
+          }`}
+        >
+          <Send className="w-5 h-5 rotate-45" />
+          <span className="text-[10px] font-medium tracking-wide">Offers</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('dates')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
+            activeTab === 'dates' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
+          }`}
+        >
+          <Calendar className="w-5 h-5" />
+          <span className="text-[10px] font-medium tracking-wide">Dates</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('profile')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
+            activeTab === 'profile' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
+          }`}
+        >
+          <User className="w-5 h-5" />
+          <span className="text-[10px] font-medium tracking-wide">Profile</span>
+        </button>
+      </nav>
+
+      {/* ============================================================ */}
+      {/* 5. SIDE MENU (MOBILE DRAWER MATCHING FIGMA)                 */}
+      {/* ============================================================ */}
+      {isSideMenuOpen && (
+        <div className="fixed inset-0 z-50 flex animate-in fade-in duration-200">
+          {/* Dark Backdrop Overlay */}
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsSideMenuOpen(false)}
+          />
+
+          {/* Drawer Sheet */}
+          <aside className="relative z-50 w-[290px] max-w-[85vw] h-full bg-[#16120F] text-[#F5F1E6] p-6 sm:p-8 flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-250">
+            <div>
+              {/* Header with Dark Red Square Close Button on top right */}
+              <div className="flex items-center justify-between pb-8">
+                <img
+                  src="/assets/logo.png"
+                  alt="thedateboss"
+                  className="h-7 w-auto object-contain brightness-200"
+                />
+                
+                <button
+                  type="button"
+                  onClick={() => setIsSideMenuOpen(false)}
+                  className="w-9 h-9 rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors cursor-pointer active:scale-95 shadow-sm"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Navigation Links list */}
+              <nav className="flex flex-col space-y-5 pt-3">
+                <a
+                  href="#messages"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsSideMenuOpen(false);
+                    alert('Messages drawer opens here');
+                  }}
+                  className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors flex items-center justify-between group"
+                >
+                  <span>Message</span>
+                  <span className="text-xs bg-[#9F1E19] text-white px-2 py-0.5 rounded-full font-semibold">1</span>
+                </a>
+
+                <a
+                  href="#how-it-works"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsSideMenuOpen(false);
+                    if (onBackToLanding) onBackToLanding();
+                  }}
+                  className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors"
+                >
+                  How It Works
+                </a>
+
+                <a
+                  href="#roles"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsSideMenuOpen(false);
+                    if (onBackToLanding) onBackToLanding();
+                  }}
+                  className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors"
+                >
+                  Roles
+                </a>
+
+                <a
+                  href="#safety"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsSideMenuOpen(false);
+                  }}
+                  className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors"
+                >
+                  Safety
+                </a>
+
+                <a
+                  href="#faq"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsSideMenuOpen(false);
+                  }}
+                  className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors"
+                >
+                  FAQ
+                </a>
+              </nav>
+            </div>
+
+            {/* Bottom Note */}
+            <div className="pt-6 border-t border-white/10 text-xs text-[#A9A49C]">
+              <p className="font-serif italic text-white/90 mb-1">
+                The date starts with an offer.
+              </p>
+              <p>© 2025 thedateboss</p>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 6. SEND OFFER MODAL                                          */}
+      {/* ============================================================ */}
+      {offerModalProfile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[28px] max-w-[500px] w-full p-6 sm:p-7 shadow-2xl relative animate-in zoom-in-95 duration-200">
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setOfferModalProfile(null)}
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#F5F1E6] hover:bg-[#EADBCA] text-[#16120F] flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Recipient banner */}
+            <div className="flex items-center gap-3.5 mb-5">
+              <img
+                src={offerModalProfile.image}
+                alt={offerModalProfile.name}
+                className="w-13 h-13 rounded-2xl object-cover border border-[#EADBCA]"
+              />
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-serif font-bold text-lg text-[#16120F]">
+                    Send Offer to {offerModalProfile.name}
+                  </h3>
+                  <span className="text-amber-500 text-sm">👑</span>
+                </div>
+                <p className="text-xs text-[#6E6A63]">
+                  {offerModalProfile.location} · Reliability {offerModalProfile.reliability.toFixed(1)}
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSendOfferSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#16120F] mb-1.5">
+                  What outing would you like to invite them to?
+                </label>
+                <select
+                  value={selectedOfferOuting}
+                  onChange={(e) => setSelectedOfferOuting(e.target.value)}
+                  className="w-full bg-[#F5F1E6] border border-[#EADBCA] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#16120F] focus:outline-none focus:border-[#9F1E19]"
+                >
+                  <option value="Dinner at a fine restaurant">Dinner at a fine restaurant</option>
+                  <option value="Wine Tasting & Tapas">Wine Tasting & Tapas</option>
+                  <option value="Art Gallery & Rooftop Lounge">Art Gallery & Rooftop Lounge</option>
+                  <option value="Live Jazz & Cocktails">Live Jazz & Cocktails</option>
+                  <option value="Cooking Class for Two">Cooking Class for Two</option>
+                  <option value="Cozy Coffee & Walk">Cozy Coffee & Walk</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#16120F] mb-1.5">
+                  Personal message or venue idea (optional)
+                </label>
+                <textarea
+                  rows={3}
+                  value={offerMessage}
+                  onChange={(e) => setOfferMessage(e.target.value)}
+                  placeholder="e.g. I know a charming candlelit bistro near the waterfront, would love to host you this Friday."
+                  className="w-full bg-[#F5F1E6] border border-[#EADBCA] rounded-2xl p-3 text-xs sm:text-sm text-[#16120F] placeholder-[#6E6A63] focus:outline-none focus:border-[#9F1E19] resize-none"
+                />
+              </div>
+
+              <div className="bg-[#FAF0F1] border border-[#F3C5C7] rounded-xl p-3 text-[11px] text-[#9F1E19] flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>
+                  As a Host, your offer includes dinner & reservation hospitality. Guests of honor review offers privately.
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="submit"
+                  className="flex-1 bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Send className="w-3.5 h-3.5 rotate-45" />
+                  <span>Send Offer</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOfferModalProfile(null)}
+                  className="px-5 py-3 text-xs text-[#6E6A63] hover:text-[#16120F]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 7. VIEW PROFILE MODAL                                        */}
+      {/* ============================================================ */}
+      {viewProfileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[28px] max-w-[540px] w-full overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setViewProfileModal(null)}
+              className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Profile Cover Image */}
+            <div className="h-60 w-full relative bg-[#E8DFD0] shrink-0">
+              <img
+                src={viewProfileModal.image}
+                alt={viewProfileModal.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute bottom-4 left-5 text-white">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-serif font-bold text-2xl">
+                    {viewProfileModal.name}, {viewProfileModal.age}
+                  </h3>
+                  <span className="text-amber-400 text-lg">👑</span>
+                </div>
+                <p className="text-xs text-white/80">
+                  {viewProfileModal.occupation} · {viewProfileModal.location}
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-4">
+              <div className="flex items-center justify-between bg-[#F5F1E6] rounded-2xl p-3 border border-[#EADBCA]">
+                <div className="text-center flex-1 border-r border-[#EADBCA]">
+                  <span className="block text-xs text-[#6E6A63]">Reliability</span>
+                  <span className="font-serif font-bold text-base text-[#16120F]">
+                    {viewProfileModal.reliability.toFixed(1)} / 5.0
+                  </span>
+                </div>
+                <div className="text-center flex-1 border-r border-[#EADBCA]">
+                  <span className="block text-xs text-[#6E6A63]">Distance</span>
+                  <span className="font-serif font-bold text-base text-[#16120F]">
+                    {viewProfileModal.distanceKm} km
+                  </span>
+                </div>
+                <div className="text-center flex-1">
+                  <span className="block text-xs text-[#6E6A63]">Status</span>
+                  <span className="font-semibold text-xs text-emerald-700">
+                    Verified
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-semibold text-[#16120F] uppercase tracking-wider mb-1">
+                  About
+                </h4>
+                <p className="text-xs sm:text-sm text-[#524D46] leading-relaxed">
+                  {viewProfileModal.bio}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-semibold text-[#16120F] uppercase tracking-wider mb-2">
+                  Open to Outings
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {viewProfileModal.openTo.map((outing, i) => (
+                    <span
+                      key={i}
+                      className="px-3 py-1 rounded-full bg-[#FAF0F1] border border-[#F3C5C7] text-[#9F1E19] text-xs font-medium"
+                    >
+                      {outing}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {viewProfileModal.interests && (
+                <div>
+                  <h4 className="text-xs font-semibold text-[#16120F] uppercase tracking-wider mb-2">
+                    Interests & Passions
+                  </h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {viewProfileModal.interests.map((tag, i) => (
+                      <span
+                        key={i}
+                        className="px-2.5 py-1 rounded-full bg-[#F5F1E6] border border-[#EADBCA] text-[#6E6A63] text-xs"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const prof = viewProfileModal;
+                    setViewProfileModal(null);
+                    setOfferModalProfile(prof);
+                  }}
+                  className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Send className="w-3.5 h-3.5 rotate-45" />
+                  <span>Send an Offer to {viewProfileModal.name}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 8. QUICK FILTER MODAL                                        */}
+      {/* ============================================================ */}
+      {isFilterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[28px] max-w-[420px] w-full p-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-4 border-b border-[#EADBCA]">
+              <h3 className="font-serif font-bold text-lg text-[#16120F]">
+                Filter Discover
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsFilterModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-[#F5F1E6] hover:bg-[#EADBCA] text-[#16120F] flex items-center justify-center cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="py-4 space-y-5">
+              <div>
+                <div className="flex justify-between text-xs font-semibold mb-1.5">
+                  <span>Max Distance</span>
+                  <span className="text-[#9F1E19]">{maxDistance} km</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="50"
+                  value={maxDistance}
+                  onChange={(e) => setMaxDistance(Number(e.target.value))}
+                  className="w-full accent-[#9F1E19]"
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs font-semibold mb-1.5">
+                  <span>Min Reliability Score</span>
+                  <span className="text-[#9F1E19]">{minReliability.toFixed(1)}+</span>
+                </div>
+                <input
+                  type="range"
+                  min="4.0"
+                  max="5.0"
+                  step="0.1"
+                  value={minReliability}
+                  onChange={(e) => setMinReliability(Number(e.target.value))}
+                  className="w-full accent-[#9F1E19]"
+                />
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsFilterModalOpen(false)}
+                className="flex-1 bg-[#9F1E19] hover:bg-[#851713] text-white text-xs py-2.5 rounded-full font-medium"
+              >
+                Apply Filters
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMaxDistance(50);
+                  setMinReliability(4.0);
+                  setIsFilterModalOpen(false);
+                }}
+                className="px-4 py-2.5 text-xs text-[#6E6A63] hover:text-[#16120F]"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 9. SUCCESS TOAST NOTIFICATION                                */}
+      {/* ============================================================ */}
+      {showOfferSuccessToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#16120F] text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10 animate-in slide-in-from-bottom-5 duration-300">
+          <div className="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center shrink-0">
+            <Check className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-white">Offer sent successfully!</p>
+            <p className="text-[11px] text-white/70">You will be notified once they respond.</p>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+export default DiscoverPage;

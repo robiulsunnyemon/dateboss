@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LandingPage } from './pages/Landing';
+import { DiscoverPage } from './pages/Discover';
 import {
   Step1Begin,
   Step2Interests,
@@ -18,9 +19,10 @@ import {
 import { UserRole } from './types/onboarding';
 
 export function App() {
-  // Routing view state: 'landing' | 'onboarding-step1' | 'onboarding-guest-events' | 'onboarding-step2' .. 'onboarding-step12'
+  // Routing view state: 'landing' | 'discover' | 'onboarding-step1' | 'onboarding-guest-events' | 'onboarding-step2' .. 'onboarding-step12'
   const [currentView, setCurrentView] = useState<
     | 'landing'
+    | 'discover'
     | 'onboarding-step1'
     | 'onboarding-guest-events'
     | 'onboarding-step2'
@@ -38,6 +40,7 @@ export function App() {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       const hash = window.location.hash;
+      if (path === '/discover' || hash === '#discover' || hash === '#explore') return 'discover';
       if (path === '/step12' || hash === '#step12' || hash === '#welcome-host' || hash === '#membership') return 'onboarding-step12';
       if (path === '/step11' || hash === '#step11' || hash === '#checking') return 'onboarding-step11';
       if (path === '/step10' || hash === '#step10' || hash === '#face' || hash === '#video-check') return 'onboarding-step10';
@@ -172,6 +175,14 @@ export function App() {
     }
   };
 
+  const navigateToDiscover = () => {
+    setCurrentView('discover');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'discover' }, '', '#discover');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const navigateToLanding = () => {
     setCurrentView('landing');
     if (typeof window !== 'undefined') {
@@ -185,7 +196,9 @@ export function App() {
     const handlePopState = () => {
       const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/step12' || hash === '#step12' || hash === '#welcome-host' || hash === '#membership') {
+      if (path === '/discover' || hash === '#discover' || hash === '#explore') {
+        setCurrentView('discover');
+      } else if (path === '/step12' || hash === '#step12' || hash === '#welcome-host' || hash === '#membership') {
         setCurrentView('onboarding-step12');
       } else if (path === '/step11' || hash === '#step11' || hash === '#checking') {
         setCurrentView('onboarding-step11');
@@ -364,11 +377,22 @@ export function App() {
       <Step12WelcomeHost
         onBack={() => navigateToStep10()}
         onStartHosting={() => {
-          navigateToLanding();
+          navigateToDiscover();
         }}
         onLookAround={() => {
-          navigateToLanding();
+          navigateToDiscover();
         }}
+        onBuyNow={() => {
+          navigateToDiscover();
+        }}
+      />
+    );
+  }
+
+  if (currentView === 'discover') {
+    return (
+      <DiscoverPage
+        onBackToLanding={navigateToLanding}
       />
     );
   }
