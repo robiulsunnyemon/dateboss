@@ -56,6 +56,14 @@ export function App() {
   });
 
   const [initialRole, setInitialRole] = useState<UserRole>('host');
+  const [step2Source, setStep2Source] = useState<'events' | 'host'>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      const path = window.location.pathname;
+      if (path === '/step2' || hash === '#step2' || hash === '#host') return 'host';
+    }
+    return 'events';
+  });
 
   const navigateToStep1 = (role: UserRole = 'host') => {
     setInitialRole(role);
@@ -67,6 +75,7 @@ export function App() {
   };
 
   const navigateToGuestEvents = () => {
+    setStep2Source('events');
     setCurrentView('onboarding-guest-events');
     if (typeof window !== 'undefined') {
       window.history.pushState({ view: 'onboarding-guest-events' }, '', '#events');
@@ -75,6 +84,7 @@ export function App() {
   };
 
   const navigateToStep2 = () => {
+    setStep2Source('host');
     setCurrentView('onboarding-step2');
     if (typeof window !== 'undefined') {
       window.history.pushState({ view: 'onboarding-step2' }, '', '#step2');
@@ -196,8 +206,10 @@ export function App() {
       } else if (path === '/step3' || hash === '#step3' || hash === '#account') {
         setCurrentView('onboarding-step3');
       } else if (path === '/events' || hash === '#events' || hash === '#guest-events') {
+        setStep2Source('events');
         setCurrentView('onboarding-guest-events');
       } else if (path === '/step2' || hash === '#step2' || hash === '#host') {
+        setStep2Source('host');
         setCurrentView('onboarding-step2');
       } else if (path === '/join' || hash === '#join') {
         setCurrentView('onboarding-step1');
@@ -233,7 +245,9 @@ export function App() {
     return (
       <Step2GuestEvents
         onBack={() => navigateToStep1(initialRole)}
-        onContinue={(_events) => navigateToStep3()}
+        onContinue={(_events) => {
+          navigateToStep3();
+        }}
       />
     );
   }
@@ -250,7 +264,13 @@ export function App() {
   if (currentView === 'onboarding-step3') {
     return (
       <Step3Account
-        onBack={() => navigateToStep1(initialRole)}
+        onBack={() => {
+          if (step2Source === 'events' || initialRole === 'guest') {
+            navigateToGuestEvents();
+          } else {
+            navigateToStep2();
+          }
+        }}
         onComplete={() => navigateToStep4()}
         onSignIn={navigateToLanding}
       />
