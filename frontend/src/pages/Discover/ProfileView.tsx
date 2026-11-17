@@ -9,10 +9,10 @@ import {
 
 export function ProfileView() {
   return (
-    <div className="w-full max-w-[1020px] mx-auto animate-in fade-in duration-200">
+    <div className="w-full mx-auto animate-in fade-in duration-200">
       
-      {/* Container: Borderless & full-bleed on mobile, Centered white card on desktop */}
-      <div className="bg-transparent sm:bg-[#FAF7F2] sm:border sm:border-[#EADBCA] sm:rounded-[36px] p-0 sm:p-10 lg:p-12 sm:shadow-[0_10px_35px_rgba(22,18,15,0.03)]">
+      {/* Container: Full-width matching Figma desktop view, centered */}
+      <div className="bg-transparent sm:bg-[#FAF7F2] sm:border sm:border-[#EADBCA] sm:rounded-[32px] p-0 sm:p-8 md:p-10 lg:p-12 sm:shadow-[0_10px_35px_rgba(22,18,15,0.03)]">
         
         {/* ============================================================ */}
         {/* 1. AVATAR & NAME SECTION                                     */}
@@ -73,18 +73,18 @@ export function ProfileView() {
             </button>
           </div>
 
-          {/* 4 Thumbnails on Mobile, 5 on Desktop */}
-          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
+          {/* Compact Thumbnails aligned to the left matching Figma (NOT stretched full width) */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5 overflow-x-auto pb-1 no-scrollbar">
             {[
-              '/assets/julian-gallery-1.jpg',
-              '/assets/julian-gallery-2.jpg',
-              '/assets/julian-gallery-3.jpg',
-              '/assets/julian-gallery-4.jpg',
-              '/assets/julian-gallery-5.jpg',
+              '/assets/julian-gallery-1.png',
+              '/assets/julian-gallery-2.png',
+              '/assets/julian-gallery-3.png',
+              '/assets/julian-gallery-4.png',
+              '/assets/julian-gallery-5.png',
             ].map((imgSrc, idx) => (
               <div
                 key={idx}
-                className={`relative aspect-square rounded-[18px] sm:rounded-[20px] overflow-hidden border border-[#EADBCA] shadow-2xs group cursor-pointer ${
+                className={`w-14 h-14 sm:w-16 sm:h-16 rounded-[14px] sm:rounded-[16px] overflow-hidden border border-[#EADBCA] shadow-2xs group cursor-pointer shrink-0 ${
                   idx === 4 ? 'hidden sm:block' : ''
                 }`}
               >
@@ -103,7 +103,7 @@ export function ProfileView() {
         {/* ============================================================ */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-2.5 mt-5 sm:mt-6">
           {/* Coffee */}
-          <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
+          <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[14px] sm:rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
             <div className="text-[10px] text-[#8A857D] font-medium mb-0.5">
               Coffee
             </div>
@@ -114,7 +114,7 @@ export function ProfileView() {
           </div>
 
           {/* Smoking */}
-          <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
+          <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[14px] sm:rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
             <div className="text-[10px] text-[#8A857D] font-medium mb-0.5">
               Smoking
             </div>
@@ -125,7 +125,7 @@ export function ProfileView() {
           </div>
 
           {/* Drinking */}
-          <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
+          <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[14px] sm:rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
             <div className="text-[10px] text-[#8A857D] font-medium mb-0.5">
               Drinking
             </div>
@@ -136,35 +136,35 @@ export function ProfileView() {
           </div>
 
           {/* Education */}
-          <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
+          <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[14px] sm:rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
             <div className="text-[10px] text-[#8A857D] font-medium mb-0.5">
               Education
             </div>
             <div className="text-xs font-semibold text-[#16120F] flex items-center gap-1 truncate">
               <GraduationCap className="w-3.5 h-3.5 text-[#16120F] shrink-0" />
-              <span className="truncate">Graduat...</span>
+              <span className="truncate">Graduate Deg.</span>
             </div>
           </div>
 
           {/* Profession */}
-          <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
+          <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[14px] sm:rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
             <div className="text-[10px] text-[#8A857D] font-medium mb-0.5">
               Profession
             </div>
             <div className="text-xs font-semibold text-[#16120F] flex items-center gap-1 truncate">
               <Briefcase className="w-3.5 h-3.5 text-[#16120F] shrink-0" />
-              <span className="truncate">Managin...</span>
+              <span className="truncate">Managing Directo...</span>
             </div>
           </div>
 
           {/* Net Worth */}
-          <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
+          <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[14px] sm:rounded-[16px] p-2.5 sm:p-3 shadow-2xs">
             <div className="text-[10px] text-[#8A857D] font-medium mb-0.5">
               Net Worth
             </div>
             <div className="text-xs font-semibold text-[#16120F] flex items-center gap-0.5">
               <span>$</span>
-              <span className="truncate">$1,000,0...</span>
+              <span>$1,000,000+</span>
             </div>
           </div>
         </div>
@@ -172,7 +172,7 @@ export function ProfileView() {
         {/* ============================================================ */}
         {/* 4. ENVISIONED IDEAL FIRST DATE                               */}
         {/* ============================================================ */}
-        <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[20px] p-4 sm:p-5 shadow-2xs mt-3 sm:mt-3.5">
+        <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[18px] sm:rounded-[22px] px-5 py-4 sm:px-6 sm:py-4.5 mt-3 sm:mt-3.5">
           <h3 className="font-semibold text-xs sm:text-[13px] text-[#16120F] mb-1">
             Envisioned Ideal First Date
           </h3>
@@ -184,7 +184,7 @@ export function ProfileView() {
         {/* ============================================================ */}
         {/* 5. INTRODUCE YOURSELF TO THE COMMUNITY                       */}
         {/* ============================================================ */}
-        <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[20px] p-4 sm:p-5 shadow-2xs mt-3 sm:mt-3.5">
+        <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[18px] sm:rounded-[22px] px-5 py-4 sm:px-6 sm:py-4.5 mt-3 sm:mt-3.5">
           <h3 className="font-semibold text-xs sm:text-[13px] text-[#16120F] mb-1">
             Introduce Yourself To The Community
           </h3>
@@ -196,11 +196,11 @@ export function ProfileView() {
         {/* ============================================================ */}
         {/* 6. WHAT ARE YOU INTO? (5 Chosen)                             */}
         {/* ============================================================ */}
-        <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[20px] p-4 sm:p-5 shadow-2xs mt-3 sm:mt-3.5">
+        <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[18px] sm:rounded-[22px] px-5 py-4 sm:px-6 sm:py-4.5 mt-3 sm:mt-3.5">
           <h3 className="font-semibold text-xs sm:text-[13px] text-[#16120F] mb-2">
             What Are You Into? (5 Chosen)
           </h3>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] sm:text-xs text-[#4A453E] font-medium">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] sm:text-xs text-[#4A453E] font-medium">
             <span className="flex items-center gap-1.5">
               <Check className="w-3.5 h-3.5 text-[#16120F] stroke-[2.5]" />
               <span>Fine Wine</span>
@@ -227,7 +227,7 @@ export function ProfileView() {
         {/* ============================================================ */}
         {/* 7. ESCROW BALANCE CARD                                       */}
         {/* ============================================================ */}
-        <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[20px] p-4 sm:p-5 shadow-2xs mt-3 sm:mt-3.5">
+        <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[18px] sm:rounded-[22px] px-5 py-4 sm:px-6 sm:py-4.5 mt-3 sm:mt-3.5">
           <div className="text-[10px] uppercase tracking-wider text-[#8A857D] font-medium mb-0.5">
             Escrow Balance
           </div>
@@ -242,7 +242,7 @@ export function ProfileView() {
         {/* ============================================================ */}
         {/* 8. ATTENDANCE RECORD CARD                                    */}
         {/* ============================================================ */}
-        <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[20px] p-4 sm:p-5 shadow-2xs mt-3 sm:mt-3.5">
+        <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[18px] sm:rounded-[22px] px-5 py-4 sm:px-6 sm:py-4.5 mt-3 sm:mt-3.5">
           <div className="text-[10px] uppercase tracking-wider text-[#8A857D] font-medium mb-0.5">
             Attendance Record
           </div>
@@ -257,7 +257,7 @@ export function ProfileView() {
         {/* ============================================================ */}
         {/* 9. MEMBER SINCE CARD                                         */}
         {/* ============================================================ */}
-        <div className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[20px] p-4 sm:p-5 shadow-2xs mt-3 sm:mt-3.5">
+        <div className="bg-[#FAF7F2] sm:bg-[#EFE7DA] border border-[#E4DAC8] rounded-[18px] sm:rounded-[22px] px-5 py-4 sm:px-6 sm:py-4.5 mt-3 sm:mt-3.5">
           <div className="text-[10px] uppercase tracking-wider text-[#8A857D] font-medium mb-0.5">
             Member Since
           </div>
