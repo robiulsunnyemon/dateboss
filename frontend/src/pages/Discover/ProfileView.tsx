@@ -12,7 +12,11 @@ export function ProfileView() {
   const [showReviews, setShowReviews] = useState(false);
 
   if (showReviews) {
-    return <ProfileReviewsView onBack={() => setShowReviews(false)} />;
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-[#FAF7F2] sm:bg-[#EFE7DA]">
+        <ProfileReviewsView onBack={() => setShowReviews(false)} />
+      </div>
+    );
   }
 
   return (

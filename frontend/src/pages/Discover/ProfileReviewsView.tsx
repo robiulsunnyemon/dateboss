@@ -146,19 +146,26 @@ export function ProfileReviewsView({ onBack }: ProfileReviewsViewProps) {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="font-serif font-bold text-2xl sm:text-[28px] text-[#16120F] tracking-tight">
-              {viewMode === 'appeals' ? 'Appeal Statues' : 'Review'}
+              {viewMode === 'appeals' ? (
+                <>
+                  <span className="sm:hidden">Review</span>
+                  <span className="hidden sm:inline">Appeal Statues</span>
+                </>
+              ) : (
+                'Review'
+              )}
             </h1>
           </div>
 
-          {viewMode === 'reviews' && (
-            <button
-              type="button"
-              onClick={() => setViewMode('appeals')}
-              className="bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-[13px] px-5 py-2 rounded-full shadow-xs transition-all active:scale-95 cursor-pointer"
-            >
-              Appeal statues
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setViewMode(viewMode === 'appeals' ? 'reviews' : 'appeals')}
+            className={`bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-[13px] px-5 py-2 rounded-full shadow-xs transition-all active:scale-95 cursor-pointer ${
+              viewMode === 'appeals' ? 'sm:hidden' : ''
+            }`}
+          >
+            Appeal statues
+          </button>
         </div>
 
         {/* ======================================================== */}
