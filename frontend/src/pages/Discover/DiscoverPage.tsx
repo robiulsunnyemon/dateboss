@@ -24,6 +24,7 @@ import { InviteDetailsView } from './InviteDetailsView';
 import { OffersView } from './OffersView';
 import { ConfirmedDatesView } from './ConfirmedDatesView';
 import { ProfileView } from './ProfileView';
+import { MessagesChatView } from './MessagesChatView';
 
 export interface DiscoverProfile {
   id: string;
@@ -151,6 +152,10 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
 
   // Mobile Side Menu Drawer
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+
+  // Messages Chat View State
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [initialChatContactName, setInitialChatContactName] = useState<string | undefined>(undefined);
 
   // Send Offer Modal state
   const [offerModalProfile, setOfferModalProfile] = useState<DiscoverProfile | null>(null);
@@ -325,7 +330,10 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
           <div className="hidden sm:flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setIsSideMenuOpen(true)}
+              onClick={() => {
+                setInitialChatContactName('Farhana Ahmed');
+                setIsMessagesOpen(true);
+              }}
               className="w-10 h-10 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#16120F] hover:bg-[#F5F1E6] hover:border-[#9F1E19]/30 transition-all shadow-xs cursor-pointer relative"
               aria-label="Messages"
             >
@@ -359,9 +367,20 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
           : 'px-4 sm:px-6 lg:px-8 py-5 sm:py-8'
       }`}>
         {activeTab === 'offers' ? (
-          <OffersView onNavigateExplore={() => setActiveTab('explore')} />
+          <OffersView
+            onNavigateExplore={() => setActiveTab('explore')}
+            onOpenChat={(offer) => {
+              setInitialChatContactName(offer.userName);
+              setIsMessagesOpen(true);
+            }}
+          />
         ) : activeTab === 'dates' ? (
-          <ConfirmedDatesView />
+          <ConfirmedDatesView
+            onOpenChat={(item) => {
+              setInitialChatContactName(item.userName);
+              setIsMessagesOpen(true);
+            }}
+          />
         ) : activeTab === 'profile' ? (
           <ProfileView />
         ) : (
@@ -693,7 +712,8 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                   onClick={(e) => {
                     e.preventDefault();
                     setIsSideMenuOpen(false);
-                    alert('Messages drawer opens here');
+                    setInitialChatContactName('Farhana Ahmed');
+                    setIsMessagesOpen(true);
                   }}
                   className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors flex items-center justify-between group"
                 >
@@ -930,6 +950,21 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
         onReset={handleResetPreferences}
         initialFilters={searchPreferences}
       />
+
+      {/* ============================================================ */}
+      {/* 8. MESSAGES / CHAT VIEW (FIGMA SCREENSHOT DESIGN)            */}
+      {/* ============================================================ */}
+      {isMessagesOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <MessagesChatView
+            initialContactName={initialChatContactName}
+            onClose={() => {
+              setIsMessagesOpen(false);
+              setInitialChatContactName(undefined);
+            }}
+          />
+        </div>
+      )}
 
       {/* ============================================================ */}
       {/* 9. SUCCESS TOAST NOTIFICATION                                */}

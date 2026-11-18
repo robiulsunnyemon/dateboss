@@ -11,3 +11,5 @@ export type { ConfirmedDateItem } from './ConfirmedDatesView';
 export { ProfileView } from './ProfileView';
 export { InviteDetailsView } from './InviteDetailsView';
 export type { InviteDetailsViewProps } from './InviteDetailsView';
+export { MessagesChatView } from './MessagesChatView';
+export type { MessagesChatViewProps, ChatContact, ChatMessage } from './MessagesChatView';
