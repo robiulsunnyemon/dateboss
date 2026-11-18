@@ -4,8 +4,6 @@ import {
   MapPin,
   Clock,
   ShieldCheck,
-  CheckCircle2,
-  MessageCircle,
   Star,
   X,
   Check,
@@ -27,6 +25,54 @@ export interface ConfirmedDateItem {
   youStatus: 'Confirmed' | 'Pending';
   counterpartStatus: 'Confirmed' | 'Pending';
 }
+
+const SAMPLE_HOST_CONFIRMED_DATES: ConfirmedDateItem[] = [
+  {
+    id: 'date-h-1',
+    userName: 'Sophia Laurent',
+    userAvatar: '/assets/discover-card-1.jpg',
+    reliability: 4.97,
+    isVerified: true,
+    escrowGift: 200,
+    venueName: 'Caviar Russe',
+    venueAddress: '538 Madison Ave, New York',
+    dateTime: 'Friday, Nov 1 · 8:30 PM',
+    courtesyWindow: 'Arrival window: 15 min courtesy',
+    checkInStatus: 'Confirmed',
+    youStatus: 'Confirmed',
+    counterpartStatus: 'Pending',
+  },
+  {
+    id: 'date-h-2',
+    userName: "Liam O'Connor",
+    userAvatar: '/assets/discover-card-2.jpg',
+    reliability: 4.85,
+    isVerified: true,
+    escrowGift: 150,
+    venueName: 'Blue Hill',
+    venueAddress: '75 Washington Pl, New York',
+    dateTime: 'Saturday, Nov 2 · 7:00 PM',
+    courtesyWindow: 'Arrival window: 20 min courtesy',
+    checkInStatus: 'Confirmed',
+    youStatus: 'Confirmed',
+    counterpartStatus: 'Confirmed',
+  },
+  {
+    id: 'date-h-3',
+    userName: 'Maya Fernandez',
+    userAvatar: '/assets/discover-card-3.jpg',
+    reliability: 4.99,
+    isVerified: true,
+    escrowGift: 250,
+    venueName: 'Le Bernardin',
+    venueAddress: '155 W 51st St, New York',
+    dateTime: 'Sunday, Nov 3 · 6:45 PM',
+    courtesyWindow: 'Arrival window: 10 min courtesy',
+    checkInStatus: 'Confirmed',
+    youStatus: 'Confirmed',
+    counterpartStatus: 'Pending',
+  },
+];
 
 const SAMPLE_GUEST_CONFIRMED_DATES: ConfirmedDateItem[] = [
   {
@@ -59,19 +105,16 @@ const SAMPLE_GUEST_CONFIRMED_DATES: ConfirmedDateItem[] = [
     youStatus: 'Confirmed',
     counterpartStatus: 'Confirmed',
   },
-];
-
-const SAMPLE_HOST_CONFIRMED_DATES: ConfirmedDateItem[] = [
   {
-    id: 'date-h-1',
-    userName: 'Sophia Laurent',
+    id: 'date-g-3',
+    userName: 'Julian Sterling',
     userAvatar: '/assets/discover-card-1.jpg',
     reliability: 4.97,
     isVerified: true,
-    escrowGift: 200,
-    venueName: 'Caviar Russe',
-    venueAddress: '538 Madison Ave, New York',
-    dateTime: 'Friday, Nov 1 · 8:30 PM',
+    escrowGift: 250,
+    venueName: 'Carbone',
+    venueAddress: '181 Thompson St, New York',
+    dateTime: 'Sunday, Nov 10 · 7:30 PM',
     courtesyWindow: 'Arrival window: 15 min courtesy',
     checkInStatus: 'Confirmed',
     youStatus: 'Confirmed',
@@ -128,7 +171,7 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
       }
       showToast(
         isGuest
-          ? 'Attendance confirmed! Your $200 escrow gift has been released to your wallet.'
+          ? 'Attendance confirmed! Your escrow gift has been released to your wallet.'
           : 'Attendance & rating verified! Escrow payout released to guest.'
       );
       setRatingModalDate(null);
@@ -149,52 +192,55 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
       </div>
 
       {/* Headline: Confirmed Dates */}
-      <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#16120F] tracking-tight leading-tight mb-5 sm:mb-6">
+      <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#16120F] tracking-tight leading-tight mb-5 sm:mb-7">
         Confirmed Dates
       </h1>
 
-      {/* Dates Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 sm:gap-6">
+      {/* 3-Column Responsive Dates Cards Grid (matching Figma desktop & mobile view) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
         {datesList.map((item) => (
           <div
             key={item.id}
-            className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] sm:rounded-[28px] p-4 sm:p-6 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
+            className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] sm:rounded-[26px] p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
           >
             <div>
-              {/* Top Bar: Confirmed Date & Escrow Gift */}
-              <div className="flex items-center justify-between text-[11px] pb-3 mb-4 border-b border-[#EADBCA]/60">
-                <span className="font-medium text-[#6E6A63]">Confirmed Date</span>
-                <span className="flex items-center gap-1 text-emerald-700 font-bold bg-[#ECFDF5] px-2.5 py-1 rounded-full border border-emerald-200">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  Escrow Gift: ${item.escrowGift} Protected
+              {/* Top Header Row inside card */}
+              <div className="flex items-center justify-between text-[11px] pb-3 mb-3 border-b border-[#EADBCA]/60">
+                <span className="text-[#8A857D] font-normal">
+                  Confirmed Date
+                </span>
+                <span className="flex items-center gap-1 text-[#059669] font-medium text-[11px]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#059669]" />
+                  <span>Escrow Gift: ${item.escrowGift}</span>
+                  <span>Protected</span>
                 </span>
               </div>
 
-              {/* Host / Counterpart Profile Header */}
-              <div className="flex items-center gap-3.5 mb-4">
+              {/* User Profile Header */}
+              <div className="flex items-center gap-3 mb-3.5">
                 <img
                   src={item.userAvatar}
                   alt={item.userName}
-                  className="w-13 h-13 rounded-full object-cover border-2 border-[#EADBCA] shadow-2xs"
+                  className="w-10 h-10 rounded-full object-cover border border-[#EADBCA]"
                 />
                 <div>
-                  <h3 className="font-serif font-bold text-base sm:text-lg text-[#16120F]">
+                  <h3 className="font-serif font-bold text-sm sm:text-base text-[#16120F]">
                     {item.userName}
                   </h3>
                   <div className="flex items-center gap-1.5 text-xs text-[#6E6A63] mt-0.5">
                     <span>{item.reliability} Reliability</span>
                     <span>·</span>
-                    <span className="text-emerald-700 font-semibold flex items-center gap-0.5">
-                      <Check className="w-3 h-3" /> ID Verified
+                    <span className="text-[#2563EB] font-medium flex items-center gap-0.5">
+                      <Check className="w-3 h-3 text-[#2563EB]" /> ID Verified
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Reserved Venue Info */}
-              <div className="bg-[#F5EFE6] rounded-2xl p-3.5 mb-3.5 border border-[#E5DDD0] space-y-3">
+              {/* Reserved Venue Info Box */}
+              <div className="bg-[#F5EFE6] rounded-[18px] p-3.5 mb-3 border border-[#E5DDD0] space-y-2.5">
                 <div>
-                  <div className="text-[10px] uppercase font-bold text-[#8A857D] tracking-wider">
+                  <div className="text-[10px] uppercase font-semibold text-[#9F1E19] tracking-wider">
                     Reserved Venue
                   </div>
                   <div className="text-xs sm:text-[13px] font-bold text-[#16120F] mt-0.5">
@@ -206,27 +252,27 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#E5DDD0]">
-                  <div className="text-[10px] uppercase font-bold text-[#8A857D] tracking-wider">
+                <div className="pt-2 border-t border-[#E5DDD0]/70">
+                  <div className="text-[10px] uppercase font-semibold text-[#9F1E19] tracking-wider">
                     Reserved Time
                   </div>
                   <div className="text-xs sm:text-[13px] font-bold text-[#16120F] mt-0.5">
                     {item.dateTime}
                   </div>
                   <div className="flex items-center gap-1 text-[11px] text-[#6E6A63] mt-0.5">
-                    <Clock className="w-3 h-3 text-[#9F1E19] shrink-0" />
+                    <Calendar className="w-3 h-3 text-[#9F1E19] shrink-0" />
                     <span>{item.courtesyWindow}</span>
                   </div>
                 </div>
               </div>
 
-              {/* 24-Hour Attendance Check-In Section */}
-              <div className="bg-[#FAF7F2] border border-[#E8DFD0] rounded-[18px] p-3.5 mb-4 space-y-1.5">
+              {/* 24-Hour Attendance Check-In Box */}
+              <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[18px] p-3 mb-3.5 space-y-1.5">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-[#16120F]">
                     24-Hour Attendance Check-In
                   </h4>
-                  <span className="bg-[#ECFDF5] text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+                  <span className="bg-[#ECFDF5] text-[#059669] text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">
                     Confirmed
                   </span>
                 </div>
@@ -236,25 +282,23 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
                 </p>
 
                 <div className="text-[11px] flex items-center gap-2 pt-0.5 font-medium">
-                  <span className="text-emerald-700">
+                  <span className="text-[#059669]">
                     You: <strong className="font-semibold">Confirmed</strong>
                   </span>
                   <span className="text-[#8A857D]">·</span>
-                  <span className={item.counterpartStatus === 'Confirmed' ? 'text-emerald-700' : 'text-[#9F1E19]'}>
+                  <span className={item.counterpartStatus === 'Confirmed' ? 'text-[#059669]' : 'text-[#9F1E19]'}>
                     {item.userName}: <strong className="font-semibold">{item.counterpartStatus}</strong>
                   </span>
                 </div>
 
                 <p className="text-[10px] text-[#8A857D] pt-0.5">
-                  {isGuest
-                    ? 'Host Action: Verify attendance to release escrow gift.'
-                    : 'Your Action: Verify attendance to release escrow gift to guest.'}
+                  Host Action: Verify attendance to release escrow gift.
                 </p>
               </div>
 
             </div>
 
-            {/* Bottom Action Buttons: Open Chat & Confirm/Report Attendance & Rating */}
+            {/* Bottom Action Buttons: Open Chat & Report/Confirm Attendance & Rating */}
             <div className="pt-2 flex items-center gap-2 border-t border-[#EADBCA]/60">
               <button
                 type="button"
@@ -262,7 +306,7 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
                   if (onOpenChat) onOpenChat(item);
                   else showToast(`Opening chat with ${item.userName}...`);
                 }}
-                className="flex-1 bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#EADBCA] text-[#16120F] text-xs font-semibold py-2.5 px-3 rounded-full transition-all active:scale-95 cursor-pointer text-center whitespace-nowrap"
+                className="flex-1 bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] text-xs font-semibold py-2.5 px-3 rounded-full transition-all active:scale-95 cursor-pointer text-center whitespace-nowrap shadow-2xs"
               >
                 Open Chat
               </button>
@@ -290,7 +334,7 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
               <button
                 type="button"
                 onClick={() => setRatingModalDate(null)}
-                className="w-8 h-8 rounded-full bg-[#9F1E19] text-white flex items-center justify-center hover:bg-[#851713] transition-all cursor-pointer shadow-xs"
+                className="w-8 h-8 rounded-full bg-[#9F1E19] text-white flex items-center justify-center hover:bg-[#851713] transition-all cursor-pointer shadow-xs active:scale-95"
                 aria-label="Close"
               >
                 <X className="w-4 h-4" />
