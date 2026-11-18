@@ -22,46 +22,84 @@ async function main() {
   });
   console.log('[Seed] Admin created:', admin.email);
 
-  // 2. Seed Verified Host (Male)
-  const host = await prisma.user.upsert({
-    where: { email: 'alexandre.host@thedateboss.com' },
-    update: {},
-    create: {
+  // 2. Seed Verified Hosts (Men / Inviter)
+  const hostsData = [
+    {
       email: 'alexandre.host@thedateboss.com',
-      passwordHash,
-      role: Role.HOST,
-      gender: Gender.MAN,
-      targetGender: TargetGender.WOMEN,
       nickname: 'Alexandre',
-      locationCity: 'West End, London',
-      isVerified: true,
-      onboardingStep: 12,
-      hostProfile: {
-        create: {
-          interests: ['Fine Dining', 'Opera & Theatre', 'Wine Tasting', 'Architecture'],
-          occupation: 'Managing Partner',
-          education: 'Master Degree',
-          annualIncome: '$250k - $500k',
-          netWorth: '$1M - $5M',
-          smoking: 'Socially',
-          drinking: 'Socially',
-          children: 'Someday',
-          bio: 'Passionate about culinary arts, vintage vinyl, and thoughtful date hospitality.',
-          photos: ['/assets/discover-card-2.jpg'],
-        },
-      },
-      subscription: {
-        create: {
-          plan: 'HOST_MONTHLY_PRO',
-          priceCents: 999,
-          status: 'ACTIVE',
-        },
-      },
+      occupation: 'Managing Partner',
+      city: 'West End, London',
+      bio: 'Passionate about culinary arts, vintage vinyl, and thoughtful date hospitality.',
+      interests: ['Fine Dining', 'Opera & Theatre', 'Wine Tasting', 'Architecture'],
+      image: '/assets/discover-card-2.jpg',
+      income: '$250k - $500k',
+      netWorth: '$1M - $5M',
     },
-  });
-  console.log('[Seed] Host created:', host.nickname);
+    {
+      email: 'julian.sterling@thedateboss.com',
+      nickname: 'Julian Sterling',
+      occupation: 'Private Equity Managing Director',
+      city: 'Upper East Side, NY',
+      bio: 'Fond of vintage Bordeaux, competitive polo, and lively discussions on world history. I believe in chivalry, clear intentions, and elevated experiences.',
+      interests: ['Vintage Bordeaux', 'Polo', 'World History', 'Opera'],
+      image: '/assets/discover-card-1.jpg',
+      income: '$500k+',
+      netWorth: '$5M+',
+    },
+    {
+      email: 'farhan.ahmed@thedateboss.com',
+      nickname: 'Farhan Ahmed',
+      occupation: 'Venture Capital Partner',
+      city: 'Tribeca, NY',
+      bio: 'Passionate about contemporary art, Michelin dining, and meaningful conversations.',
+      interests: ['Michelin Dining', 'Jazz', 'Contemporary Art', 'Sailing'],
+      image: '/assets/discover-card-3.jpg',
+      income: '$500k+',
+      netWorth: '$5M+',
+    },
+  ];
 
-  // 3. Seed Verified Guests of Honor (Female)
+  for (const h of hostsData) {
+    const hostUser = await prisma.user.upsert({
+      where: { email: h.email },
+      update: {},
+      create: {
+        email: h.email,
+        passwordHash,
+        role: Role.HOST,
+        gender: Gender.MAN,
+        targetGender: TargetGender.WOMEN,
+        nickname: h.nickname,
+        locationCity: h.city,
+        isVerified: true,
+        onboardingStep: 12,
+        hostProfile: {
+          create: {
+            interests: h.interests,
+            occupation: h.occupation,
+            education: 'Master Degree',
+            annualIncome: h.income,
+            netWorth: h.netWorth,
+            smoking: 'Socially',
+            drinking: 'Socially',
+            children: 'Someday',
+            bio: h.bio,
+            photos: [h.image],
+          },
+        },
+        subscription: {
+          create: {
+            plan: 'HOST_MONTHLY_PRO',
+            priceCents: 999,
+            status: 'ACTIVE',
+          },
+        },
+      },
+    });
+    console.log('[Seed] Host created:', hostUser.nickname);
+  }
+
+  // 3. Seed Verified Guests of Honor (Women / Invitee)
   const guestsData = [
     {
       email: 'camila@thedateboss.com',
@@ -72,6 +110,16 @@ async function main() {
       outings: ['Weddings', 'Coffee', 'Museums', 'Cooking', 'Day Trips', 'Dinner'],
       image: '/assets/discover-card-1.jpg',
       reliability: 4.9,
+    },
+    {
+      email: 'sophia@thedateboss.com',
+      nickname: 'Sophia Laurent',
+      age: 28,
+      occupation: 'Brand Director',
+      bio: 'Sunset terrace dining, acoustic sessions, and genuine laughs.',
+      outings: ['Dinner', 'Cocktail Lounges', 'Modern Art', 'Tennis'],
+      image: '/assets/discover-card-3.jpg',
+      reliability: 4.97,
     },
     {
       email: 'elena@thedateboss.com',

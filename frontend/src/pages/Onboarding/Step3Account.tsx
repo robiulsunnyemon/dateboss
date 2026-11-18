@@ -159,9 +159,10 @@ export function Step3Account({
 
     try {
       let resolvedRole: 'host' | 'guest' = userRole;
-      if (cleanEmail.toLowerCase().includes('camila')) {
+      const lower = cleanEmail.toLowerCase();
+      if (lower.includes('camila') || lower.includes('sophia') || lower.includes('elena') || lower.includes('maya')) {
         resolvedRole = 'guest';
-      } else if (cleanEmail.toLowerCase().includes('alexandre')) {
+      } else if (lower.includes('alexandre') || lower.includes('julian') || lower.includes('farhan') || lower.includes('marcus')) {
         resolvedRole = 'host';
       }
 
@@ -442,10 +443,24 @@ export function Step3Account({
                 </button>
                 <button
                   type="button"
+                  onClick={() => fillQuickTest('sophia@thedateboss.com')}
+                  className="px-3 py-1 bg-[#F5F1E6] border border-[#EADBCA] text-[11px] font-medium rounded-full hover:border-[#9F1E19] text-[#16120F]"
+                >
+                  Sophia (Guest)
+                </button>
+                <button
+                  type="button"
                   onClick={() => fillQuickTest('alexandre.host@thedateboss.com')}
                   className="px-3 py-1 bg-[#F5F1E6] border border-[#EADBCA] text-[11px] font-medium rounded-full hover:border-[#9F1E19] text-[#16120F]"
                 >
                   Alexandre (Host)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillQuickTest('julian.sterling@thedateboss.com')}
+                  className="px-3 py-1 bg-[#F5F1E6] border border-[#EADBCA] text-[11px] font-medium rounded-full hover:border-[#9F1E19] text-[#16120F]"
+                >
+                  Julian (Host)
                 </button>
                 <button
                   type="button"
