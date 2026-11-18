@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { SearchPreferenceModal, SearchPreferenceFilters } from './SearchPreferenceModal';
 import { OfferEventsView } from './OfferEventsView';
+import { InviteDetailsView } from './InviteDetailsView';
 import { OffersView } from './OffersView';
 import { ConfirmedDatesView } from './ConfirmedDatesView';
 import { ProfileView } from './ProfileView';
@@ -153,6 +154,8 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
 
   // Send Offer Modal state
   const [offerModalProfile, setOfferModalProfile] = useState<DiscoverProfile | null>(null);
+  const [offerStep, setOfferStep] = useState<'events' | 'details'>('events');
+  const [selectedOfferEvents, setSelectedOfferEvents] = useState<string[]>([]);
   const [selectedOfferOuting, setSelectedOfferOuting] = useState('Dinner at a fine restaurant');
   const [offerMessage, setOfferMessage] = useState('');
   const [showOfferSuccessToast, setShowOfferSuccessToast] = useState(false);
@@ -531,7 +534,10 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
 
                       <button
                         type="button"
-                        onClick={() => setOfferModalProfile(profile)}
+                        onClick={() => {
+                          setOfferModalProfile(profile);
+                          setOfferStep('events');
+                        }}
                         className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
                       >
                         Send offer
@@ -755,16 +761,35 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       )}
 
       {/* ============================================================ */}
-      {/* 6. SEND OFFER MODAL (WHERE SHOULD THE OFFER TAKE THEM?)      */}
+      {/* 6. SEND OFFER MODAL (STEP 1: EVENTS, STEP 2: DETAILS)        */}
       {/* ============================================================ */}
-      {offerModalProfile && (
+      {offerModalProfile && offerStep === 'events' && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <OfferEventsView
             targetProfileName={offerModalProfile.name}
             onBack={() => setOfferModalProfile(null)}
             onContinue={(events) => {
+              setSelectedOfferEvents(events);
+              setOfferStep('details');
+              window.scrollTo({ top: 0, behavior: 'instant' });
+            }}
+          />
+        </div>
+      )}
+
+      {offerModalProfile && offerStep === 'details' && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <InviteDetailsView
+            targetProfileName={offerModalProfile.name}
+            selectedEvents={selectedOfferEvents}
+            onBack={() => {
+              setOfferStep('events');
+              window.scrollTo({ top: 0, behavior: 'instant' });
+            }}
+            onSendOffer={(_offerData) => {
               setShowOfferSuccessToast(true);
               setOfferModalProfile(null);
+              setOfferStep('events');
               setTimeout(() => {
                 setShowOfferSuccessToast(false);
               }, 3500);
@@ -882,6 +907,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                     const prof = viewProfileModal;
                     setViewProfileModal(null);
                     setOfferModalProfile(prof);
+                    setOfferStep('events');
                   }}
                   className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
                 >

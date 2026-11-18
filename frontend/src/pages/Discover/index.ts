@@ -9,3 +9,5 @@ export type { OfferFilterType, OfferItem, CounterOfferItem, PassOfferItem } from
 export { ConfirmedDatesView } from './ConfirmedDatesView';
 export type { ConfirmedDateItem } from './ConfirmedDatesView';
 export { ProfileView } from './ProfileView';
+export { InviteDetailsView } from './InviteDetailsView';
+export type { InviteDetailsViewProps } from './InviteDetailsView';
