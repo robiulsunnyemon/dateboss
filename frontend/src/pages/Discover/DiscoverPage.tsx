@@ -467,32 +467,6 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             </button>
           </nav>
 
-          {/* Role Switcher Pill (Host / Guest View) */}
-          <div className="flex items-center bg-[#FAF7F2] border border-[#EADBCA] p-1 rounded-full shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setRole('host')}
-              className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
-                isHost
-                  ? 'bg-[#16120F] text-white shadow-xs'
-                  : 'text-[#6E6A63] hover:text-[#16120F]'
-              }`}
-            >
-              Host View (Male)
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole('guest')}
-              className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
-                isGuest
-                  ? 'bg-[#9F1E19] text-white shadow-xs'
-                  : 'text-[#6E6A63] hover:text-[#16120F]'
-              }`}
-            >
-              Guest View (Female)
-            </button>
-          </div>
-
           {/* Right Icons: Messages + Profile (Desktop only) */}
           <div className="hidden sm:flex items-center gap-3">
             <button
@@ -933,39 +907,6 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                 >
                   FAQ
                 </a>
-
-                {/* Mobile Role Switcher */}
-                <div className="pt-4 border-t border-white/10">
-                  <div className="text-[11px] text-[#A9A49C] uppercase font-bold tracking-wider mb-2">
-                    Active Role:
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 bg-white/5 p-1 rounded-2xl border border-white/10">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRole('host');
-                        setIsSideMenuOpen(false);
-                      }}
-                      className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        isHost ? 'bg-white text-[#16120F]' : 'text-white/70 hover:text-white'
-                      }`}
-                    >
-                      Host (Male)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRole('guest');
-                        setIsSideMenuOpen(false);
-                      }}
-                      className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        isGuest ? 'bg-[#9F1E19] text-white' : 'text-white/70 hover:text-white'
-                      }`}
-                    >
-                      Guest (Female)
-                    </button>
-                  </div>
-                </div>
               </nav>
             </div>
 

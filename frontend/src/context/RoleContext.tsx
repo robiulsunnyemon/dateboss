@@ -17,6 +17,14 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('thedateboss_active_role');
       if (saved === 'host' || saved === 'guest') return saved;
+      const userStr = localStorage.getItem('thedateboss_user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          if (user.role === 'GUEST') return 'guest';
+          if (user.role === 'HOST') return 'host';
+        } catch (_) {}
+      }
     }
     return 'host'; // Default to host
   });
@@ -31,6 +39,23 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   const toggleRole = () => {
     setRole(role === 'host' ? 'guest' : 'host');
   };
+
+  // Synchronize on window focus or storage update
+  useEffect(() => {
+    const syncRoleFromStorage = () => {
+      const saved = localStorage.getItem('thedateboss_active_role');
+      if (saved === 'host' || saved === 'guest') {
+        if (saved !== role) setRoleState(saved);
+      }
+    };
+
+    window.addEventListener('storage', syncRoleFromStorage);
+    window.addEventListener('focus', syncRoleFromStorage);
+    return () => {
+      window.removeEventListener('storage', syncRoleFromStorage);
+      window.removeEventListener('focus', syncRoleFromStorage);
+    };
+  }, [role]);
 
   return (
     <RoleContext.Provider
