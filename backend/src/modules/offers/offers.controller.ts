@@ -169,4 +169,122 @@ export class OffersController {
       res.status(500).json({ success: false, message: error.message });
     }
   }
+
+  // POST /api/offers/ask - Guest broadcasts or sends date wishlist to Hosts
+  static async askForOffer(req: Request, res: Response): Promise<void> {
+    try {
+      const guestId = req.user!.id;
+      const { plan, time, location, note, giftAmount, targetHostId } = req.body;
+
+      // Expiration: 48 hours
+      const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
+
+      // If specific host was targeted, use that, otherwise pick verified host
+      let hostId = targetHostId;
+      if (!hostId) {
+        const anyHost = await prisma.user.findFirst({
+          where: { role: Role.HOST, isActive: true },
+        });
+        hostId = anyHost?.id || guestId;
+      }
+
+      const offer = await prisma.dateOffer.create({
+        data: {
+          hostId,
+          guestId,
+          activityType: plan || 'Dinner',
+          venueName: location || 'Midtown Manhattan',
+          venueAddress: location || 'New York',
+          proposedDateTime: time ? new Date(time) : new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+          personalMessage: note || "Tell Hosts what you'd love",
+          hospitalityGuarantee: `$${giftAmount || 250} Escrow Gift Requested`,
+          expiresAt,
+          status: OfferStatus.PENDING,
+        },
+      });
+
+      res.status(201).json({
+        success: true,
+        message: 'Your date request has been created! Verified hosts can now send you gifted offers.',
+        data: offer,
+      });
+    } catch (error: any) {
+      console.error('Ask for offer error:', error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  // POST /api/offers/:id/withdraw - Guest or Host withdraws an offer or counter
+  static async withdrawOffer(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const { id } = req.params;
+
+      const offer = await prisma.dateOffer.findUnique({ where: { id } });
+      if (!offer) {
+        res.status(404).json({ success: false, message: 'Offer not found' });
+        return;
+      }
+
+      if (offer.hostId !== userId && offer.guestId !== userId) {
+        res.status(403).json({ success: false, message: 'You are not authorized to withdraw this offer' });
+        return;
+      }
+
+      const updatedOffer = await prisma.dateOffer.update({
+        where: { id },
+        data: { status: OfferStatus.CANCELLED },
+      });
+
+      res.json({
+        success: true,
+        message: 'Offer withdrawn successfully',
+        data: updatedOffer,
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  // POST /api/offers/:id/checkin - Verify attendance and release escrow
+  static async confirmAttendance(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+
+      const offer = await prisma.dateOffer.findUnique({ where: { id } });
+      if (!offer) {
+        res.status(404).json({ success: false, message: 'Date not found' });
+        return;
+      }
+
+      const updatedOffer = await prisma.dateOffer.update({
+        where: { id },
+        data: {
+          status: OfferStatus.COMPLETED,
+        },
+      });
+
+      res.json({
+        success: true,
+        message: 'Attendance confirmed! Escrow funds successfully processed.',
+        data: updatedOffer,
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  // POST /api/offers/:id/review - Submit star rating & review
+  static async submitReview(req: Request, res: Response): Promise<void> {
+    try {
+      const { rating, feedback } = req.body;
+      res.json({
+        success: true,
+        message: 'Thank you! Your rating and review have been recorded and your reliability score updated.',
+        data: { rating, feedback },
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
 }

@@ -18,9 +18,11 @@ import {
   ArrowRight,
   ShieldCheck,
 } from 'lucide-react';
+import { useRole } from '../../context/RoleContext';
 import { SearchPreferenceModal, SearchPreferenceFilters } from './SearchPreferenceModal';
 import { OfferEventsView } from './OfferEventsView';
 import { InviteDetailsView } from './InviteDetailsView';
+import { AskForAnOfferModal } from './AskForAnOfferModal';
 import { OffersView } from './OffersView';
 import { ConfirmedDatesView } from './ConfirmedDatesView';
 import { ProfileView } from './ProfileView';
@@ -40,6 +42,65 @@ export interface DiscoverProfile {
   occupation?: string;
   interests?: string[];
 }
+
+const SAMPLE_MALE_HOST_PROFILES: DiscoverProfile[] = [
+  {
+    id: 'h-1',
+    name: 'Julian Sterling',
+    age: 34,
+    image: '/assets/discover-card-1.jpg',
+    reliability: 4.97,
+    distanceKm: 2,
+    bio: 'Fond of vintage Bordeaux, competitive polo, and lively discussions on world history. I believe in chivalry, clear intentions, and elevated experiences.',
+    openTo: ['Dinner', 'Events'],
+    categories: ['dinner', 'events'],
+    location: 'Upper East Side, NY',
+    occupation: 'Private Equity Managing Director',
+    interests: ['Vintage Bordeaux', 'Polo', 'World History', 'Opera'],
+  },
+  {
+    id: 'h-2',
+    name: 'Marcus Montgomery',
+    age: 36,
+    image: '/assets/discover-card-2.jpg',
+    reliability: 4.98,
+    distanceKm: 3,
+    bio: 'Fond of vintage Bordeaux, competitive polo, and lively discussions on world history. I believe in chivalry, clear intentions, and elevated experiences.',
+    openTo: ['Dinner', 'Lunch', 'Events'],
+    categories: ['dinner', 'lunch', 'events'],
+    location: 'Upper East Side, NY',
+    occupation: 'Private Equity Managing Director',
+    interests: ['Fine Dining', 'Yachting', 'Architecture', 'Art Auctions'],
+  },
+  {
+    id: 'h-3',
+    name: 'Farhan Ahmed',
+    age: 32,
+    image: '/assets/discover-card-3.jpg',
+    reliability: 4.97,
+    distanceKm: 4,
+    bio: 'Passionate about Michelin dining, acoustic jazz, and spontaneous weekend travel. Delighted to host refined evenings.',
+    openTo: ['Dinner', 'Events'],
+    categories: ['dinner', 'events'],
+    location: 'Tribeca, NY',
+    occupation: 'Venture Capital Partner',
+    interests: ['Michelin Dining', 'Jazz', 'Contemporary Art'],
+  },
+  {
+    id: 'h-4',
+    name: 'Alexander Wright',
+    age: 35,
+    image: '/assets/discover-card-1.jpg',
+    reliability: 4.95,
+    distanceKm: 5,
+    bio: 'Architecture enthusiast, classical pianist, and lover of warm conversations at quiet rooftop lounges.',
+    openTo: ['Lunch', 'Events'],
+    categories: ['lunch', 'events'],
+    location: 'SoHo, NY',
+    occupation: 'Architect & Founder',
+    interests: ['Architecture', 'Piano', 'Rooftop Lounges'],
+  },
+];
 
 const SAMPLE_PROFILES: DiscoverProfile[] = [
   {
@@ -134,6 +195,10 @@ interface DiscoverPageProps {
 }
 
 export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
+  const { role, setRole, isHost, isGuest } = useRole();
+  const [askOfferHostProfile, setAskOfferHostProfile] = useState<DiscoverProfile | null>(null);
+  const [successToastText, setSuccessToastText] = useState('Offer sent successfully!');
+
   // Navigation tabs: 'explore' | 'offers' | 'dates' | 'profile'
   const [activeTab, setActiveTab] = useState<'explore' | 'offers' | 'dates' | 'profile'>(() => {
     if (typeof window !== 'undefined') {
@@ -251,7 +316,8 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
 
   // Filtered profiles list
   const filteredProfiles = useMemo(() => {
-    return SAMPLE_PROFILES.filter((profile) => {
+    const sourceProfiles = isGuest ? SAMPLE_MALE_HOST_PROFILES : SAMPLE_PROFILES;
+    return sourceProfiles.filter((profile) => {
       // Category filter
       if (selectedCategory && !profile.categories.includes(selectedCategory)) {
         return false;
@@ -298,7 +364,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       }
       return true;
     });
-  }, [selectedCategory, maxDistance, minReliability, searchQuery, searchPreferences]);
+  }, [selectedCategory, maxDistance, minReliability, searchQuery, searchPreferences, isGuest]);
 
   const handleApplyPreferences = (filters: SearchPreferenceFilters) => {
     setSearchPreferences(filters);
@@ -400,6 +466,32 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
               Dates
             </button>
           </nav>
+
+          {/* Role Switcher Pill (Host / Guest View) */}
+          <div className="flex items-center bg-[#FAF7F2] border border-[#EADBCA] p-1 rounded-full shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setRole('host')}
+              className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
+                isHost
+                  ? 'bg-[#16120F] text-white shadow-xs'
+                  : 'text-[#6E6A63] hover:text-[#16120F]'
+              }`}
+            >
+              Host View (Male)
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole('guest')}
+              className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
+                isGuest
+                  ? 'bg-[#9F1E19] text-white shadow-xs'
+                  : 'text-[#6E6A63] hover:text-[#16120F]'
+              }`}
+            >
+              Guest View (Female)
+            </button>
+          </div>
 
           {/* Right Icons: Messages + Profile (Desktop only) */}
           <div className="hidden sm:flex items-center gap-3">
@@ -610,7 +702,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                       </p>
                     </div>
 
-                    {/* Action Buttons: View Profile (outlined) & Send Offer (red solid) */}
+                    {/* Action Buttons: View Profile (outlined) & Send Offer / Ask for an offer (red solid) */}
                     <div className="mt-5 pt-1 flex items-center gap-2.5">
                       <button
                         type="button"
@@ -620,13 +712,23 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                         View profile
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={() => openOfferModal(profile)}
-                        className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
-                      >
-                        Send offer
-                      </button>
+                      {isGuest ? (
+                        <button
+                          type="button"
+                          onClick={() => setAskOfferHostProfile(profile)}
+                          className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
+                        >
+                          Ask for an offer
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => openOfferModal(profile)}
+                          className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
+                        >
+                          Send offer
+                        </button>
+                      )}
                     </div>
                   </div>
                 </article>
@@ -831,6 +933,39 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                 >
                   FAQ
                 </a>
+
+                {/* Mobile Role Switcher */}
+                <div className="pt-4 border-t border-white/10">
+                  <div className="text-[11px] text-[#A9A49C] uppercase font-bold tracking-wider mb-2">
+                    Active Role:
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 bg-white/5 p-1 rounded-2xl border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRole('host');
+                        setIsSideMenuOpen(false);
+                      }}
+                      className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        isHost ? 'bg-white text-[#16120F]' : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      Host (Male)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRole('guest');
+                        setIsSideMenuOpen(false);
+                      }}
+                      className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        isGuest ? 'bg-[#9F1E19] text-white' : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      Guest (Female)
+                    </button>
+                  </div>
+                </div>
               </nav>
             </div>
 
@@ -985,23 +1120,56 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
               )}
 
               <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const prof = viewProfileModal;
-                    setViewProfileModal(null);
-                    setOfferModalProfile(prof);
-                    setOfferStep('events');
-                  }}
-                  className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <Send className="w-3.5 h-3.5 rotate-45" />
-                  <span>Send an Offer to {viewProfileModal.name}</span>
-                </button>
+                {isGuest ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const prof = viewProfileModal;
+                      setViewProfileModal(null);
+                      setAskOfferHostProfile(prof);
+                    }}
+                    className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Ask for an Offer from {viewProfileModal.name}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const prof = viewProfileModal;
+                      setViewProfileModal(null);
+                      setOfferModalProfile(prof);
+                      setOfferStep('events');
+                    }}
+                    className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Send className="w-3.5 h-3.5 rotate-45" />
+                    <span>Send an Offer to {viewProfileModal.name}</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 7. ASK FOR AN OFFER MODAL (GUEST VIEW - FIGMA SCREEN 2)      */}
+      {/* ============================================================ */}
+      {askOfferHostProfile && (
+        <AskForAnOfferModal
+          hostProfile={askOfferHostProfile}
+          onClose={() => setAskOfferHostProfile(null)}
+          onSubmitSuccess={(data) => {
+            setAskOfferHostProfile(null);
+            setSuccessToastText(`Your date request was sent! Verified hosts will review your wishlist.`);
+            setShowOfferSuccessToast(true);
+            setTimeout(() => {
+              setShowOfferSuccessToast(false);
+            }, 4000);
+          }}
+        />
       )}
 
       {/* ============================================================ */}
@@ -1036,7 +1204,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             <Check className="w-4 h-4 text-white" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white">Offer sent successfully!</p>
+            <p className="text-xs font-semibold text-white">{successToastText}</p>
             <p className="text-[11px] text-white/70">You will be notified once they respond.</p>
           </div>
         </div>
