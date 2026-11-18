@@ -227,14 +227,19 @@ export function ProfileReviewsView({ onBack }: ProfileReviewsViewProps) {
                 })}
               </div>
 
-              {/* Comment text input */}
+              {/* Comment text input - only enabled for "Other" option */}
               <div className="mt-3.5">
                 <input
                   type="text"
-                  value={reportComment}
+                  disabled={selectedReason !== 'Other'}
+                  value={selectedReason === 'Other' ? reportComment : ''}
                   onChange={(e) => setReportComment(e.target.value)}
                   placeholder="Type your comment"
-                  className="w-full bg-[#FAF7F2] border border-[#E5DDD0] rounded-xl px-3.5 py-2 text-xs text-[#16120F] placeholder-[#8A857D] focus:outline-none focus:border-[#9F1E19] transition-colors"
+                  className={`w-full border rounded-xl px-3.5 py-2 text-xs transition-colors ${
+                    selectedReason === 'Other'
+                      ? 'bg-[#FAF7F2] border-[#E5DDD0] text-[#16120F] placeholder-[#8A857D] focus:outline-none focus:border-[#9F1E19]'
+                      : 'bg-[#F2ECE1]/70 border-[#E5DDD0]/60 text-[#8A857D]/60 placeholder-[#8A857D]/40 cursor-not-allowed'
+                  }`}
                 />
               </div>
 
