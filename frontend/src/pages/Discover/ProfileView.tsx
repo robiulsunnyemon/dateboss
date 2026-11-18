@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ShieldCheck,
   Pencil,
@@ -6,8 +6,15 @@ import {
   Briefcase,
   Check,
 } from 'lucide-react';
+import { ProfileReviewsView } from './ProfileReviewsView';
 
 export function ProfileView() {
+  const [showReviews, setShowReviews] = useState(false);
+
+  if (showReviews) {
+    return <ProfileReviewsView onBack={() => setShowReviews(false)} />;
+  }
+
   return (
     <div className="w-full mx-auto animate-in fade-in duration-200">
       
@@ -47,7 +54,14 @@ export function ProfileView() {
 
           {/* Reliability & Verification */}
           <div className="flex items-center gap-1.5 text-xs text-[#8A857D] mt-1 font-medium">
-            <span>4.97 Reliability</span>
+            <button
+              type="button"
+              onClick={() => setShowReviews(true)}
+              className="text-[#8A857D] hover:text-[#9F1E19] hover:underline cursor-pointer transition-colors font-medium"
+              title="View reviews and reliability"
+            >
+              4.97 Reliability
+            </button>
             <span>·</span>
             <span className="inline-flex items-center gap-0.5 text-[#3B82F6]">
               <ShieldCheck className="w-3.5 h-3.5" />

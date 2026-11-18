@@ -13,3 +13,5 @@ export { InviteDetailsView } from './InviteDetailsView';
 export type { InviteDetailsViewProps } from './InviteDetailsView';
 export { MessagesChatView } from './MessagesChatView';
 export type { MessagesChatViewProps, ChatContact, ChatMessage } from './MessagesChatView';
+export { ProfileReviewsView } from './ProfileReviewsView';
+export type { ProfileReviewsViewProps, ProfileReviewItem } from './ProfileReviewsView';
