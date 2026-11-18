@@ -331,7 +331,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             <button
               type="button"
               onClick={() => {
-                setInitialChatContactName('Farhana Ahmed');
+                setInitialChatContactName(undefined);
                 setIsMessagesOpen(true);
               }}
               className="w-10 h-10 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#16120F] hover:bg-[#F5F1E6] hover:border-[#9F1E19]/30 transition-all shadow-xs cursor-pointer relative"
@@ -712,7 +712,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                   onClick={(e) => {
                     e.preventDefault();
                     setIsSideMenuOpen(false);
-                    setInitialChatContactName('Farhana Ahmed');
+                    setInitialChatContactName(undefined);
                     setIsMessagesOpen(true);
                   }}
                   className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors flex items-center justify-between group"
