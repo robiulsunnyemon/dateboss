@@ -280,23 +280,23 @@ export function MessagesChatView({
               mobileView === 'list' ? 'flex' : 'hidden sm:flex'
             }`}
           >
-            {/* Mobile Header: Red Back Button + "Messages" Title */}
-            <div className="p-4 sm:p-0 flex items-center gap-3.5 shrink-0">
+            {/* Mobile Header: Red Back Button + "Messages" Title (Hidden on desktop) */}
+            <div className="sm:hidden p-4 flex items-center gap-3.5 shrink-0">
               <button
                 type="button"
                 onClick={onClose}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
+                className="w-10 h-10 rounded-2xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
                 aria-label="Back to Discover"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <h1 className="font-serif font-bold text-2xl sm:text-[26px] text-[#16120F] tracking-tight">
+              <h1 className="font-serif font-bold text-2xl text-[#16120F] tracking-tight">
                 Messages
               </h1>
             </div>
 
             {/* Search Input */}
-            <div className="px-4 sm:px-0 sm:pr-6 mt-1 sm:mt-2 mb-3 shrink-0">
+            <div className="px-4 sm:px-0 sm:pr-6 mt-1 sm:mt-0 mb-3 shrink-0">
               <div className="relative">
                 <Search className="w-4 h-4 text-[#8A857D] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
