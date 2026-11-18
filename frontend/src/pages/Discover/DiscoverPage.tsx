@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   SlidersHorizontal,
@@ -154,7 +154,12 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
 
   // Messages Chat View State
-  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [isMessagesOpen, setIsMessagesOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.hash === '#messages';
+    }
+    return false;
+  });
   const [initialChatContactName, setInitialChatContactName] = useState<string | undefined>(undefined);
 
   // Send Offer Modal state
@@ -164,6 +169,76 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
   const [selectedOfferOuting, setSelectedOfferOuting] = useState('Dinner at a fine restaurant');
   const [offerMessage, setOfferMessage] = useState('');
   const [showOfferSuccessToast, setShowOfferSuccessToast] = useState(false);
+
+  // Synchronize URL hash with active tab & sub-views
+  useEffect(() => {
+    const handleHashSync = () => {
+      const hash = window.location.hash;
+      if (hash === '#offers') {
+        setActiveTab('offers');
+        setIsMessagesOpen(false);
+      } else if (hash === '#dates') {
+        setActiveTab('dates');
+        setIsMessagesOpen(false);
+      } else if (hash === '#profile' || hash === '#reviews' || hash === '#appeals') {
+        setActiveTab('profile');
+        setIsMessagesOpen(false);
+      } else if (hash === '#messages') {
+        setIsMessagesOpen(true);
+      } else if (hash === '#discover' || hash === '#explore') {
+        setActiveTab('explore');
+        setIsMessagesOpen(false);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashSync);
+    return () => window.removeEventListener('hashchange', handleHashSync);
+  }, []);
+
+  const navigateTab = (tab: 'explore' | 'offers' | 'dates' | 'profile') => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      const targetHash = tab === 'explore' ? '#discover' : `#${tab}`;
+      if (window.location.hash !== targetHash) {
+        window.history.pushState({ tab }, '', targetHash);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const openMessages = (contactName?: string) => {
+    setInitialChatContactName(contactName);
+    setIsMessagesOpen(true);
+    if (typeof window !== 'undefined' && window.location.hash !== '#messages') {
+      window.history.pushState({ view: 'messages' }, '', '#messages');
+    }
+  };
+
+  const closeMessages = () => {
+    setIsMessagesOpen(false);
+    setInitialChatContactName(undefined);
+    if (typeof window !== 'undefined') {
+      const fallback = activeTab === 'explore' ? '#discover' : `#${activeTab}`;
+      window.history.pushState({ tab: activeTab }, '', fallback);
+    }
+  };
+
+  const openOfferModal = (profile: DiscoverProfile) => {
+    setOfferModalProfile(profile);
+    setOfferStep('events');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'offer' }, '', '#send-offer');
+    }
+  };
+
+  const closeOfferModal = () => {
+    setOfferModalProfile(null);
+    setOfferStep('events');
+    if (typeof window !== 'undefined') {
+      const fallback = activeTab === 'explore' ? '#discover' : `#${activeTab}`;
+      window.history.pushState({ tab: activeTab }, '', fallback);
+    }
+  };
 
   // View Profile Modal state
   const [viewProfileModal, setViewProfileModal] = useState<DiscoverProfile | null>(null);
@@ -293,7 +368,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
           <nav className="hidden sm:flex items-center gap-1.5 bg-[#FAF7F2]/80 border border-[#EADBCA] p-1.5 rounded-full shadow-xs">
             <button
               type="button"
-              onClick={() => setActiveTab('explore')}
+              onClick={() => navigateTab('explore')}
               className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer ${
                 activeTab === 'explore'
                   ? 'bg-[#9F1E19] text-white shadow-xs'
@@ -304,7 +379,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('offers')}
+              onClick={() => navigateTab('offers')}
               className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer ${
                 activeTab === 'offers'
                   ? 'bg-[#9F1E19] text-white shadow-xs'
@@ -315,7 +390,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('dates')}
+              onClick={() => navigateTab('dates')}
               className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer ${
                 activeTab === 'dates'
                   ? 'bg-[#9F1E19] text-white shadow-xs'
@@ -343,7 +418,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
 
             <button
               type="button"
-              onClick={() => setActiveTab('profile')}
+              onClick={() => navigateTab('profile')}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-xs cursor-pointer ${
                 activeTab === 'profile'
                   ? 'bg-[#9F1E19] text-white'
@@ -368,18 +443,12 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       }`}>
         {activeTab === 'offers' ? (
           <OffersView
-            onNavigateExplore={() => setActiveTab('explore')}
-            onOpenChat={(offer) => {
-              setInitialChatContactName(offer.userName);
-              setIsMessagesOpen(true);
-            }}
+            onNavigateExplore={() => navigateTab('explore')}
+            onOpenChat={(offer) => openMessages(offer.userName)}
           />
         ) : activeTab === 'dates' ? (
           <ConfirmedDatesView
-            onOpenChat={(item) => {
-              setInitialChatContactName(item.userName);
-              setIsMessagesOpen(true);
-            }}
+            onOpenChat={(item) => openMessages(item.userName)}
           />
         ) : activeTab === 'profile' ? (
           <ProfileView />
@@ -553,10 +622,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
 
                       <button
                         type="button"
-                        onClick={() => {
-                          setOfferModalProfile(profile);
-                          setOfferStep('events');
-                        }}
+                        onClick={() => openOfferModal(profile)}
                         className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
                       >
                         Send offer
@@ -630,7 +696,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
       <nav className="fixed bottom-0 left-0 right-0 z-30 sm:hidden bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#EADBCA] py-2 px-3 flex justify-around items-center shadow-lg">
         <button
           type="button"
-          onClick={() => setActiveTab('explore')}
+          onClick={() => navigateTab('explore')}
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
             activeTab === 'explore' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
           }`}
@@ -641,7 +707,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
 
         <button
           type="button"
-          onClick={() => setActiveTab('offers')}
+          onClick={() => navigateTab('offers')}
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
             activeTab === 'offers' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
           }`}
@@ -652,7 +718,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
 
         <button
           type="button"
-          onClick={() => setActiveTab('dates')}
+          onClick={() => navigateTab('dates')}
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
             activeTab === 'dates' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
           }`}
@@ -663,7 +729,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
 
         <button
           type="button"
-          onClick={() => setActiveTab('profile')}
+          onClick={() => navigateTab('profile')}
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-colors cursor-pointer ${
             activeTab === 'profile' ? 'text-[#9F1E19]' : 'text-[#6E6A63]'
           }`}
@@ -712,8 +778,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                   onClick={(e) => {
                     e.preventDefault();
                     setIsSideMenuOpen(false);
-                    setInitialChatContactName(undefined);
-                    setIsMessagesOpen(true);
+                    openMessages();
                   }}
                   className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors flex items-center justify-between group"
                 >
@@ -787,7 +852,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <OfferEventsView
             targetProfileName={offerModalProfile.name}
-            onBack={() => setOfferModalProfile(null)}
+            onBack={closeOfferModal}
             onContinue={(events) => {
               setSelectedOfferEvents(events);
               setOfferStep('details');
@@ -808,8 +873,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             }}
             onSendOffer={(_offerData) => {
               setShowOfferSuccessToast(true);
-              setOfferModalProfile(null);
-              setOfferStep('events');
+              closeOfferModal();
               setTimeout(() => {
                 setShowOfferSuccessToast(false);
               }, 3500);
@@ -958,10 +1022,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <MessagesChatView
             initialContactName={initialChatContactName}
-            onClose={() => {
-              setIsMessagesOpen(false);
-              setInitialChatContactName(undefined);
-            }}
+            onClose={closeMessages}
           />
         </div>
       )}

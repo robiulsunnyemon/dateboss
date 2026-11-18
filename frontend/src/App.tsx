@@ -40,7 +40,19 @@ export function App() {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/discover' || hash === '#discover' || hash === '#explore' || hash === '#offers' || hash === '#dates' || hash === '#profile') return 'discover';
+      if (
+        path === '/discover' ||
+        hash === '#discover' ||
+        hash === '#explore' ||
+        hash === '#offers' ||
+        hash === '#dates' ||
+        hash === '#profile' ||
+        hash === '#messages' ||
+        hash === '#reviews' ||
+        hash === '#appeals' ||
+        hash === '#send-offer'
+      )
+        return 'discover';
       if (path === '/step12' || hash === '#step12' || hash === '#welcome-host' || hash === '#membership') return 'onboarding-step12';
       if (path === '/step11' || hash === '#step11' || hash === '#checking') return 'onboarding-step11';
       if (path === '/step10' || hash === '#step10' || hash === '#face' || hash === '#video-check') return 'onboarding-step10';
@@ -196,7 +208,18 @@ export function App() {
     const handlePopState = () => {
       const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/discover' || hash === '#discover' || hash === '#explore') {
+      if (
+        path === '/discover' ||
+        hash === '#discover' ||
+        hash === '#explore' ||
+        hash === '#offers' ||
+        hash === '#dates' ||
+        hash === '#profile' ||
+        hash === '#messages' ||
+        hash === '#reviews' ||
+        hash === '#appeals' ||
+        hash === '#send-offer'
+      ) {
         setCurrentView('discover');
       } else if (path === '/step12' || hash === '#step12' || hash === '#welcome-host' || hash === '#membership') {
         setCurrentView('onboarding-step12');

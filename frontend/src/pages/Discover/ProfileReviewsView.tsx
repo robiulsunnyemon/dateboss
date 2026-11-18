@@ -101,7 +101,40 @@ const REPORT_REASONS = [
 ];
 
 export function ProfileReviewsView({ onBack }: ProfileReviewsViewProps) {
-  const [viewMode, setViewMode] = useState<'reviews' | 'appeals'>('reviews');
+  const [viewMode, setViewMode] = useState<'reviews' | 'appeals'>(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.hash === '#appeals' ? 'appeals' : 'reviews';
+    }
+    return 'reviews';
+  });
+
+  // Sync with browser hash navigation
+  React.useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#appeals') {
+        setViewMode('appeals');
+      } else if (window.location.hash === '#reviews') {
+        setViewMode('reviews');
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const switchView = (mode: 'reviews' | 'appeals') => {
+    setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: mode }, '', `#${mode}`);
+    }
+  };
+
+  const handleBack = () => {
+    if (viewMode === 'appeals') {
+      switchView('reviews');
+    } else {
+      onBack();
+    }
+  };
   const [reviews] = useState<ProfileReviewItem[]>(SAMPLE_REVIEWS);
   const [appeals] = useState<AppealReviewItem[]>(SAMPLE_APPEALS);
 
@@ -139,7 +172,7 @@ export function ProfileReviewsView({ onBack }: ProfileReviewsViewProps) {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={viewMode === 'appeals' ? () => setViewMode('reviews') : onBack}
+              onClick={handleBack}
               className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
               aria-label="Back"
             >
@@ -159,7 +192,7 @@ export function ProfileReviewsView({ onBack }: ProfileReviewsViewProps) {
 
           <button
             type="button"
-            onClick={() => setViewMode(viewMode === 'appeals' ? 'reviews' : 'appeals')}
+            onClick={() => switchView(viewMode === 'appeals' ? 'reviews' : 'appeals')}
             className={`bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-[13px] px-5 py-2 rounded-full shadow-xs transition-all active:scale-95 cursor-pointer ${
               viewMode === 'appeals' ? 'sm:hidden' : ''
             }`}

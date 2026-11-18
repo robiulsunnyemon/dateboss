@@ -9,12 +9,41 @@ import {
 import { ProfileReviewsView } from './ProfileReviewsView';
 
 export function ProfileView() {
-  const [showReviews, setShowReviews] = useState(false);
+  const [showReviews, setShowReviews] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.hash === '#reviews' || window.location.hash === '#appeals';
+    }
+    return false;
+  });
+
+  // Sync reviews state with browser hash navigation
+  React.useEffect(() => {
+    const handleHash = () => {
+      const h = window.location.hash;
+      setShowReviews(h === '#reviews' || h === '#appeals');
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const openReviews = () => {
+    setShowReviews(true);
+    if (typeof window !== 'undefined' && window.location.hash !== '#reviews') {
+      window.history.pushState({ view: 'reviews' }, '', '#reviews');
+    }
+  };
+
+  const closeReviews = () => {
+    setShowReviews(false);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ tab: 'profile' }, '', '#profile');
+    }
+  };
 
   if (showReviews) {
     return (
       <div className="fixed inset-0 z-50 overflow-y-auto bg-[#FAF7F2] sm:bg-[#EFE7DA]">
-        <ProfileReviewsView onBack={() => setShowReviews(false)} />
+        <ProfileReviewsView onBack={closeReviews} />
       </div>
     );
   }
@@ -60,7 +89,7 @@ export function ProfileView() {
           <div className="flex items-center gap-1.5 text-xs text-[#8A857D] mt-1 font-medium">
             <button
               type="button"
-              onClick={() => setShowReviews(true)}
+              onClick={openReviews}
               className="text-[#8A857D] hover:text-[#9F1E19] hover:underline cursor-pointer transition-colors font-medium"
               title="View reviews and reliability"
             >
