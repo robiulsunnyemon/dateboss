@@ -61,7 +61,21 @@ const DEFAULT_OUTINGS: OutingOption[] = [
   {
     id: 'walks',
     name: 'Walks',
-    icon: <Footprints className="w-5 h-5 text-[#9F1E19]" />,
+    icon: (
+      <svg
+        className="w-5 h-5 text-[#9F1E19]"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="4" r="2" />
+        <path d="m9 20 3-6 2 3 2 3" />
+        <path d="m6 13 4-2 3 2 3-1" />
+      </svg>
+    ),
   },
   {
     id: 'coffee',
@@ -101,7 +115,23 @@ const DEFAULT_OUTINGS: OutingOption[] = [
   {
     id: 'sports',
     name: 'Sports Games',
-    icon: <Trophy className="w-5 h-5 text-[#9F1E19]" />,
+    icon: (
+      <svg
+        className="w-5 h-5 text-[#9F1E19]"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 3a14 14 0 0 1 0 18" />
+        <path d="M3 12h18" />
+        <path d="M4.5 7.5a14 14 0 0 0 15 0" />
+        <path d="M4.5 16.5a14 14 0 0 1 15 0" />
+      </svg>
+    ),
   },
   {
     id: 'cooking',
@@ -172,17 +202,17 @@ export function OfferEventsView({
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#EFE7DA] py-4 sm:py-10 px-4 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#16120F] animate-in fade-in duration-200">
+    <div className="min-h-screen w-full bg-[#FAF7F2] sm:bg-[#EFE7DA] py-0 sm:py-10 px-0 sm:px-6 flex items-start sm:items-center justify-center font-sans antialiased text-[#16120F] animate-in fade-in duration-200">
       
-      {/* Centered White/Cream Card matching Figma Desktop View */}
-      <div className="w-full max-w-[840px] bg-[#FAF7F2] border border-[#E8DFD0] rounded-[28px] sm:rounded-[32px] p-5 sm:p-9 lg:p-11 shadow-[0_10px_35px_rgba(22,18,15,0.05)]">
+      {/* Centered White/Cream Card matching Figma Desktop View & edge-to-edge on mobile */}
+      <div className="w-full max-w-[840px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-5 sm:p-9 lg:p-11 shadow-none sm:shadow-[0_10px_35px_rgba(22,18,15,0.05)]">
         
         {/* Top Header: Dark Red Rounded Back Button + thedateboss Logo */}
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBack}
-            className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
+            className="w-10 h-10 rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -206,7 +236,7 @@ export function OfferEventsView({
 
         {/* Eyebrow: — Events */}
         <div className="flex items-center gap-2 mt-6 sm:mt-7">
-          <span className="w-5 h-[1.5px] bg-[#9F1E19]"></span>
+          <span className="w-4 h-[1.5px] bg-[#9F1E19]"></span>
           <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
             Events
           </span>
@@ -220,11 +250,6 @@ export function OfferEventsView({
         {/* Subtitle: Pick a kind of outing, or write your own. */}
         <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-1 leading-relaxed">
           Pick a kind of outing, or write your own.
-          {targetProfileName && (
-            <span className="block mt-0.5 text-[#9F1E19] font-medium">
-              Inviting {targetProfileName}
-            </span>
-          )}
         </p>
 
         {/* Events Grid: 2 columns on Mobile, 4 columns on Desktop */}
@@ -235,10 +260,10 @@ export function OfferEventsView({
               <div
                 key={option.id}
                 onClick={() => toggleSelect(option.id)}
-                className={`rounded-[20px] sm:rounded-[22px] p-3.5 sm:p-4 flex flex-col justify-between min-h-[95px] sm:min-h-[105px] cursor-pointer transition-all active:scale-[0.98] select-none ${
+                className={`rounded-[18px] sm:rounded-[22px] p-3.5 sm:p-4 flex flex-col justify-between min-h-[92px] sm:min-h-[102px] cursor-pointer transition-all active:scale-[0.98] select-none ${
                   isSelected
                     ? 'bg-[#F5F1E6] border-[1.5px] border-[#9F1E19] shadow-xs'
-                    : 'bg-[#FAF7F2] border border-[#E8DFD0] hover:border-[#9F1E19]/40 hover:bg-[#FDFBF7]'
+                    : 'bg-[#FAF7F2] border border-[#EADBCA] hover:border-[#9F1E19]/40 hover:bg-[#FDFBF7]'
                 }`}
               >
                 <div className="w-8 h-8 rounded-full flex items-center justify-start">
@@ -267,10 +292,10 @@ export function OfferEventsView({
               <div
                 key={customId}
                 onClick={() => toggleSelect(customId)}
-                className={`rounded-[20px] sm:rounded-[22px] p-3.5 sm:p-4 flex flex-col justify-between min-h-[95px] sm:min-h-[105px] cursor-pointer transition-all active:scale-[0.98] select-none ${
+                className={`rounded-[18px] sm:rounded-[22px] p-3.5 sm:p-4 flex flex-col justify-between min-h-[92px] sm:min-h-[102px] cursor-pointer transition-all active:scale-[0.98] select-none ${
                   isSelected
                     ? 'bg-[#F5F1E6] border-[1.5px] border-[#9F1E19] shadow-xs'
-                    : 'bg-[#FAF7F2] border border-[#E8DFD0] hover:border-[#9F1E19]/40 hover:bg-[#FDFBF7]'
+                    : 'bg-[#FAF7F2] border border-[#EADBCA] hover:border-[#9F1E19]/40 hover:bg-[#FDFBF7]'
                 }`}
               >
                 <div className="w-8 h-8 rounded-full flex items-center justify-start">
