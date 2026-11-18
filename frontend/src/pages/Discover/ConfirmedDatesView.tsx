@@ -85,7 +85,7 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
 
   // Rating & Attendance Modal state
   const [ratingModalDate, setRatingModalDate] = useState<ConfirmedDateItem | null>(null);
-  const [stars, setStars] = useState(5);
+  const [stars, setStars] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -258,96 +258,72 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
       </div>
 
       {/* ============================================================ */}
-      {/* RATING & ATTENDANCE REPORT MODAL                             */}
+      {/* RATING & ATTENDANCE REPORT BOTTOM SHEET (FIGMA DESIGN)       */}
       {/* ============================================================ */}
       {ratingModalDate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[28px] max-w-[460px] w-full p-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => setRatingModalDate(null)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#F5F1E6] hover:bg-[#EADBCA] text-[#16120F] flex items-center justify-center cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex flex-col justify-end items-center animate-in fade-in duration-200">
+          <div className="w-full max-w-[580px] sm:max-w-[620px] bg-[#FAF7F2] rounded-t-[32px] sm:rounded-t-[36px] p-6 pt-5 pb-8 shadow-2xl border-t border-[#EADBCA] animate-in slide-in-from-bottom duration-300 relative">
+            
+            {/* Top Right Close Button (Red Rounded Square) */}
+            <div className="flex justify-end mb-1">
+              <button
+                type="button"
+                onClick={() => setRatingModalDate(null)}
+                className="w-8 h-8 rounded-lg bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors cursor-pointer active:scale-95 shadow-xs"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
 
-            <h3 className="font-serif font-bold text-lg text-[#16120F] mb-1">
-              Verify Attendance & Rate Date
-            </h3>
-            <p className="text-xs text-[#6E6A63] mb-4">
-              With {ratingModalDate.userName} at {ratingModalDate.venueName}
-            </p>
-
-            <form onSubmit={handleRatingSubmit} className="space-y-4">
-              {/* Star Rating */}
+            <form onSubmit={handleRatingSubmit}>
+              {/* 1. Tap The Stars To Rate */}
               <div>
-                <label className="block text-xs font-semibold text-[#16120F] mb-2">
-                  How was your experience?
-                </label>
+                <h3 className="font-serif font-bold text-sm sm:text-base text-[#16120F] tracking-tight mb-2">
+                  Tap The Stars To Rate
+                </h3>
                 <div className="flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => setStars(star)}
-                      className="cursor-pointer transition-transform hover:scale-110"
+                      className="cursor-pointer transition-transform hover:scale-110 active:scale-95"
                     >
                       <Star
-                        className={`w-6 h-6 ${
+                        className={`w-6 h-6 stroke-[1.5] ${
                           star <= stars
-                            ? 'text-amber-500 fill-amber-500'
-                            : 'text-[#DCD5C8]'
+                            ? 'text-[#9F1E19] fill-[#9F1E19]'
+                            : 'text-[#16120F] fill-transparent'
                         }`}
                       />
                     </button>
                   ))}
-                  <span className="text-xs font-bold text-[#16120F] ml-2">
-                    {stars} / 5 Stars
-                  </span>
                 </div>
               </div>
 
-              {/* Attendance confirmation checkbox */}
-              <div className="bg-[#F5F1E6] rounded-xl p-3 flex items-start gap-2.5 border border-[#E8DFD0]">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <div className="text-xs text-[#16120F]">
-                  <p className="font-semibold">Confirm Guest Arrival</p>
-                  <p className="text-[#6E6A63] text-[11px] mt-0.5">
-                    Releases ${ratingModalDate.escrowGift} escrow payout to {ratingModalDate.userName}.
-                  </p>
-                </div>
-              </div>
-
-              {/* Private review notes */}
-              <div>
-                <label className="block text-xs font-semibold text-[#16120F] mb-1.5">
-                  Private feedback (optional)
-                </label>
+              {/* 2. Write Something */}
+              <div className="mt-4 sm:mt-5">
+                <h3 className="font-serif font-bold text-sm sm:text-base text-[#16120F] tracking-tight mb-2">
+                  Write Something
+                </h3>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Share private notes or feedback..."
-                  className="w-full bg-[#F5F1E6] border border-[#EADBCA] rounded-xl p-3 text-xs text-[#16120F] placeholder-[#8A857D] focus:outline-none focus:border-[#9F1E19] resize-none"
+                  placeholder="Input your review"
+                  className="w-full bg-[#FAF7F2] border border-[#8A857D]/60 rounded-[14px] sm:rounded-[16px] p-3.5 text-xs sm:text-sm text-[#16120F] placeholder-[#8A857D] focus:outline-none focus:border-[#9F1E19] resize-none leading-relaxed transition-colors"
                 />
               </div>
 
-              {/* Submit Buttons */}
-              <div className="flex items-center gap-2.5 pt-1">
+              {/* 3. Submit Button */}
+              <div className="mt-5 sm:mt-6">
                 <button
                   type="submit"
                   disabled={isVerifying}
-                  className="flex-1 bg-[#9F1E19] hover:bg-[#851713] text-white text-xs font-bold py-3 rounded-full transition-all shadow-xs cursor-pointer active:scale-95 text-center"
+                  className="w-full sm:w-auto bg-[#9F1E19] hover:bg-[#851713] disabled:opacity-50 text-white font-medium text-xs sm:text-sm py-3 px-8 rounded-full shadow-sm transition-all active:scale-[0.98] cursor-pointer inline-flex items-center justify-center"
                 >
-                  {isVerifying ? 'Verifying...' : 'Submit & Release Escrow'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRatingModalDate(null)}
-                  className="px-4 py-3 text-xs text-[#6E6A63] hover:text-[#16120F] cursor-pointer"
-                >
-                  Cancel
+                  {isVerifying ? 'Submitting...' : 'Submit'}
                 </button>
               </div>
             </form>
