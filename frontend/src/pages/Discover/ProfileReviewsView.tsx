@@ -10,6 +10,17 @@ export interface ProfileReviewItem {
   comment: string;
 }
 
+export interface AppealReviewItem {
+  id: string;
+  authorName: string;
+  avatar: string;
+  rating: number;
+  status: 'accepted' | 'rejected';
+  statusLabel: string;
+  timeText: string;
+  comment: string;
+}
+
 export interface ProfileReviewsViewProps {
   onBack: () => void;
 }
@@ -53,6 +64,31 @@ const SAMPLE_REVIEWS: ProfileReviewItem[] = [
   },
 ];
 
+const SAMPLE_APPEALS: AppealReviewItem[] = [
+  {
+    id: 'app-1',
+    authorName: 'Eleanor Summers',
+    avatar: '/assets/discover-card-1.jpg',
+    rating: 1,
+    status: 'accepted',
+    statusLabel: 'APPEAL ACCEPTED',
+    timeText: 'Today, 16:40',
+    comment:
+      "What can I say It's fast food, it's scoutakis.No different to any of the other scoutakis, nice with adequate seating.",
+  },
+  {
+    id: 'app-2',
+    authorName: 'Victoria Champain',
+    avatar: '/assets/discover-card-2.jpg',
+    rating: 2,
+    status: 'rejected',
+    statusLabel: 'APPEAL REJECTED',
+    timeText: 'Today, 09:12',
+    comment:
+      'Food, as always, is good both upstairs and downstairs.is always clean (download the bk app for deals etc.) I sit upstairs every time, more relaxed feel.',
+  },
+];
+
 const REPORT_REASONS = [
   'False Review',
   'Abuse',
@@ -65,7 +101,10 @@ const REPORT_REASONS = [
 ];
 
 export function ProfileReviewsView({ onBack }: ProfileReviewsViewProps) {
+  const [viewMode, setViewMode] = useState<'reviews' | 'appeals'>('reviews');
   const [reviews] = useState<ProfileReviewItem[]>(SAMPLE_REVIEWS);
+  const [appeals] = useState<AppealReviewItem[]>(SAMPLE_APPEALS);
+
   const [reportingReview, setReportingReview] = useState<ProfileReviewItem | null>(null);
   const [selectedReason, setSelectedReason] = useState<string>('Other');
   const [reportComment, setReportComment] = useState<string>('');
@@ -94,87 +133,149 @@ export function ProfileReviewsView({ onBack }: ProfileReviewsViewProps) {
       <div className="w-full max-w-[760px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-4 sm:p-8 lg:p-9 shadow-none sm:shadow-[0_10px_35px_rgba(22,18,15,0.05)]">
         
         {/* ======================================================== */}
-        {/* HEADER: Back Button + "Review" Title + "Appeal status"    */}
+        {/* HEADER: Back Button + Title + "Appeal statues" Button     */}
         {/* ======================================================== */}
         <div className="flex items-center justify-between pb-4 sm:pb-6 border-b border-[#EADBCA]/70">
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={onBack}
+              onClick={viewMode === 'appeals' ? () => setViewMode('reviews') : onBack}
               className="w-10 h-10 rounded-2xl sm:rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
-              aria-label="Back to Profile"
+              aria-label="Back"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="font-serif font-bold text-2xl sm:text-[28px] text-[#16120F] tracking-tight">
-              Review
+              {viewMode === 'appeals' ? 'Appeal Statues' : 'Review'}
             </h1>
           </div>
 
-          <button
-            type="button"
-            onClick={() => showToast('Appeal Status: 0 active disputes. Profile is verified.')}
-            className="bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-[13px] px-5 py-2 rounded-full shadow-xs transition-all active:scale-95 cursor-pointer"
-          >
-            Appeal statues
-          </button>
+          {viewMode === 'reviews' && (
+            <button
+              type="button"
+              onClick={() => setViewMode('appeals')}
+              className="bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-[13px] px-5 py-2 rounded-full shadow-xs transition-all active:scale-95 cursor-pointer"
+            >
+              Appeal statues
+            </button>
+          )}
         </div>
 
         {/* ======================================================== */}
-        {/* REVIEWS LIST                                             */}
+        {/* VIEW 1: REVIEWS LIST                                     */}
         {/* ======================================================== */}
-        <div className="divide-y divide-[#EADBCA]/60">
-          {reviews.map((rev) => (
-            <article key={rev.id} className="py-4 sm:py-5">
-              
-              {/* Header: Avatar + Author + Stars + 3-dots */}
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={rev.avatar}
-                    alt={rev.authorName}
-                    className="w-9 h-9 rounded-full object-cover border border-[#E5DDD0]"
-                  />
-                  <div>
-                    <h3 className="font-serif font-bold text-sm sm:text-[15px] text-[#16120F] leading-tight">
-                      {rev.authorName}
-                    </h3>
-                    <div className="flex items-center gap-0.5 mt-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className="w-3.5 h-3.5 text-amber-500 fill-amber-500"
-                        />
-                      ))}
+        {viewMode === 'reviews' && (
+          <div className="divide-y divide-[#EADBCA]/60">
+            {reviews.map((rev) => (
+              <article key={rev.id} className="py-4 sm:py-5">
+                
+                {/* Header: Avatar + Author + Stars + 3-dots */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={rev.avatar}
+                      alt={rev.authorName}
+                      className="w-9 h-9 rounded-full object-cover border border-[#E5DDD0]"
+                    />
+                    <div>
+                      <h3 className="font-serif font-bold text-sm sm:text-[15px] text-[#16120F] leading-tight">
+                        {rev.authorName}
+                      </h3>
+                      <div className="flex items-center gap-0.5 mt-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className="w-3.5 h-3.5 text-amber-500 fill-amber-500"
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
+
+                  {/* 3 dots action menu button */}
+                  <button
+                    type="button"
+                    onClick={() => setReportingReview(rev)}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-[#8A857D] hover:text-[#16120F] hover:bg-[#F5EFE6] transition-colors cursor-pointer"
+                    title="Report review"
+                    aria-label="Report review"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
                 </div>
 
-                {/* 3 dots action menu button */}
-                <button
-                  type="button"
-                  onClick={() => setReportingReview(rev)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#8A857D] hover:text-[#16120F] hover:bg-[#F5EFE6] transition-colors cursor-pointer"
-                  title="Report review"
-                  aria-label="Report review"
-                >
-                  <MoreVertical className="w-4 h-4" />
-                </button>
-              </div>
+                {/* Timestamp */}
+                <div className="mt-2 text-[11px] sm:text-xs text-[#8A857D] font-normal">
+                  {rev.timeText}
+                </div>
 
-              {/* Timestamp */}
-              <div className="mt-2 text-[11px] sm:text-xs text-[#8A857D] font-normal">
-                {rev.timeText}
-              </div>
+                {/* Comment */}
+                <p className="mt-1 text-xs sm:text-[13px] text-[#6E6A63] leading-relaxed">
+                  {rev.comment}
+                </p>
 
-              {/* Comment */}
-              <p className="mt-1 text-xs sm:text-[13px] text-[#6E6A63] leading-relaxed">
-                {rev.comment}
-              </p>
+              </article>
+            ))}
+          </div>
+        )}
 
-            </article>
-          ))}
-        </div>
+        {/* ======================================================== */}
+        {/* VIEW 2: APPEAL STATUES LIST (MATCHING FIGMA SCREENSHOT)  */}
+        {/* ======================================================== */}
+        {viewMode === 'appeals' && (
+          <div className="divide-y divide-[#EADBCA]/60 animate-in fade-in duration-150">
+            {appeals.map((item) => (
+              <article key={item.id} className="py-4 sm:py-5">
+                
+                {/* Header: Avatar + Author + Stars + Status Badge */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={item.avatar}
+                      alt={item.authorName}
+                      className="w-9 h-9 rounded-full object-cover border border-[#E5DDD0]"
+                    />
+                    <div>
+                      <h3 className="font-serif font-bold text-sm sm:text-[15px] text-[#16120F] leading-tight">
+                        {item.authorName}
+                      </h3>
+                      <div className="flex items-center gap-0.5 mt-1">
+                        {Array.from({ length: item.rating }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className="w-3.5 h-3.5 text-amber-500 fill-amber-500"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Badge: APPEAL ACCEPTED / APPEAL REJECTED */}
+                  {item.status === 'accepted' ? (
+                    <span className="border border-[#22C55E] bg-[#F0FDF4] text-[#16A34A] text-[10px] sm:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shrink-0 select-none">
+                      APPEAL ACCEPTED
+                    </span>
+                  ) : (
+                    <span className="border border-[#F87171] bg-[#FEF2F2] text-[#EF4444] text-[10px] sm:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shrink-0 select-none">
+                      APPEAL REJECTED
+                    </span>
+                  )}
+                </div>
+
+                {/* Timestamp */}
+                <div className="mt-2 text-[11px] sm:text-xs text-[#8A857D] font-normal">
+                  {item.timeText}
+                </div>
+
+                {/* Comment */}
+                <p className="mt-1 text-xs sm:text-[13px] text-[#6E6A63] leading-relaxed">
+                  {item.comment}
+                </p>
+
+              </article>
+            ))}
+          </div>
+        )}
 
       </div>
 
