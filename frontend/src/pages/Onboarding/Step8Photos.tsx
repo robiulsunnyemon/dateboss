@@ -1,5 +1,16 @@
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, Smile, X, Loader2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  Smile,
+  X,
+  Loader2,
+  ShieldAlert,
+  Ban,
+  Sparkles,
+  Camera,
+  AlertCircle,
+  CheckCircle2,
+} from 'lucide-react';
 import { api } from '../../services/api';
 
 interface Step8PhotosProps {
@@ -68,6 +79,10 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
 
   const handleContinue = () => {
     const validPhotos = photos.filter((p): p is string => Boolean(p));
+    if (validPhotos.length < 3) {
+      setUploadError(`Please upload at least 3 photos to proceed (${validPhotos.length}/3 uploaded).`);
+      return;
+    }
     if (onContinue) {
       onContinue(validPhotos);
     }
@@ -121,17 +136,62 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
 
         {/* Subtitles */}
         <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-1 leading-relaxed">
-          Add at least <span className="font-semibold text-[#16120F]">1 photos</span> to get started.
+          Add at least <span className="font-semibold text-[#16120F]">3 photos</span> to get started.
         </p>
-        <p className="text-[#6E6A63] text-[11px] sm:text-xs font-normal mt-1.5 mb-5 sm:mb-6 leading-relaxed max-w-[580px]">
+        <p className="text-[#6E6A63] text-[11px] sm:text-xs font-normal mt-1.5 mb-4 leading-relaxed max-w-[580px]">
           Profiles with multiple photos attract more attention and messages! Upload up to 6 photos at a time. You can add up to 20 photos and videos to your profile in total.
         </p>
 
         {uploadError && (
-          <div className="mb-4 p-3 rounded-xl bg-[#FBEFF0] border border-[#F3C5C7] text-xs text-[#9F1E19]">
-            {uploadError}
+          <div className="mb-4 p-3 rounded-xl bg-[#FBEFF0] border border-[#F3C5C7] text-xs text-[#9F1E19] flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{uploadError}</span>
           </div>
         )}
+
+        {/* Photo Guidelines & Rules Card */}
+        <div className="mb-5 p-3.5 sm:p-4 rounded-2xl bg-[#EDE7D9]/80 border border-[#DFCBB5] text-xs">
+          <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center gap-2 text-[#9F1E19] font-semibold text-xs sm:text-sm">
+              <ShieldAlert className="w-4 h-4 shrink-0" />
+              <span>Photo Guidelines & Rules</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#6E6A63]">
+              {uploadedCount >= 3 ? (
+                <span className="flex items-center gap-1 text-[#2E7D32]">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  {uploadedCount}/3 uploaded
+                </span>
+              ) : (
+                <span className="text-[#9F1E19]">
+                  {uploadedCount}/3 uploaded (min. 3 required)
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] sm:text-xs text-[#4A443D]">
+            <div className="flex items-center gap-1.5 bg-[#FAF7F2] px-2.5 py-1.5 rounded-lg border border-[#E4D7C5]">
+              <Ban className="w-3.5 h-3.5 text-[#9F1E19] shrink-0" />
+              <span>No Drugs</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-[#FAF7F2] px-2.5 py-1.5 rounded-lg border border-[#E4D7C5]">
+              <Ban className="w-3.5 h-3.5 text-[#9F1E19] shrink-0" />
+              <span>No Weapons</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-[#FAF7F2] px-2.5 py-1.5 rounded-lg border border-[#E4D7C5]">
+              <Ban className="w-3.5 h-3.5 text-[#9F1E19] shrink-0" />
+              <span>No Nudity</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-[#FAF7F2] px-2.5 py-1.5 rounded-lg border border-[#E4D7C5]">
+              <Sparkles className="w-3.5 h-3.5 text-[#9F1E19] shrink-0" />
+              <span>Minimal Filters</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-[#FAF7F2] px-2.5 py-1.5 rounded-lg border border-[#E4D7C5] col-span-2 sm:col-span-2">
+              <Camera className="w-3.5 h-3.5 text-[#9F1E19] shrink-0" />
+              <span>Only Recent Pictures</span>
+            </div>
+          </div>
+        </div>
 
         {/* Photo Grid: 3-column layout where Slot 1 spans 2 cols & 2 rows */}
         <div className="grid grid-cols-3 gap-2.5 sm:gap-3 max-w-[520px]">
@@ -235,10 +295,24 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
             </button>
             <button
               type="button"
+              disabled={uploadedCount < 3 || uploadingSlot !== null}
               onClick={handleContinue}
-              className="bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-2.5 px-6 rounded-full shadow-sm transition-all active:scale-[0.99]"
+              className={`font-medium text-xs sm:text-sm py-2.5 px-6 rounded-full shadow-sm transition-all active:scale-[0.99] flex items-center gap-2 ${
+                uploadedCount < 3 || uploadingSlot !== null
+                  ? 'bg-[#9F1E19]/50 text-white/80 cursor-not-allowed shadow-none'
+                  : 'bg-[#9F1E19] hover:bg-[#851713] text-white cursor-pointer'
+              }`}
             >
-              Upload ({uploadedCount}) file &amp; continue
+              {uploadingSlot !== null ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Uploading...</span>
+                </>
+              ) : uploadedCount < 3 ? (
+                <span>Upload at least 3 photos ({uploadedCount}/3)</span>
+              ) : (
+                <span>Continue with {uploadedCount} photos</span>
+              )}
             </button>
           </div>
 
@@ -246,10 +320,24 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
           <div className="flex flex-col sm:hidden">
             <button
               type="button"
+              disabled={uploadedCount < 3 || uploadingSlot !== null}
               onClick={handleContinue}
-              className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 rounded-full shadow-sm transition-all active:scale-[0.99]"
+              className={`w-full font-medium text-xs sm:text-sm py-3.5 rounded-full shadow-sm transition-all active:scale-[0.99] flex items-center justify-center gap-2 ${
+                uploadedCount < 3 || uploadingSlot !== null
+                  ? 'bg-[#9F1E19]/50 text-white/80 cursor-not-allowed shadow-none'
+                  : 'bg-[#9F1E19] hover:bg-[#851713] text-white cursor-pointer'
+              }`}
             >
-              Upload ({uploadedCount}) file &amp; continue
+              {uploadingSlot !== null ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Uploading...</span>
+                </>
+              ) : uploadedCount < 3 ? (
+                <span>Upload at least 3 photos ({uploadedCount}/3)</span>
+              ) : (
+                <span>Continue with {uploadedCount} photos</span>
+              )}
             </button>
             <button
               type="button"
