@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Search,
   SlidersHorizontal,
@@ -8,17 +8,15 @@ import {
   User,
   Compass,
   Calendar,
-  Crown,
-  Heart,
   Send,
   Sparkles,
   Check,
-  MapPin,
-  Clock,
-  ArrowRight,
-  ShieldCheck,
+  LogOut,
+  Loader2,
 } from 'lucide-react';
 import { useRole } from '../../context/RoleContext';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 import { SearchPreferenceModal, SearchPreferenceFilters } from './SearchPreferenceModal';
 import { OfferEventsView } from './OfferEventsView';
 import { InviteDetailsView } from './InviteDetailsView';
@@ -33,192 +31,81 @@ export interface DiscoverProfile {
   name: string;
   age: number;
   image: string;
+  photos?: string[];
   reliability: number;
   distanceKm: number;
   bio: string;
+  idealDate?: string;
   openTo: string[];
-  categories: Array<'dinner' | 'lunch' | 'events'>;
+  categories: string[];
+  lookingFor?: string[];
+  bodyType?: string;
+  height?: string;
+  education?: string;
+  smoking?: string;
+  drinking?: string;
+  children?: string;
   location?: string;
   occupation?: string;
   interests?: string[];
+  isVerified?: boolean;
+  isIdVerified?: boolean;
+  isSelfieVerified?: boolean;
+  completedDatesCount?: number;
+  reviews?: Array<{
+    id: string;
+    rating: number;
+    comment?: string;
+    eventTitle?: string;
+    venueName?: string;
+    reviewerName?: string;
+  }>;
 }
-
-const SAMPLE_MALE_HOST_PROFILES: DiscoverProfile[] = [
-  {
-    id: 'h-1',
-    name: 'Julian Sterling',
-    age: 34,
-    image: '/assets/discover-card-1.jpg',
-    reliability: 4.97,
-    distanceKm: 2,
-    bio: 'Fond of vintage Bordeaux, competitive polo, and lively discussions on world history. I believe in chivalry, clear intentions, and elevated experiences.',
-    openTo: ['Dinner', 'Events'],
-    categories: ['dinner', 'events'],
-    location: 'Upper East Side, NY',
-    occupation: 'Private Equity Managing Director',
-    interests: ['Vintage Bordeaux', 'Polo', 'World History', 'Opera'],
-  },
-  {
-    id: 'h-2',
-    name: 'Marcus Montgomery',
-    age: 36,
-    image: '/assets/discover-card-2.jpg',
-    reliability: 4.98,
-    distanceKm: 3,
-    bio: 'Fond of vintage Bordeaux, competitive polo, and lively discussions on world history. I believe in chivalry, clear intentions, and elevated experiences.',
-    openTo: ['Dinner', 'Lunch', 'Events'],
-    categories: ['dinner', 'lunch', 'events'],
-    location: 'Upper East Side, NY',
-    occupation: 'Private Equity Managing Director',
-    interests: ['Fine Dining', 'Yachting', 'Architecture', 'Art Auctions'],
-  },
-  {
-    id: 'h-3',
-    name: 'Farhan Ahmed',
-    age: 32,
-    image: '/assets/discover-card-3.jpg',
-    reliability: 4.97,
-    distanceKm: 4,
-    bio: 'Passionate about Michelin dining, acoustic jazz, and spontaneous weekend travel. Delighted to host refined evenings.',
-    openTo: ['Dinner', 'Events'],
-    categories: ['dinner', 'events'],
-    location: 'Tribeca, NY',
-    occupation: 'Venture Capital Partner',
-    interests: ['Michelin Dining', 'Jazz', 'Contemporary Art'],
-  },
-  {
-    id: 'h-4',
-    name: 'Alexander Wright',
-    age: 35,
-    image: '/assets/discover-card-1.jpg',
-    reliability: 4.95,
-    distanceKm: 5,
-    bio: 'Architecture enthusiast, classical pianist, and lover of warm conversations at quiet rooftop lounges.',
-    openTo: ['Lunch', 'Events'],
-    categories: ['lunch', 'events'],
-    location: 'SoHo, NY',
-    occupation: 'Architect & Founder',
-    interests: ['Architecture', 'Piano', 'Rooftop Lounges'],
-  },
-];
-
-const SAMPLE_PROFILES: DiscoverProfile[] = [
-  {
-    id: '1',
-    name: 'Camila',
-    age: 29,
-    image: '/assets/discover-card-1.jpg',
-    reliability: 4.9,
-    distanceKm: 3,
-    bio: 'Long dinners, warm light, no rush.',
-    openTo: ['Dinner', 'Events'],
-    categories: ['dinner', 'events'],
-    location: 'Downtown, 3 km away',
-    occupation: 'Creative Producer',
-    interests: ['Fine Dining', 'Art Galleries', 'Wine Tasting', 'Cinema'],
-  },
-  {
-    id: '2',
-    name: 'Camila',
-    age: 29,
-    image: '/assets/discover-card-2.jpg',
-    reliability: 4.9,
-    distanceKm: 3,
-    bio: 'Long dinners, warm light, no rush.',
-    openTo: ['Dinner', 'Events'],
-    categories: ['dinner', 'lunch', 'events'],
-    location: 'West End, 3 km away',
-    occupation: 'Architectural Designer',
-    interests: ['Jazz Lounges', 'Coffee', 'Architecture', 'Cooking'],
-  },
-  {
-    id: '3',
-    name: 'Camila',
-    age: 18,
-    image: '/assets/discover-card-3.jpg',
-    reliability: 4.9,
-    distanceKm: 3,
-    bio: 'Long dinners, warm light, no rush.',
-    openTo: ['Dinner', 'Events'],
-    categories: ['dinner', 'events'],
-    location: 'Midtown, 3 km away',
-    occupation: 'Sound Designer & DJ',
-    interests: ['Live Concerts', 'Vinyl Bars', 'Rooftop Lounges', 'Sushi'],
-  },
-  {
-    id: '4',
-    name: 'Elena',
-    age: 27,
-    image: '/assets/discover-card-2.jpg',
-    reliability: 4.8,
-    distanceKm: 5,
-    bio: 'Slow Sunday brunches, vintage bookstores and great wine.',
-    openTo: ['Lunch', 'Events'],
-    categories: ['lunch', 'events'],
-    location: 'Old Town, 5 km away',
-    occupation: 'Curator',
-    interests: ['Bookstores', 'Museums', 'Botanical Gardens', 'Bistros'],
-  },
-  {
-    id: '5',
-    name: 'Maya',
-    age: 26,
-    image: '/assets/discover-card-1.jpg',
-    reliability: 5.0,
-    distanceKm: 2,
-    bio: 'Looking for thoughtful conversations and memorable evenings.',
-    openTo: ['Dinner', 'Lunch'],
-    categories: ['dinner', 'lunch'],
-    location: 'Harbor District, 2 km away',
-    occupation: 'Product Strategist',
-    interests: ['Tasting Menus', 'Opera', 'Day Trips', 'Farmers Market'],
-  },
-  {
-    id: '6',
-    name: 'Sophia',
-    age: 28,
-    image: '/assets/discover-card-3.jpg',
-    reliability: 4.9,
-    distanceKm: 4,
-    bio: 'Sunset terrace dining, acoustic sessions, and genuine laughs.',
-    openTo: ['Dinner', 'Events'],
-    categories: ['dinner', 'events'],
-    location: 'Hillside, 4 km away',
-    occupation: 'Brand Director',
-    interests: ['Cocktail Lounges', 'Modern Art', 'Boutique Hotels', 'Tennis'],
-  },
-];
 
 interface DiscoverPageProps {
   onBackToLanding?: () => void;
+  onRequireSubscription?: () => void;
   onOpenProfile?: (profile: DiscoverProfile) => void;
 }
 
-export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
-  const { role, setRole, isHost, isGuest } = useRole();
+export function DiscoverPage({
+  onBackToLanding,
+  onRequireSubscription,
+}: DiscoverPageProps) {
+  const { isGuest } = useRole();
+  const { user, logout } = useAuth();
+
+  const [profiles, setProfiles] = useState<DiscoverProfile[]>([]);
+  const [isLoadingFeed, setIsLoadingFeed] = useState(true);
+  const [feedError, setFeedError] = useState<string | null>(null);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
+
   const [askOfferHostProfile, setAskOfferHostProfile] = useState<DiscoverProfile | null>(null);
   const [successToastText, setSuccessToastText] = useState('Offer sent successfully!');
+  const [toastSubtitle, setToastSubtitle] = useState('You will be notified once they respond.');
+  const [showOfferSuccessToast, setShowOfferSuccessToast] = useState(false);
 
-  // Navigation tabs: 'explore' | 'offers' | 'dates' | 'profile'
   const [activeTab, setActiveTab] = useState<'explore' | 'offers' | 'dates' | 'profile'>(() => {
     if (typeof window !== 'undefined') {
       if (window.location.hash === '#offers') return 'offers';
       if (window.location.hash === '#dates') return 'dates';
-      if (window.location.hash === '#profile') return 'profile';
+      if (
+        window.location.hash === '#profile' ||
+        window.location.hash === '#reviews' ||
+        window.location.hash === '#appeals'
+      ) {
+        return 'profile';
+      }
     }
     return 'explore';
   });
 
-  // Filter category: 'dinner' | 'lunch' | 'events' | null
-  const [selectedCategory, setSelectedCategory] = useState<'dinner' | 'lunch' | 'events' | null>('dinner');
-
-  // Search query
+  const [selectedCategory, setSelectedCategory] = useState<'dinner' | 'lunch' | 'events' | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  // Mobile Side Menu Drawer
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
 
-  // Messages Chat View State
   const [isMessagesOpen, setIsMessagesOpen] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.location.hash === '#messages';
@@ -226,14 +113,143 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
     return false;
   });
   const [initialChatContactName, setInitialChatContactName] = useState<string | undefined>(undefined);
+  const [initialChatOfferId, setInitialChatOfferId] = useState<string | undefined>(undefined);
 
-  // Send Offer Modal state
   const [offerModalProfile, setOfferModalProfile] = useState<DiscoverProfile | null>(null);
   const [offerStep, setOfferStep] = useState<'events' | 'details'>('events');
   const [selectedOfferEvents, setSelectedOfferEvents] = useState<string[]>([]);
-  const [selectedOfferOuting, setSelectedOfferOuting] = useState('Dinner at a fine restaurant');
-  const [offerMessage, setOfferMessage] = useState('');
-  const [showOfferSuccessToast, setShowOfferSuccessToast] = useState(false);
+
+  const [viewProfileModal, setViewProfileModal] = useState<DiscoverProfile | null>(null);
+
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [maxDistance, setMaxDistance] = useState<number>(50);
+  const [minReliability, setMinReliability] = useState<number>(0);
+  const [searchPreferences, setSearchPreferences] = useState<Partial<SearchPreferenceFilters>>({});
+
+  const triggerToast = (title: string, subtitle = 'You will be notified once they respond.') => {
+    setSuccessToastText(title);
+    setToastSubtitle(subtitle);
+    setShowOfferSuccessToast(true);
+    setTimeout(() => setShowOfferSuccessToast(false), 3800);
+  };
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch live Discover feed from backend (including all Search Preference filters)
+  const fetchDiscoverFeed = useCallback(async () => {
+    setIsLoadingFeed(true);
+    setFeedError(null);
+    try {
+      const res = await api.discover.getFeed({
+        category: selectedCategory || undefined,
+        search: debouncedSearch || undefined,
+        location: searchPreferences.location?.trim() || undefined,
+        isIdVerified: searchPreferences.isIdVerified || undefined,
+        isSelfieVerified: searchPreferences.isSelfieVerified || undefined,
+        smoking: searchPreferences.smoking || undefined,
+        drinking: searchPreferences.drinking || undefined,
+        children: searchPreferences.children || undefined,
+        education:
+          searchPreferences.education && searchPreferences.education.length > 0
+            ? searchPreferences.education
+            : undefined,
+        lookingFor:
+          searchPreferences.lookingFor && searchPreferences.lookingFor.length > 0
+            ? searchPreferences.lookingFor
+            : undefined,
+        bodyTypes:
+          searchPreferences.bodyTypes && searchPreferences.bodyTypes.length > 0
+            ? searchPreferences.bodyTypes
+            : undefined,
+        heightMin:
+          searchPreferences.heightMinInches && searchPreferences.heightMinInches > 58
+            ? searchPreferences.heightMinInches
+            : undefined,
+        heightMax:
+          searchPreferences.heightMaxInches && searchPreferences.heightMaxInches < 80
+            ? searchPreferences.heightMaxInches
+            : undefined,
+        minAge: searchPreferences.minAge,
+        maxAge: searchPreferences.maxAge,
+        maxDistance,
+        minReliability: minReliability > 0 ? minReliability : undefined,
+        limit: 40,
+      });
+
+      if (res.success && Array.isArray(res.data)) {
+        const mapped: DiscoverProfile[] = res.data.map((item: any) => ({
+          id: item.id,
+          name: item.name || item.nickname || 'Member',
+          age: item.age || 28,
+          image: item.image || '/assets/discover-card-1.jpg',
+          photos: Array.isArray(item.photos) && item.photos.length > 0 ? item.photos : [item.image || '/assets/discover-card-1.jpg'],
+          reliability: typeof item.reliability === 'number' ? item.reliability : 4.9,
+          distanceKm: typeof item.distanceKm === 'number' ? item.distanceKm : 3,
+          bio: item.bio || 'Meaningful connections and thoughtful evenings.',
+          idealDate: item.idealDate,
+          openTo: Array.isArray(item.openTo) && item.openTo.length > 0 ? item.openTo : ['Dinner', 'Events'],
+          categories: Array.isArray(item.categories) ? item.categories : ['dinner', 'events'],
+          lookingFor: Array.isArray(item.lookingFor) ? item.lookingFor : ['Dating', 'Long-term'],
+          bodyType: item.bodyType || 'Athletic',
+          height: item.height || '5\'09"',
+          education: item.education || "Bachelor's degree",
+          smoking: item.smoking || 'No',
+          drinking: item.drinking || 'Occasionally',
+          children: item.children || 'No',
+          location: item.location || 'New York',
+          occupation: item.occupation || 'Member',
+          interests: Array.isArray(item.openTo) ? item.openTo : [],
+          isVerified: Boolean(item.isVerified),
+          isIdVerified: Boolean(item.isIdVerified ?? item.isVerified),
+          isSelfieVerified: Boolean(item.isSelfieVerified ?? item.isVerified),
+        }));
+        setProfiles(mapped);
+      } else {
+        setProfiles([]);
+      }
+    } catch (err: any) {
+      if (err?.status === 403 && String(err?.message || '').toLowerCase().includes('subscription')) {
+        if (onRequireSubscription) onRequireSubscription();
+        return;
+      }
+      setFeedError(err?.message || 'Unable to load profiles right now.');
+      setProfiles([]);
+    } finally {
+      setIsLoadingFeed(false);
+    }
+  }, [
+    selectedCategory,
+    debouncedSearch,
+    searchPreferences,
+    maxDistance,
+    minReliability,
+    user?.role,
+    onRequireSubscription,
+  ]);
+
+  useEffect(() => {
+    fetchDiscoverFeed();
+  }, [fetchDiscoverFeed]);
+
+  // Load unread message count
+  useEffect(() => {
+    api.messages
+      .getConversations()
+      .then((res) => {
+        if (res.success && Array.isArray(res.data)) {
+          const totalUnread = res.data.reduce(
+            (sum: number, conv: any) => sum + (Number(conv.unreadCount) || 0),
+            0
+          );
+          setUnreadMessagesCount(totalUnread);
+        }
+      })
+      .catch(() => {});
+  }, [isMessagesOpen, activeTab]);
 
   // Synchronize URL hash with active tab & sub-views
   useEffect(() => {
@@ -271,8 +287,9 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
     }
   };
 
-  const openMessages = (contactName?: string) => {
+  const openMessages = (contactName?: string, offerId?: string) => {
     setInitialChatContactName(contactName);
+    setInitialChatOfferId(offerId);
     setIsMessagesOpen(true);
     if (typeof window !== 'undefined' && window.location.hash !== '#messages') {
       window.history.pushState({ view: 'messages' }, '', '#messages');
@@ -282,6 +299,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
   const closeMessages = () => {
     setIsMessagesOpen(false);
     setInitialChatContactName(undefined);
+    setInitialChatOfferId(undefined);
     if (typeof window !== 'undefined') {
       const fallback = activeTab === 'explore' ? '#discover' : `#${activeTab}`;
       window.history.pushState({ tab: activeTab }, '', fallback);
@@ -305,66 +323,59 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
     }
   };
 
-  // View Profile Modal state
-  const [viewProfileModal, setViewProfileModal] = useState<DiscoverProfile | null>(null);
-
-  // Filter Drawer / Modal & Search Preferences
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [maxDistance, setMaxDistance] = useState<number>(20);
-  const [minReliability, setMinReliability] = useState<number>(4.5);
-  const [searchPreferences, setSearchPreferences] = useState<Partial<SearchPreferenceFilters>>({});
-
-  // Filtered profiles list
-  const filteredProfiles = useMemo(() => {
-    const sourceProfiles = isGuest ? SAMPLE_MALE_HOST_PROFILES : SAMPLE_PROFILES;
-    return sourceProfiles.filter((profile) => {
-      // Category filter
-      if (selectedCategory && !profile.categories.includes(selectedCategory)) {
-        return false;
-      }
-      // Distance filter
-      if (profile.distanceKm > maxDistance) {
-        return false;
-      }
-      // Reliability filter
-      if (profile.reliability < minReliability) {
-        return false;
-      }
-      // Search Preference filters (Age, Location, Keywords)
-      if (searchPreferences.minAge && profile.age < searchPreferences.minAge) {
-        return false;
-      }
-      if (searchPreferences.maxAge && profile.age > searchPreferences.maxAge) {
-        return false;
-      }
-      if (searchPreferences.location && searchPreferences.location.trim()) {
-        const loc = searchPreferences.location.toLowerCase();
-        if (profile.location && !profile.location.toLowerCase().includes(loc)) {
-          return false;
+  // Fetch full public profile details whenever View Profile modal opens
+  useEffect(() => {
+    if (!viewProfileModal?.id) return;
+    let cancelled = false;
+    api.profile
+      .getPublicProfile(viewProfileModal.id)
+      .then((res) => {
+        if (!cancelled && res.success && res.data) {
+          setViewProfileModal((prev) =>
+            prev && prev.id === res.data.id
+              ? {
+                  ...prev,
+                  ...res.data,
+                  image: res.data.photos?.[0] || prev.image,
+                }
+              : prev
+          );
         }
-      }
-      if (searchPreferences.keywords && searchPreferences.keywords.trim()) {
-        const kw = searchPreferences.keywords.toLowerCase();
-        const matchName = profile.name.toLowerCase().includes(kw);
-        const matchBio = profile.bio.toLowerCase().includes(kw);
-        const matchInterests = profile.interests?.some((i) => i.toLowerCase().includes(kw));
-        if (!matchName && !matchBio && !matchInterests) {
-          return false;
-        }
-      }
-      // Search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchName = profile.name.toLowerCase().includes(query);
-        const matchBio = profile.bio.toLowerCase().includes(query);
-        const matchOpenTo = profile.openTo.some((item) =>
-          item.toLowerCase().includes(query)
-        );
-        return matchName || matchBio || matchOpenTo;
-      }
-      return true;
-    });
-  }, [selectedCategory, maxDistance, minReliability, searchQuery, searchPreferences, isGuest]);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [viewProfileModal?.id]);
+
+  const activePreferenceCount = useMemo(() => {
+    let count = 0;
+    if (searchPreferences.location?.trim()) count++;
+    if (searchPreferences.isIdVerified) count++;
+    if (searchPreferences.isSelfieVerified) count++;
+    if (searchPreferences.smoking) count++;
+    if (searchPreferences.drinking) count++;
+    if (searchPreferences.children) count++;
+    if (searchPreferences.education && searchPreferences.education.length > 0) count++;
+    if (searchPreferences.lookingFor && searchPreferences.lookingFor.length > 0) count++;
+    if (searchPreferences.bodyTypes && searchPreferences.bodyTypes.length > 0) count++;
+    if (
+      (searchPreferences.heightMinInches && searchPreferences.heightMinInches > 58) ||
+      (searchPreferences.heightMaxInches && searchPreferences.heightMaxInches < 80)
+    ) {
+      count++;
+    }
+    if (
+      (searchPreferences.minAge && searchPreferences.minAge > 18) ||
+      (searchPreferences.maxAge && searchPreferences.maxAge < 60)
+    ) {
+      count++;
+    }
+    if (searchPreferences.keywords?.trim()) count++;
+    return count;
+  }, [searchPreferences]);
+
+  const filteredProfiles = profiles;
 
   const handleApplyPreferences = (filters: SearchPreferenceFilters) => {
     setSearchPreferences(filters);
@@ -378,30 +389,25 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
     setSearchPreferences({});
     setSearchQuery('');
     setSelectedCategory(null);
+    setMaxDistance(50);
+    setMinReliability(0);
     setIsFilterModalOpen(false);
   };
 
-  const handleSendOfferSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setShowOfferSuccessToast(true);
-    setOfferModalProfile(null);
-    setOfferMessage('');
-    setTimeout(() => {
-      setShowOfferSuccessToast(false);
-    }, 3500);
+  const handleSignOut = () => {
+    logout();
+    if (onBackToLanding) onBackToLanding();
   };
 
   return (
     <div className="min-h-screen w-full bg-[#EFE7DA] font-sans antialiased text-[#16120F] flex flex-col justify-between selection:bg-[#9F1E19]/15 pb-20 sm:pb-0">
-      
-      {/* ============================================================ */}
-      {/* 1. TOP NAVBAR / HEADER                                      */}
-      {/* ============================================================ */}
-      <header className={`w-full bg-[#EFE7DA]/95 sticky top-0 z-40 backdrop-blur-md border-b border-[#EADBCA]/60 transition-all ${
-        activeTab === 'profile' ? 'hidden sm:block' : ''
-      }`}>
+      {/* 1. TOP NAVBAR / HEADER */}
+      <header
+        className={`w-full bg-[#EFE7DA]/95 sticky top-0 z-40 backdrop-blur-md border-b border-[#EADBCA]/60 transition-all ${
+          activeTab === 'profile' ? 'hidden sm:block' : ''
+        }`}
+      >
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-          
           {/* Mobile: Left Hamburger Button */}
           <div className="flex items-center gap-3 sm:hidden">
             <button
@@ -414,7 +420,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             </button>
           </div>
 
-          {/* Logo (Left on desktop, right/center on mobile) */}
+          {/* Logo */}
           <a
             href="#"
             onClick={(e) => {
@@ -467,19 +473,20 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             </button>
           </nav>
 
-          {/* Right Icons: Messages + Profile (Desktop only) */}
-          <div className="hidden sm:flex items-center gap-3">
+          {/* Right Icons: Messages + Profile + Sign Out (Desktop only) */}
+          <div className="hidden sm:flex items-center gap-2.5">
             <button
               type="button"
-              onClick={() => {
-                setInitialChatContactName(undefined);
-                setIsMessagesOpen(true);
-              }}
+              onClick={() => openMessages(undefined, undefined)}
               className="w-10 h-10 rounded-full bg-[#FAF7F2] border border-[#EADBCA] flex items-center justify-center text-[#16120F] hover:bg-[#F5F1E6] hover:border-[#9F1E19]/30 transition-all shadow-xs cursor-pointer relative"
               aria-label="Messages"
             >
               <MessageCircle className="w-4 h-4 text-[#16120F]" />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#9F1E19]"></span>
+              {unreadMessagesCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-[#9F1E19] text-white text-[9px] font-bold flex items-center justify-center">
+                  {unreadMessagesCount}
+                </span>
+              )}
             </button>
 
             <button
@@ -494,234 +501,234 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             >
               <User className="w-4 h-4" />
             </button>
-          </div>
 
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="w-10 h-10 rounded-xl bg-[#FAF7F2] border border-[#EADBCA] text-[#6E6A63] hover:text-[#9F1E19] hover:border-[#9F1E19]/40 flex items-center justify-center transition-all shadow-xs cursor-pointer"
+              title="Sign out"
+              aria-label="Sign out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* ============================================================ */}
-      {/* 2. MAIN CONTENT AREA                                        */}
-      {/* ============================================================ */}
-      <main className={`max-w-[1240px] w-full mx-auto flex-1 ${
-        activeTab === 'profile'
-          ? 'px-4 sm:px-6 lg:px-8 pt-4 pb-24 sm:py-8'
-          : 'px-4 sm:px-6 lg:px-8 py-5 sm:py-8'
-      }`}>
+      {/* 2. MAIN CONTENT AREA */}
+      <main
+        className={`max-w-[1240px] w-full mx-auto flex-1 ${
+          activeTab === 'profile'
+            ? 'px-4 sm:px-6 lg:px-8 pt-4 pb-24 sm:py-8'
+            : 'px-4 sm:px-6 lg:px-8 py-5 sm:py-8'
+        }`}
+      >
         {activeTab === 'offers' ? (
           <OffersView
             onNavigateExplore={() => navigateTab('explore')}
-            onOpenChat={(offer) => openMessages(offer.userName)}
+            onOpenChat={(offer) => openMessages(offer.userName, offer.id)}
           />
         ) : activeTab === 'dates' ? (
           <ConfirmedDatesView
-            onOpenChat={(item) => openMessages(item.userName)}
+            onOpenChat={(item) => openMessages(item.userName, item.id)}
           />
         ) : activeTab === 'profile' ? (
           <ProfileView />
         ) : (
           <>
-            {/* Search Bar + Filter Button (Pill Container) */}
+            {/* Search Bar + Filter Button */}
             <div className="w-full bg-[#FAF7F2] border border-[#EADBCA] rounded-full p-1.5 sm:p-2 flex items-center shadow-xs transition-shadow focus-within:shadow-md focus-within:border-[#9F1E19]/40">
-          <div className="pl-3 sm:pl-4 pr-2 text-[#6E6A63]">
-            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#6E6A63]" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search"
-            className="flex-1 bg-transparent border-0 text-xs sm:text-sm text-[#16120F] placeholder-[#6E6A63] focus:outline-none focus:ring-0 font-sans"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              className="p-1 text-[#6E6A63] hover:text-[#16120F] text-xs font-semibold mr-1"
-            >
-              Clear
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#F5F1E6] hover:bg-[#EAE3D6] text-[#16120F] text-xs font-medium border border-[#E0D7C6] transition-colors cursor-pointer active:scale-95 shrink-0"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-[#16120F]" />
-            <span className="hidden sm:inline">Filter</span>
-          </button>
-        </div>
-
-        {/* Category Filter Pills (Dinner, Lunch, Events) */}
-        <div className="flex items-center gap-2 sm:gap-2.5 mt-4 sm:mt-5 overflow-x-auto pb-1 no-scrollbar">
-          <button
-            type="button"
-            onClick={() => setSelectedCategory(selectedCategory === 'dinner' ? null : 'dinner')}
-            className={`px-4 sm:px-5 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-              selectedCategory === 'dinner'
-                ? 'bg-[#16120F] text-white shadow-xs'
-                : 'bg-[#FAF7F2] text-[#16120F] border border-[#EADBCA] hover:border-[#16120F]/30'
-            }`}
-          >
-            Dinner
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSelectedCategory(selectedCategory === 'lunch' ? null : 'lunch')}
-            className={`px-4 sm:px-5 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-              selectedCategory === 'lunch'
-                ? 'bg-[#16120F] text-white shadow-xs'
-                : 'bg-[#FAF7F2] text-[#16120F] border border-[#EADBCA] hover:border-[#16120F]/30'
-            }`}
-          >
-            Lunch
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSelectedCategory(selectedCategory === 'events' ? null : 'events')}
-            className={`px-4 sm:px-5 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-              selectedCategory === 'events'
-                ? 'bg-[#16120F] text-white shadow-xs'
-                : 'bg-[#FAF7F2] text-[#16120F] border border-[#EADBCA] hover:border-[#16120F]/30'
-            }`}
-          >
-            Events
-          </button>
-
-          {selectedCategory && (
-            <button
-              type="button"
-              onClick={() => setSelectedCategory(null)}
-              className="text-xs text-[#9F1E19] hover:underline font-semibold ml-1 cursor-pointer"
-            >
-              Show all
-            </button>
-          )}
-        </div>
-
-        {/* ============================================================ */}
-        {/* CARDS FEED / GRID                                           */}
-        {/* ============================================================ */}
-        <section className="mt-6 sm:mt-8">
-          {filteredProfiles.length === 0 ? (
-            <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] p-10 text-center max-w-[480px] mx-auto my-12">
-              <Compass className="w-10 h-10 text-[#9F1E19]/60 mx-auto mb-3" />
-              <h3 className="font-serif font-bold text-lg text-[#16120F]">
-                No profiles match your filter
-              </h3>
-              <p className="text-xs text-[#6E6A63] mt-1.5 leading-relaxed">
-                Try clearing your search query or selecting another category to see more guests of honor.
-              </p>
+              <div className="pl-3 sm:pl-4 pr-2 text-[#6E6A63]">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#6E6A63]" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by name, bio, or occupation"
+                className="flex-1 bg-transparent border-0 text-xs sm:text-sm text-[#16120F] placeholder-[#6E6A63] focus:outline-none focus:ring-0 font-sans"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="p-1 text-[#6E6A63] hover:text-[#16120F] text-xs font-semibold mr-1"
+                >
+                  Clear
+                </button>
+              )}
               <button
                 type="button"
-                onClick={() => {
-                  setSelectedCategory(null);
-                  setSearchQuery('');
-                  setMaxDistance(50);
-                }}
-                className="mt-4 bg-[#9F1E19] text-white text-xs px-5 py-2 rounded-full font-medium hover:bg-[#851713]"
+                onClick={() => setIsFilterModalOpen(true)}
+                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs font-medium border transition-colors cursor-pointer active:scale-95 shrink-0 ${
+                  activePreferenceCount > 0
+                    ? 'bg-[#9F1E19] text-white border-[#9F1E19]'
+                    : 'bg-[#F5F1E6] hover:bg-[#EAE3D6] text-[#16120F] border-[#E0D7C6]'
+                }`}
               >
-                Reset filters
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">
+                  Filter{activePreferenceCount > 0 ? ` (${activePreferenceCount})` : ''}
+                </span>
               </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-              {filteredProfiles.map((profile) => (
-                <article
-                  key={profile.id}
-                  className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[24px] overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-md transition-all duration-200 group"
+
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-2 sm:gap-2.5 mt-4 sm:mt-5 overflow-x-auto pb-1 no-scrollbar">
+              {(['dinner', 'lunch', 'events'] as const).map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+                  className={`px-4 sm:px-5 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 capitalize ${
+                    selectedCategory === cat
+                      ? 'bg-[#16120F] text-white shadow-xs'
+                      : 'bg-[#FAF7F2] text-[#16120F] border border-[#EADBCA] hover:border-[#16120F]/30'
+                  }`}
                 >
-                  {/* Card Image */}
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#E8DFD0]">
-                    <img
-                      src={profile.image}
-                      alt={profile.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 pointer-events-none" />
-                  </div>
-
-                  {/* Card Content Details */}
-                  <div className="p-4 sm:p-5 flex flex-col justify-between flex-1">
-                    <div>
-                      {/* Name, Age + Crown Icon */}
-                      <div className="flex items-center justify-between">
-                        <h2 className="font-serif font-bold text-lg sm:text-xl text-[#16120F] tracking-tight">
-                          {profile.name}, {profile.age}
-                        </h2>
-                        <span
-                          title="Verified Guest of Honor"
-                          className="text-[#B38E46] text-base"
-                        >
-                          👑
-                        </span>
-                      </div>
-
-                      {/* Reliability Score + Distance */}
-                      <div className="flex items-center gap-1.5 text-xs text-[#6E6A63] mt-0.5 font-normal">
-                        <span>Reliability {profile.reliability.toFixed(1)}</span>
-                        <span>·</span>
-                        <span>{profile.distanceKm} km away</span>
-                      </div>
-
-                      {/* Bio snippet */}
-                      <p className="text-xs sm:text-sm text-[#16120F] mt-2.5 font-normal leading-relaxed line-clamp-2">
-                        {profile.bio}
-                      </p>
-
-                      {/* Outings Open to */}
-                      <p className="text-[11px] sm:text-xs text-[#6E6A63] mt-2 font-medium">
-                        Open to {profile.openTo.join(' · ')}
-                      </p>
-                    </div>
-
-                    {/* Action Buttons: View Profile (outlined) & Send Offer / Ask for an offer (red solid) */}
-                    <div className="mt-5 pt-1 flex items-center gap-2.5">
-                      <button
-                        type="button"
-                        onClick={() => setViewProfileModal(profile)}
-                        className="flex-1 py-2.5 px-3 rounded-full border border-[#DED7C8] bg-[#FAF7F2] hover:bg-[#EFE7DA] text-[#16120F] font-semibold text-xs text-center transition-colors shadow-2xs active:scale-95 cursor-pointer"
-                      >
-                        View profile
-                      </button>
-
-                      {isGuest ? (
-                        <button
-                          type="button"
-                          onClick={() => setAskOfferHostProfile(profile)}
-                          className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
-                        >
-                          Ask for an offer
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => openOfferModal(profile)}
-                          className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
-                        >
-                          Send offer
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </article>
+                  {cat}
+                </button>
               ))}
-            </div>
-          )}
-        </section>
-        </>
-      )}
 
+              {(selectedCategory || activePreferenceCount > 0) && (
+                <button
+                  type="button"
+                  onClick={handleResetPreferences}
+                  className="text-xs text-[#9F1E19] hover:underline font-semibold ml-1 cursor-pointer whitespace-nowrap"
+                >
+                  Clear all filters
+                </button>
+              )}
+            </div>
+
+            {/* CARDS FEED / GRID */}
+            <section className="mt-6 sm:mt-8">
+              {isLoadingFeed ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                  {[1, 2, 3].map((n) => (
+                    <div
+                      key={n}
+                      className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] overflow-hidden h-[360px] flex flex-col animate-pulse"
+                    >
+                      <div className="h-44 bg-[#E8DFD0]" />
+                      <div className="p-5 space-y-3 flex-1">
+                        <div className="h-5 w-1/2 bg-[#E8DFD0] rounded" />
+                        <div className="h-3 w-2/3 bg-[#E8DFD0] rounded" />
+                        <div className="h-8 w-full bg-[#E8DFD0] rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : feedError ? (
+                <div className="bg-[#FAF7F2] border border-[#F3C5C7] rounded-[24px] p-10 text-center max-w-[480px] mx-auto my-12">
+                  <p className="font-serif font-bold text-base text-[#9F1E19]">{feedError}</p>
+                  <button
+                    type="button"
+                    onClick={fetchDiscoverFeed}
+                    className="mt-4 bg-[#9F1E19] text-white text-xs px-5 py-2 rounded-full font-medium hover:bg-[#851713] cursor-pointer"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : filteredProfiles.length === 0 ? (
+                <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] p-10 text-center max-w-[480px] mx-auto my-12">
+                  <Compass className="w-10 h-10 text-[#9F1E19]/60 mx-auto mb-3" />
+                  <h3 className="font-serif font-bold text-lg text-[#16120F]">
+                    No profiles match your filter
+                  </h3>
+                  <p className="text-xs text-[#6E6A63] mt-1.5 leading-relaxed">
+                    Try clearing your search query or selecting another category to see more members.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleResetPreferences}
+                    className="mt-4 bg-[#9F1E19] text-white text-xs px-5 py-2 rounded-full font-medium hover:bg-[#851713] cursor-pointer"
+                  >
+                    Reset filters
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                  {filteredProfiles.map((profile) => (
+                    <article
+                      key={profile.id}
+                      className="bg-[#FAF7F2] sm:bg-[#F5F1E6] border border-[#EADBCA] rounded-[24px] overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-md transition-all duration-200 group"
+                    >
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#E8DFD0]">
+                        <img
+                          src={profile.image}
+                          alt={profile.name}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 pointer-events-none" />
+                      </div>
+
+                      <div className="p-4 sm:p-5 flex flex-col justify-between flex-1">
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <h2 className="font-serif font-bold text-lg sm:text-xl text-[#16120F] tracking-tight">
+                              {profile.name}, {profile.age}
+                            </h2>
+                            <span title="Verified Member" className="text-[#B38E46] text-base">
+                              👑
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-xs text-[#6E6A63] mt-0.5 font-normal">
+                            <span>Reliability {profile.reliability.toFixed(1)}</span>
+                            <span>·</span>
+                            <span>{profile.distanceKm} km away</span>
+                          </div>
+
+                          <p className="text-xs sm:text-sm text-[#16120F] mt-2.5 font-normal leading-relaxed line-clamp-2">
+                            {profile.bio}
+                          </p>
+
+                          <p className="text-[11px] sm:text-xs text-[#6E6A63] mt-2 font-medium">
+                            Open to {profile.openTo.join(' · ')}
+                          </p>
+                        </div>
+
+                        <div className="mt-5 pt-1 flex items-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => setViewProfileModal(profile)}
+                            className="flex-1 py-2.5 px-3 rounded-full border border-[#DED7C8] bg-[#FAF7F2] hover:bg-[#EFE7DA] text-[#16120F] font-semibold text-xs text-center transition-colors shadow-2xs active:scale-95 cursor-pointer"
+                          >
+                            View profile
+                          </button>
+
+                          {isGuest ? (
+                            <button
+                              type="button"
+                              onClick={() => setAskOfferHostProfile(profile)}
+                              className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
+                            >
+                              Ask for an offer
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => openOfferModal(profile)}
+                              className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
+                            >
+                              Send offer
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
+          </>
+        )}
       </main>
 
-      {/* ============================================================ */}
-      {/* 3. DESKTOP FOOTER                                           */}
-      {/* ============================================================ */}
+      {/* 3. DESKTOP FOOTER */}
       <footer className="w-full border-t border-[#EADBCA] mt-12 sm:mt-20 py-8 bg-[#EFE7DA]">
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#6E6A63]">
-          
-          {/* Left: Copyright */}
           <div className="flex items-center gap-2">
             <img
               src="/assets/seal.png"
@@ -734,7 +741,6 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             <span>© 2025 thedateboss - 18+ only</span>
           </div>
 
-          {/* Center Links */}
           <div className="flex items-center gap-5 sm:gap-6 font-medium">
             <a href="#how-it-works" className="hover:text-[#16120F] transition-colors">
               How it works
@@ -750,7 +756,6 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
             </a>
           </div>
 
-          {/* Right Links */}
           <div className="flex items-center gap-5 sm:gap-6">
             <a href="#terms" className="hover:text-[#16120F] transition-colors">
               Terms & Conditions
@@ -762,13 +767,10 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
               Privacy Policy
             </a>
           </div>
-
         </div>
       </footer>
 
-      {/* ============================================================ */}
-      {/* 4. MOBILE BOTTOM NAVIGATION BAR                              */}
-      {/* ============================================================ */}
+      {/* 4. MOBILE BOTTOM NAVIGATION BAR */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 sm:hidden bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#EADBCA] py-2 px-3 flex justify-around items-center shadow-lg">
         <button
           type="button"
@@ -815,28 +817,23 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
         </button>
       </nav>
 
-      {/* ============================================================ */}
-      {/* 5. SIDE MENU (MOBILE DRAWER MATCHING FIGMA)                 */}
-      {/* ============================================================ */}
+      {/* 5. SIDE MENU (MOBILE DRAWER) */}
       {isSideMenuOpen && (
         <div className="fixed inset-0 z-50 flex animate-in fade-in duration-200">
-          {/* Dark Backdrop Overlay */}
           <div
             className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
             onClick={() => setIsSideMenuOpen(false)}
           />
 
-          {/* Drawer Sheet */}
           <aside className="relative z-50 w-[290px] max-w-[85vw] h-full bg-[#16120F] text-[#F5F1E6] p-6 sm:p-8 flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-250">
             <div>
-              {/* Header with Dark Red Square Close Button on top right */}
               <div className="flex items-center justify-between pb-8">
                 <img
                   src="/assets/logo.png"
                   alt="thedateboss"
                   className="h-7 w-auto object-contain brightness-200"
                 />
-                
+
                 <button
                   type="button"
                   onClick={() => setIsSideMenuOpen(false)}
@@ -847,7 +844,6 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                 </button>
               </div>
 
-              {/* Navigation Links list */}
               <nav className="flex flex-col space-y-5 pt-3">
                 <a
                   href="#messages"
@@ -858,59 +854,28 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                   }}
                   className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors flex items-center justify-between group"
                 >
-                  <span>Message</span>
-                  <span className="text-xs bg-[#9F1E19] text-white px-2 py-0.5 rounded-full font-semibold">1</span>
+                  <span>Messages</span>
+                  {unreadMessagesCount > 0 && (
+                    <span className="text-xs bg-[#9F1E19] text-white px-2 py-0.5 rounded-full font-semibold">
+                      {unreadMessagesCount}
+                    </span>
+                  )}
                 </a>
 
-                <a
-                  href="#how-it-works"
-                  onClick={(e) => {
-                    e.preventDefault();
+                <button
+                  type="button"
+                  onClick={() => {
                     setIsSideMenuOpen(false);
-                    if (onBackToLanding) onBackToLanding();
+                    handleSignOut();
                   }}
-                  className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors"
+                  className="text-left text-base sm:text-lg font-medium text-[#F87171] hover:text-white transition-colors flex items-center gap-2 cursor-pointer"
                 >
-                  How It Works
-                </a>
-
-                <a
-                  href="#roles"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsSideMenuOpen(false);
-                    if (onBackToLanding) onBackToLanding();
-                  }}
-                  className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors"
-                >
-                  Roles
-                </a>
-
-                <a
-                  href="#safety"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsSideMenuOpen(false);
-                  }}
-                  className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors"
-                >
-                  Safety
-                </a>
-
-                <a
-                  href="#faq"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsSideMenuOpen(false);
-                  }}
-                  className="text-base sm:text-lg font-medium text-[#F5F1E6] hover:text-[#FCB943] transition-colors"
-                >
-                  FAQ
-                </a>
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
               </nav>
             </div>
 
-            {/* Bottom Note */}
             <div className="pt-6 border-t border-white/10 text-xs text-[#A9A49C]">
               <p className="font-serif italic text-white/90 mb-1">
                 The date starts with an offer.
@@ -921,9 +886,7 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
         </div>
       )}
 
-      {/* ============================================================ */}
-      {/* 6. SEND OFFER MODAL (STEP 1: EVENTS, STEP 2: DETAILS)        */}
-      {/* ============================================================ */}
+      {/* 6. SEND OFFER MODAL */}
       {offerModalProfile && offerStep === 'events' && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <OfferEventsView
@@ -947,24 +910,37 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
               setOfferStep('events');
               window.scrollTo({ top: 0, behavior: 'instant' });
             }}
-            onSendOffer={(_offerData) => {
-              setShowOfferSuccessToast(true);
-              closeOfferModal();
-              setTimeout(() => {
-                setShowOfferSuccessToast(false);
-              }, 3500);
+            onSendOffer={async (offerData) => {
+              try {
+                await api.offers.create({
+                  guestId: offerModalProfile.id,
+                  activityType: offerData.occasion,
+                  venueName: offerData.where,
+                  personalMessage: offerData.shortNote,
+                  hospitalityGuarantee: `$${offerData.giftAmount} Escrow Gift`,
+                });
+                closeOfferModal();
+                triggerToast(
+                  `Offer sent to ${offerModalProfile.name}!`,
+                  'They have 48 hours to accept, counter, or pass.'
+                );
+              } catch (err: any) {
+                if (err?.status === 403 && onRequireSubscription) {
+                  closeOfferModal();
+                  onRequireSubscription();
+                  return;
+                }
+                triggerToast(err?.message || 'Unable to send offer', 'Please check your subscription and try again.');
+              }
             }}
           />
         </div>
       )}
 
-      {/* ============================================================ */}
-      {/* 7. VIEW PROFILE MODAL                                        */}
-      {/* ============================================================ */}
+      {/* 7. VIEW PROFILE MODAL */}
       {viewProfileModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[28px] max-w-[540px] w-full overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
-            {/* Close button */}
             <button
               type="button"
               onClick={() => setViewProfileModal(null)}
@@ -973,7 +949,6 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
               <X className="w-4 h-4" />
             </button>
 
-            {/* Profile Cover Image */}
             <div className="h-60 w-full relative bg-[#E8DFD0] shrink-0">
               <img
                 src={viewProfileModal.image}
@@ -994,7 +969,6 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
               </div>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6 overflow-y-auto space-y-4">
               <div className="flex items-center justify-between bg-[#F5F1E6] rounded-2xl p-3 border border-[#EADBCA]">
                 <div className="text-center flex-1 border-r border-[#EADBCA]">
@@ -1010,9 +984,74 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                   </span>
                 </div>
                 <div className="text-center flex-1">
-                  <span className="block text-xs text-[#6E6A63]">Status</span>
+                  <span className="block text-xs text-[#6E6A63]">Verification</span>
                   <span className="font-semibold text-xs text-emerald-700">
-                    Verified
+                    {viewProfileModal.isIdVerified
+                      ? 'ID & Selfie Verified'
+                      : viewProfileModal.isSelfieVerified
+                      ? 'Selfie Verified'
+                      : viewProfileModal.isVerified
+                      ? 'Verified'
+                      : 'Pending'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Gallery Strip if multiple photos exist */}
+              {viewProfileModal.photos && viewProfileModal.photos.length > 1 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-[#16120F] uppercase tracking-wider mb-2">
+                    Gallery ({viewProfileModal.photos.length} Photos)
+                  </h4>
+                  <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
+                    {viewProfileModal.photos.map((photoUrl, idx) => (
+                      <img
+                        key={idx}
+                        src={photoUrl}
+                        alt={`${viewProfileModal.name} ${idx + 1}`}
+                        className="w-16 h-16 rounded-xl object-cover border border-[#EADBCA] shrink-0"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Profile Attributes Grid (Height, Body Type, Education, Smoking, Drinking, Children) */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="bg-[#F5F1E6] border border-[#EADBCA] rounded-xl p-2.5">
+                  <span className="block text-[10px] text-[#6E6A63]">Height</span>
+                  <span className="text-xs font-semibold text-[#16120F]">
+                    {viewProfileModal.height || '5\'09"'}
+                  </span>
+                </div>
+                <div className="bg-[#F5F1E6] border border-[#EADBCA] rounded-xl p-2.5">
+                  <span className="block text-[10px] text-[#6E6A63]">Body Type</span>
+                  <span className="text-xs font-semibold text-[#16120F] truncate block">
+                    {viewProfileModal.bodyType || 'Athletic'}
+                  </span>
+                </div>
+                <div className="bg-[#F5F1E6] border border-[#EADBCA] rounded-xl p-2.5">
+                  <span className="block text-[10px] text-[#6E6A63]">Education</span>
+                  <span className="text-xs font-semibold text-[#16120F] truncate block">
+                    {viewProfileModal.education || "Bachelor's degree"}
+                  </span>
+                </div>
+                <div className="bg-[#F5F1E6] border border-[#EADBCA] rounded-xl p-2.5">
+                  <span className="block text-[10px] text-[#6E6A63]">Smoking</span>
+                  <span className="text-xs font-semibold text-[#16120F]">
+                    {viewProfileModal.smoking || 'No'}
+                  </span>
+                </div>
+                <div className="bg-[#F5F1E6] border border-[#EADBCA] rounded-xl p-2.5">
+                  <span className="block text-[10px] text-[#6E6A63]">Drinking</span>
+                  <span className="text-xs font-semibold text-[#16120F]">
+                    {viewProfileModal.drinking || 'Occasionally'}
+                  </span>
+                </div>
+                <div className="bg-[#F5F1E6] border border-[#EADBCA] rounded-xl p-2.5">
+                  <span className="block text-[10px] text-[#6E6A63]">Children</span>
+                  <span className="text-xs font-semibold text-[#16120F]">
+                    {viewProfileModal.children || 'No'}
                   </span>
                 </div>
               </div>
@@ -1025,6 +1064,35 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                   {viewProfileModal.bio}
                 </p>
               </div>
+
+              {viewProfileModal.idealDate && (
+                <div>
+                  <h4 className="text-xs font-semibold text-[#16120F] uppercase tracking-wider mb-1">
+                    Ideal First Date
+                  </h4>
+                  <p className="text-xs sm:text-sm text-[#524D46] leading-relaxed">
+                    {viewProfileModal.idealDate}
+                  </p>
+                </div>
+              )}
+
+              {viewProfileModal.lookingFor && viewProfileModal.lookingFor.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-[#16120F] uppercase tracking-wider mb-2">
+                    Looking For
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {viewProfileModal.lookingFor.map((lf, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1 rounded-full bg-[#EFE7DA] border border-[#DFD4C2] text-[#16120F] text-xs font-medium"
+                      >
+                        {lf}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div>
                 <h4 className="text-xs font-semibold text-[#16120F] uppercase tracking-wider mb-2">
@@ -1042,19 +1110,23 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
                 </div>
               </div>
 
-              {viewProfileModal.interests && (
+              {viewProfileModal.reviews && viewProfileModal.reviews.length > 0 && (
                 <div>
                   <h4 className="text-xs font-semibold text-[#16120F] uppercase tracking-wider mb-2">
-                    Interests & Passions
+                    Recent Date Reviews ({viewProfileModal.reviews.length})
                   </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {viewProfileModal.interests.map((tag, i) => (
-                      <span
-                        key={i}
-                        className="px-2.5 py-1 rounded-full bg-[#F5F1E6] border border-[#EADBCA] text-[#6E6A63] text-xs"
+                  <div className="space-y-2">
+                    {viewProfileModal.reviews.slice(0, 2).map((rev) => (
+                      <div
+                        key={rev.id}
+                        className="bg-[#F5F1E6] border border-[#EADBCA] rounded-xl p-3 text-xs"
                       >
-                        {tag}
-                      </span>
+                        <div className="flex items-center justify-between font-semibold text-[#16120F] mb-1">
+                          <span>{rev.reviewerName || 'Verified Member'}</span>
+                          <span className="text-[#9F1E19]">★ {rev.rating.toFixed(1)}</span>
+                        </div>
+                        {rev.comment && <p className="text-[#524D46]">{rev.comment}</p>}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -1095,27 +1167,22 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
         </div>
       )}
 
-      {/* ============================================================ */}
-      {/* 7. ASK FOR AN OFFER MODAL (GUEST VIEW - FIGMA SCREEN 2)      */}
-      {/* ============================================================ */}
+      {/* 8. ASK FOR AN OFFER MODAL */}
       {askOfferHostProfile && (
         <AskForAnOfferModal
           hostProfile={askOfferHostProfile}
           onClose={() => setAskOfferHostProfile(null)}
-          onSubmitSuccess={(data) => {
+          onSubmitSuccess={() => {
             setAskOfferHostProfile(null);
-            setSuccessToastText(`Your date request was sent! Verified hosts will review your wishlist.`);
-            setShowOfferSuccessToast(true);
-            setTimeout(() => {
-              setShowOfferSuccessToast(false);
-            }, 4000);
+            triggerToast(
+              'Your date request was sent!',
+              'Verified hosts will review your wishlist and respond.'
+            );
           }}
         />
       )}
 
-      {/* ============================================================ */}
-      {/* 8. SEARCH PREFERENCE MODAL (FIGMA / ATTACHMENT DESIGN)        */}
-      {/* ============================================================ */}
+      {/* 9. SEARCH PREFERENCE MODAL */}
       <SearchPreferenceModal
         isOpen={isFilterModalOpen}
         onClose={() => setIsFilterModalOpen(false)}
@@ -1124,21 +1191,18 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
         initialFilters={searchPreferences}
       />
 
-      {/* ============================================================ */}
-      {/* 8. MESSAGES / CHAT VIEW (FIGMA SCREENSHOT DESIGN)            */}
-      {/* ============================================================ */}
+      {/* 10. MESSAGES / CHAT VIEW */}
       {isMessagesOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <MessagesChatView
             initialContactName={initialChatContactName}
+            initialOfferId={initialChatOfferId}
             onClose={closeMessages}
           />
         </div>
       )}
 
-      {/* ============================================================ */}
-      {/* 9. SUCCESS TOAST NOTIFICATION                                */}
-      {/* ============================================================ */}
+      {/* 11. TOAST NOTIFICATION */}
       {showOfferSuccessToast && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#16120F] text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10 animate-in slide-in-from-bottom-5 duration-300">
           <div className="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center shrink-0">
@@ -1146,12 +1210,12 @@ export function DiscoverPage({ onBackToLanding }: DiscoverPageProps) {
           </div>
           <div>
             <p className="text-xs font-semibold text-white">{successToastText}</p>
-            <p className="text-[11px] text-white/70">You will be notified once they respond.</p>
+            <p className="text-[11px] text-white/70">{toastSubtitle}</p>
           </div>
         </div>
       )}
-
     </div>
   );
 }
+
 export default DiscoverPage;

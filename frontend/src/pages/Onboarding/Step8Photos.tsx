@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, Smile, X } from 'lucide-react';
+import { ArrowLeft, Smile, X, Loader2 } from 'lucide-react';
+import { api } from '../../services/api';
 
 interface Step8PhotosProps {
   onBack: () => void;
@@ -7,7 +8,6 @@ interface Step8PhotosProps {
 }
 
 export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
-  // Slots: initially NO photo selected (all 6 slots are null as requested)
   const [photos, setPhotos] = useState<(string | null)[]>([
     null,
     null,
@@ -18,11 +18,12 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
   ]);
 
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
+  const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSlotClick = (index: number) => {
-    // If empty slot, trigger file upload
-    if (!photos[index]) {
+    if (!photos[index] && uploadingSlot === null) {
       setActiveSlot(index);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -31,14 +32,28 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && activeSlot !== null) {
-      const url = URL.createObjectURL(file);
-      const updated = [...photos];
-      updated[activeSlot] = url;
-      setPhotos(updated);
-      setActiveSlot(null);
+    if (!file || activeSlot === null) return;
+
+    const slot = activeSlot;
+    setActiveSlot(null);
+    setUploadingSlot(slot);
+    setUploadError(null);
+
+    try {
+      const res = await api.upload.uploadImage(file, 'profiles');
+      if (res.success && res.data?.url) {
+        setPhotos((prev) => {
+          const updated = [...prev];
+          updated[slot] = res.data!.url;
+          return updated;
+        });
+      }
+    } catch (err: any) {
+      setUploadError(err?.message || 'Failed to upload image to Cloudinary');
+    } finally {
+      setUploadingSlot(null);
     }
   };
 
@@ -112,6 +127,12 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
           Profiles with multiple photos attract more attention and messages! Upload up to 6 photos at a time. You can add up to 20 photos and videos to your profile in total.
         </p>
 
+        {uploadError && (
+          <div className="mb-4 p-3 rounded-xl bg-[#FBEFF0] border border-[#F3C5C7] text-xs text-[#9F1E19]">
+            {uploadError}
+          </div>
+        )}
+
         {/* Photo Grid: 3-column layout where Slot 1 spans 2 cols & 2 rows */}
         <div className="grid grid-cols-3 gap-2.5 sm:gap-3 max-w-[520px]">
           
@@ -120,7 +141,12 @@ export function Step8Photos({ onBack, onContinue }: Step8PhotosProps) {
             onClick={() => handleSlotClick(0)}
             className="col-span-2 row-span-2 relative aspect-[4/4.3] sm:aspect-square bg-[#F5F1E6] border border-[#9F1E19]/70 rounded-[20px] sm:rounded-[24px] overflow-hidden cursor-pointer group shadow-xs transition-all hover:border-[#9F1E19]"
           >
-            {photos[0] ? (
+            {uploadingSlot === 0 ? (
+              <div className="w-full h-full flex flex-col items-center justify-center text-[#9F1E19]">
+                <Loader2 className="w-8 h-8 animate-spin" />
+                <span className="text-[11px] mt-2 text-[#6E6A63]">Uploading...</span>
+              </div>
+            ) : photos[0] ? (
               <>
                 <img
                   src={photos[0]}

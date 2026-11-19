@@ -12,6 +12,12 @@ enum Role {
   GUEST
 }
 
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
 enum Gender {
   MAN
   WOMAN
@@ -31,6 +37,7 @@ enum OfferStatus {
   PASSED
   CANCELLED
   COMPLETED
+  EXPIRED
 }
 
 enum VerificationStatus {
@@ -46,75 +53,119 @@ enum SubscriptionStatus {
   EXPIRED
 }
 
+enum ReportPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum ReportStatus {
+  NEW
+  IN_REVIEW
+  RESOLVED
+}
+
+enum AppealStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum ModerationStatus {
+  NORMAL
+  FLAGGED
+  WARNED
+  RESOLVED
+}
+
 model User {
-  id               String       @id @default(uuid())
-  email            String       @unique
+  id               String        @id @default(uuid())
+  memberCode       String?
+  email            String        @unique
   passwordHash     String?
-  role             Role         @default(HOST)
+  role             Role          @default(HOST)
+  accountStatus    AccountStatus @default(ACTIVE)
   gender           Gender?
   targetGender     TargetGender?
   nickname         String?
+  age              Int?
   locationCity     String?
   latitude         Float?
   longitude        Float?
-  isVerified       Boolean      @default(false)
-  isActive         Boolean      @default(true)
-  onboardingStep   Int          @default(1)
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  isVerified       Boolean       @default(false)
+  isIdVerified     Boolean       @default(false)
+  isSelfieVerified Boolean       @default(false)
+  isActive         Boolean       @default(true)
+  onboardingStep   Int           @default(1)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   // Profile Relations
   hostProfile      HostProfile?
   guestProfile     GuestProfile?
 
   // Date Offer Relations
-  sentOffers       DateOffer[]  @relation("HostSentOffers")
-  receivedOffers   DateOffer[]  @relation("GuestReceivedOffers")
+  sentOffers       DateOffer[]   @relation("HostSentOffers")
+  receivedOffers   DateOffer[]   @relation("GuestReceivedOffers")
 
   // Verification & Safety
-  verificationRequests VerificationRequest[] @relation("UserVerifications")
+  verificationRequests  VerificationRequest[] @relation("UserVerifications")
   reviewedVerifications VerificationRequest[] @relation("AdminReviewedVerifications")
 
   // Subscription & Payments
   subscription     Subscription?
 
   // Messaging
-  sentMessages     Message[]    @relation("SentMessages")
-  receivedMessages Message[]    @relation("ReceivedMessages")
+  sentMessages     Message[]     @relation("SentMessages")
+  receivedMessages Message[]     @relation("ReceivedMessages")
+
+  // Reviews, Appeals & Reports
+  reviewsGiven     DateReview[]  @relation("ReviewsGiven")
+  reviewsReceived  DateReview[]  @relation("ReviewsReceived")
+  appeals          Appeal[]
+  reportsFiled     Report[]      @relation("ReportsFiled")
+  reportsReceived  Report[]      @relation("ReportsReceived")
 
   @@map("users")
 }
 
 model HostProfile {
-  id             String    @id @default(uuid())
-  userId         String    @unique
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  interests      String[]  @default([])
-  occupation     String?
-  education      String?
-  annualIncome   String?
-  netWorth       String?
-  smoking        String?
-  drinking       String?
-  children       String?
-  bio            String?
-  idealDate      String?
-  photos         String[]  @default([])
-  
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  interests        String[] @default([])
+  lookingFor       String[] @default([])
+  heightInches     Int?
+  bodyType         String?
+  occupation       String?
+  education        String?
+  annualIncome     String?
+  netWorth         String?
+  smoking          String?
+  drinking         String?
+  children         String?
+  bio              String?
+  idealDate        String?
+  photos           String[] @default([])
+  reliabilityScore Float    @default(5.0)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@map("host_profiles")
 }
 
 model GuestProfile {
-  id                String    @id @default(uuid())
-  userId            String    @unique
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  inviteMeToEvents  String[]  @default([])
-  customDateIdeas   Json?     @default("[]")
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  inviteMeToEvents  String[] @default([])
+  customDateIdeas   Json?    @default("[]")
+  lookingFor        String[] @default([])
+  heightInches      Int?
+  bodyType          String?
   occupation        String?
   education         String?
   smoking           String?
@@ -122,40 +173,49 @@ model GuestProfile {
   children          String?
   bio               String?
   idealDate         String?
-  photos            String[]  @default([])
-  reliabilityScore  Float     @default(5.0)
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  photos            String[] @default([])
+  reliabilityScore  Float    @default(5.0)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@map("guest_profiles")
 }
 
 model DateOffer {
-  id                     String      @id @default(uuid())
+  id                     String           @id @default(uuid())
+  threadCode             String?
   hostId                 String
-  host                   User        @relation("HostSentOffers", fields: [hostId], references: [id], onDelete: Cascade)
-  
+  host                   User             @relation("HostSentOffers", fields: [hostId], references: [id], onDelete: Cascade)
+
   guestId                String
-  guest                  User        @relation("GuestReceivedOffers", fields: [guestId], references: [id], onDelete: Cascade)
-  
+  guest                  User             @relation("GuestReceivedOffers", fields: [guestId], references: [id], onDelete: Cascade)
+
   activityType           String
   venueName              String
   venueAddress           String?
   proposedDateTime       DateTime
-  hospitalityGuarantee   String?     @default("Host covers all dining & hospitality")
+  hospitalityGuarantee   String?          @default("Host covers all dining & hospitality")
   personalMessage        String?
-  
-  status                 OfferStatus @default(PENDING)
+
+  status                 OfferStatus      @default(PENDING)
   counterNote            String?
   counterTime            DateTime?
   counterVenue           String?
-  
+
+  hostCheckedIn          Boolean          @default(false)
+  guestCheckedIn         Boolean          @default(false)
+
+  moderationStatus       ModerationStatus @default(NORMAL)
+  flagReason             String?
+  flagSubtext            String?
+
   expiresAt              DateTime
-  createdAt              DateTime    @default(now())
-  updatedAt              DateTime    @updatedAt
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
 
   messages               Message[]
+  review                 DateReview?
 
   @@map("date_offers")
 }
@@ -164,15 +224,15 @@ model VerificationRequest {
   id                String             @id @default(uuid())
   userId            String
   user              User               @relation("UserVerifications", fields: [userId], references: [id], onDelete: Cascade)
-  
+
   selfieUrl         String
   faceSnapshotUrl   String
   status            VerificationStatus @default(PENDING)
-  
+
   reviewedById      String?
   reviewedBy        User?              @relation("AdminReviewedVerifications", fields: [reviewedById], references: [id])
   rejectionReason   String?
-  
+
   createdAt         DateTime           @default(now())
   reviewedAt        DateTime?
 
@@ -183,35 +243,130 @@ model Subscription {
   id                     String             @id @default(uuid())
   userId                 String             @unique
   user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   plan                   String             @default("HOST_MONTHLY_PRO")
   priceCents             Int                @default(999)
   status                 SubscriptionStatus @default(ACTIVE)
   stripeCustomerId       String?
   stripeSubscriptionId   String?
   currentPeriodEnd       DateTime?
-  
+
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
 
   @@map("subscriptions")
 }
 
+model SubscriptionPlan {
+  id           String   @id @default(uuid())
+  code         String   @unique
+  name         String
+  tierLabel    String
+  priceCents   Int      @default(0)
+  priceDisplay String
+  variant      String   @default("guest")
+  features     Json     @default("[]")
+  footerNote   String   @default("Cancel any time. Guests of honor never pay.")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("subscription_plans")
+}
+
 model Message {
   id          String     @id @default(uuid())
   offerId     String?
   offer       DateOffer? @relation(fields: [offerId], references: [id], onDelete: SetNull)
-  
+
   senderId    String
   sender      User       @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  
+
   receiverId  String
   receiver    User       @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
-  
+
   content     String
   isRead      Boolean    @default(false)
-  
+  isFlagged   Boolean    @default(false)
+  flagReason  String?
+
   createdAt   DateTime   @default(now())
 
   @@map("messages")
+}
+
+model DateReview {
+  id          String   @id @default(uuid())
+  offerId     String   @unique
+  offer       DateOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+
+  reviewerId  String
+  reviewer    User     @relation("ReviewsGiven", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  revieweeId  String
+  reviewee    User     @relation("ReviewsReceived", fields: [revieweeId], references: [id], onDelete: Cascade)
+
+  rating      Int
+  feedback    String?
+  createdAt   DateTime @default(now())
+
+  appeal      Appeal?
+
+  @@map("date_reviews")
+}
+
+model Appeal {
+  id          String       @id @default(uuid())
+  reviewId    String       @unique
+  review      DateReview   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  reason      String
+  status      AppealStatus @default(PENDING)
+  adminNote   String?
+
+  createdAt   DateTime     @default(now())
+  resolvedAt  DateTime?
+
+  @@map("appeals")
+}
+
+model Report {
+  id            String         @id @default(uuid())
+  code          String         @unique
+  title         String
+  priority      ReportPriority @default(MEDIUM)
+  description   String
+  status        ReportStatus   @default(NEW)
+
+  reporterId    String
+  reporter      User           @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  reportedId    String
+  reported      User           @relation("ReportsReceived", fields: [reportedId], references: [id], onDelete: Cascade)
+
+  adminNote     String?
+  reviewedById  String?
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("reports")
+}
+
+model Venue {
+  id           String   @id @default(uuid())
+  name         String
+  neighborhood String
+  city         String   @default("New York")
+  category     String
+  description  String?
+  priceRange   String   @default("$$$")
+  imageUrl     String?
+  isCurated    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@map("venues")
 }

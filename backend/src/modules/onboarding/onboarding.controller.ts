@@ -61,16 +61,17 @@ export class OnboardingController {
     }
   }
 
-  // Step 4: Save Nickname & Location
+  // Step 4: Save Nickname, Age & Location
   static async saveDetails(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.user!.id;
-      const { nickname, locationCity, latitude, longitude } = req.body;
+      const { nickname, age, locationCity, latitude, longitude } = req.body;
 
       const user = await prisma.user.update({
         where: { id: userId },
         data: {
           nickname,
+          ...(age !== undefined && !Number.isNaN(Number(age)) ? { age: Number(age) } : {}),
           locationCity,
           latitude: latitude ? parseFloat(latitude) : undefined,
           longitude: longitude ? parseFloat(longitude) : undefined,
@@ -84,22 +85,35 @@ export class OnboardingController {
     }
   }
 
-  // Step 5: Save Lifestyle (children, smoke, drink)
+  // Step 5: Save Lifestyle (children, smoke, drink, heightInches, bodyType, lookingFor)
   static async saveLifestyle(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.user!.id;
-      const { children, smoking, drinking } = req.body;
+      const { children, smoking, drinking, heightInches, bodyType, lookingFor } = req.body;
       const user = await prisma.user.findUnique({ where: { id: userId } });
 
+      const lifestyleData = {
+        children,
+        smoking,
+        drinking,
+        ...(heightInches !== undefined && !Number.isNaN(Number(heightInches))
+          ? { heightInches: Number(heightInches) }
+          : {}),
+        ...(bodyType !== undefined ? { bodyType } : {}),
+        ...(Array.isArray(lookingFor) ? { lookingFor } : {}),
+      };
+
       if (user?.role === Role.HOST) {
-        await prisma.hostProfile.update({
+        await prisma.hostProfile.upsert({
           where: { userId },
-          data: { children, smoking, drinking },
+          update: lifestyleData,
+          create: { userId, ...lifestyleData },
         });
       } else {
-        await prisma.guestProfile.update({
+        await prisma.guestProfile.upsert({
           where: { userId },
-          data: { children, smoking, drinking },
+          update: lifestyleData,
+          create: { userId, ...lifestyleData },
         });
       }
 
@@ -220,7 +234,7 @@ export class OnboardingController {
 
       await prisma.user.update({
         where: { id: userId },
-        data: { onboardingStep: 11 },
+        data: { onboardingStep: 11, isSelfieVerified: true },
       });
 
       res.json({
@@ -233,17 +247,43 @@ export class OnboardingController {
     }
   }
 
-  // Step 12: Finalize membership (Host = $9.99/mo; Guest = $0.00/mo)
+  // Step 12: Finalize membership (Guest = $0.00/mo FREE ACTIVE; Host requires Stripe payment to become ACTIVE)
   static async finalizeOnboarding(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.user!.id;
-      const user = await prisma.user.findUnique({ where: { id: userId } });
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { subscription: true },
+      });
 
       const isHost = user?.role === Role.HOST;
       const planName = isHost ? 'HOST_MONTHLY_PRO' : 'FREE_GUEST_OF_HONOR';
       const priceCents = isHost ? 999 : 0;
 
-      // Upsert subscription
+      if (isHost) {
+        const hasActiveHostSub = user?.subscription?.status === 'ACTIVE';
+        if (!hasActiveHostSub) {
+          const subscription = await prisma.subscription.upsert({
+            where: { userId },
+            update: { plan: planName, priceCents },
+            create: {
+              userId,
+              plan: planName,
+              priceCents,
+              status: 'EXPIRED',
+            },
+          });
+
+          res.status(402).json({
+            success: false,
+            requiresPayment: true,
+            message: 'Host Pro subscription payment is required to unlock Discover & Offers.',
+            data: { subscription },
+          });
+          return;
+        }
+      }
+
       const subscription = await prisma.subscription.upsert({
         where: { userId },
         update: {
@@ -259,7 +299,6 @@ export class OnboardingController {
         },
       });
 
-      // Mark onboarding complete and user verified for demo/testing
       await prisma.user.update({
         where: { id: userId },
         data: {

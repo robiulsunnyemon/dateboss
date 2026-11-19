@@ -35,29 +35,16 @@ export function Step1Begin({
 
     setHasPromptError(false);
 
-    // Exact user navigation rules:
-    // 1. If user is 'Women' -> navigate to Guest Events (Where Should The Offer Take Them?)
-    // 2. If user is 'Men' (or Everyone) -> navigate to Step 2 Interests
-    if (whoYouAre === 'Women') {
-      if (onJoinAsGuestDirect) {
-        onJoinAsGuestDirect();
-      } else if (onContinueToStep2) {
-        onContinueToStep2({
-          role: 'guest',
-          whoYouAre,
-          whoToMeet,
-        });
-      }
-    } else {
-      if (onJoinAsHostDirect) {
-        onJoinAsHostDirect();
-      } else if (onContinueToStep2) {
-        onContinueToStep2({
-          role: 'host',
-          whoYouAre,
-          whoToMeet,
-        });
-      }
+    if (onContinueToStep2) {
+      onContinueToStep2({
+        role: whoYouAre === 'Women' ? 'guest' : 'host',
+        whoYouAre,
+        whoToMeet,
+      });
+    } else if (whoYouAre === 'Women' && onJoinAsGuestDirect) {
+      onJoinAsGuestDirect();
+    } else if (onJoinAsHostDirect) {
+      onJoinAsHostDirect();
     }
   };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronDown, ShieldCheck, Sparkles, Plus } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ShieldCheck, Sparkles, Plus, AlertCircle } from 'lucide-react';
 import { DiscoverProfile } from './DiscoverPage';
+import { api } from '../../services/api';
 
 interface AskForAnOfferModalProps {
   hostProfile?: DiscoverProfile | null;
@@ -36,21 +37,27 @@ export function AskForAnOfferModal({ hostProfile, onClose, onSubmitSuccess }: As
   );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
+    setErrorMsg(null);
+    const payload = {
+      plan: isCustomPlanActive ? customPlan.trim() || selectedPlan : selectedPlan,
+      location: location.trim() || 'Midtown Manhattan',
+      note: idealDateNote.trim() || "Tell Hosts what you'd love",
+      giftAmount: isCustomGiftActive ? Number(customGiftInput) || 250 : giftAmount,
+      targetHostId: hostProfile?.id,
+    };
+    try {
+      await api.offers.ask(payload);
+      onSubmitSuccess({ ...payload, time: selectedTime, targetHost: targetHostAudience });
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Unable to submit your date request. Please try again.');
+    } finally {
       setIsSubmitting(false);
-      onSubmitSuccess({
-        plan: isCustomPlanActive ? customPlan : selectedPlan,
-        time: selectedTime,
-        location: location || 'Midtown Manhattan',
-        note: idealDateNote,
-        giftAmount: isCustomGiftActive ? Number(customGiftInput) || 250 : giftAmount,
-        targetHost: targetHostAudience,
-      });
-    }, 600);
+    }
   };
 
   return (
@@ -87,6 +94,12 @@ export function AskForAnOfferModal({ hostProfile, onClose, onSubmitSuccess }: As
           </p>
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+            {errorMsg && (
+              <div className="p-3 rounded-xl bg-[#FBEFF0] border border-[#F3C5C7] text-xs text-[#9F1E19] flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
             {/* 1. The Plan */}
             <div>
               <label className="block text-xs font-bold text-[#16120F] mb-2">

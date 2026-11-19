@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Crosshair, Check, ShieldCheck, Camera } from 'lucide-react';
 
 export interface SearchPreferenceFilters {
@@ -10,6 +10,8 @@ export interface SearchPreferenceFilters {
   maxAge: number;
   heightMin: string;
   heightMax: string;
+  heightMinInches?: number;
+  heightMaxInches?: number;
   smoking: 'No' | 'Yes' | 'Occasionally' | null;
   drinking: 'No' | 'Yes' | 'Occasionally' | null;
   children: 'No' | 'Yes' | null;
@@ -26,6 +28,12 @@ interface SearchPreferenceModalProps {
   initialFilters?: Partial<SearchPreferenceFilters>;
 }
 
+function formatInches(inches: number): string {
+  const feet = Math.floor(inches / 12);
+  const rem = inches % 12;
+  return `${feet}'${String(rem).padStart(2, '0')}"`;
+}
+
 export function SearchPreferenceModal({
   isOpen,
   onClose,
@@ -33,20 +41,17 @@ export function SearchPreferenceModal({
   onReset,
   initialFilters,
 }: SearchPreferenceModalProps) {
-  // Form States
   const [location, setLocation] = useState(initialFilters?.location || '');
   const [isIdVerified, setIsIdVerified] = useState(initialFilters?.isIdVerified || false);
   const [isSelfieVerified, setIsSelfieVerified] = useState(initialFilters?.isSelfieVerified || false);
-  
-  const [lookingFor, setLookingFor] = useState<string[]>(
-    initialFilters?.lookingFor || ['Dating', 'Long-term']
-  );
 
-  const [minAge, setMinAge] = useState(initialFilters?.minAge || 20);
-  const [maxAge, setMaxAge] = useState(initialFilters?.maxAge || 32);
+  const [lookingFor, setLookingFor] = useState<string[]>(initialFilters?.lookingFor || []);
 
-  const [heightMin, setHeightMin] = useState(initialFilters?.heightMin || '5\'03"');
-  const [heightMax, setHeightMax] = useState(initialFilters?.heightMax || '6\'03"');
+  const [minAge, setMinAge] = useState(initialFilters?.minAge ?? 18);
+  const [maxAge, setMaxAge] = useState(initialFilters?.maxAge ?? 50);
+
+  const [heightMinInches, setHeightMinInches] = useState(initialFilters?.heightMinInches ?? 58);
+  const [heightMaxInches, setHeightMaxInches] = useState(initialFilters?.heightMaxInches ?? 80);
 
   const [smoking, setSmoking] = useState<'No' | 'Yes' | 'Occasionally' | null>(
     initialFilters?.smoking || null
@@ -58,19 +63,33 @@ export function SearchPreferenceModal({
     initialFilters?.children || null
   );
 
-  const [bodyTypes, setBodyTypes] = useState<string[]>(
-    initialFilters?.bodyTypes || []
-  );
-
-  const [education, setEducation] = useState<string[]>(
-    initialFilters?.education || []
-  );
-
+  const [bodyTypes, setBodyTypes] = useState<string[]>(initialFilters?.bodyTypes || []);
+  const [education, setEducation] = useState<string[]>(initialFilters?.education || []);
   const [keywords, setKeywords] = useState(initialFilters?.keywords || '');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setLocation(initialFilters?.location || '');
+    setIsIdVerified(Boolean(initialFilters?.isIdVerified));
+    setIsSelfieVerified(Boolean(initialFilters?.isSelfieVerified));
+    setLookingFor(initialFilters?.lookingFor || []);
+    setMinAge(initialFilters?.minAge ?? 18);
+    setMaxAge(initialFilters?.maxAge ?? 50);
+    setHeightMinInches(initialFilters?.heightMinInches ?? 58);
+    setHeightMaxInches(initialFilters?.heightMaxInches ?? 80);
+    setSmoking(initialFilters?.smoking || null);
+    setDrinking(initialFilters?.drinking || null);
+    setChildren(initialFilters?.children || null);
+    setBodyTypes(initialFilters?.bodyTypes || []);
+    setEducation(initialFilters?.education || []);
+    setKeywords(initialFilters?.keywords || '');
+  }, [isOpen, initialFilters]);
 
   if (!isOpen) return null;
 
-  // Toggle helpers
+  const heightMin = formatInches(heightMinInches);
+  const heightMax = formatInches(heightMaxInches);
+
   const toggleLookingFor = (item: string) => {
     setLookingFor((prev) =>
       prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
@@ -95,10 +114,12 @@ export function SearchPreferenceModal({
       isIdVerified,
       isSelfieVerified,
       lookingFor,
-      minAge,
-      maxAge,
+      minAge: Math.min(minAge, maxAge),
+      maxAge: Math.max(minAge, maxAge),
       heightMin,
       heightMax,
+      heightMinInches: Math.min(heightMinInches, heightMaxInches),
+      heightMaxInches: Math.max(heightMinInches, heightMaxInches),
       smoking,
       drinking,
       children,
@@ -114,10 +135,10 @@ export function SearchPreferenceModal({
     setIsIdVerified(false);
     setIsSelfieVerified(false);
     setLookingFor([]);
-    setMinAge(20);
-    setMaxAge(35);
-    setHeightMin('5\'00"');
-    setHeightMax('6\'05"');
+    setMinAge(18);
+    setMaxAge(50);
+    setHeightMinInches(58);
+    setHeightMaxInches(80);
     setSmoking(null);
     setDrinking(null);
     setChildren(null);
@@ -129,11 +150,8 @@ export function SearchPreferenceModal({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-[#16120F]/95 backdrop-blur-md text-[#FAF7F2] font-sans antialiased animate-in fade-in duration-200">
-      
-      {/* Container matching Figma Layout */}
       <div className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
-        
-        {/* Top Header: Dark Red Rounded Back Button + Search Preference Title */}
+        {/* Top Header */}
         <div className="flex items-center gap-3.5 mb-6 sm:mb-8">
           <button
             type="button"
@@ -149,17 +167,10 @@ export function SearchPreferenceModal({
           </h1>
         </div>
 
-        {/* ============================================================ */}
-        {/* DESKTOP & MOBILE RESPONSIVE GRID                             */}
-        {/* ============================================================ */}
+        {/* DESKTOP & MOBILE RESPONSIVE GRID */}
         <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 sm:gap-7">
-          
-          {/* ========================================================== */}
-          {/* COLUMN 1: LOCATION, VERIFICATION SWITCHES, SMOKING/DRINKING */}
-          {/* ========================================================== */}
+          {/* COLUMN 1: LOCATION, VERIFICATION SWITCHES, SMOKING/DRINKING/CHILDREN */}
           <div className="space-y-5 sm:space-y-6">
-            
-            {/* 1.1 Location Input */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-1.5">
                 Location
@@ -174,7 +185,7 @@ export function SearchPreferenceModal({
                 />
                 <button
                   type="button"
-                  onClick={() => setLocation('New York, NY')}
+                  onClick={() => setLocation('New York')}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6A63] hover:text-[#16120F] transition-colors p-1"
                   title="Detect location"
                 >
@@ -183,7 +194,7 @@ export function SearchPreferenceModal({
               </div>
             </div>
 
-            {/* 1.2 ID verified switch */}
+            {/* ID verified switch */}
             <div className="bg-[#FAF7F2] rounded-full px-5 py-2.5 flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-2 text-xs font-semibold text-[#16120F]">
                 <ShieldCheck className="w-4 h-4 text-[#9F1E19]" />
@@ -204,7 +215,7 @@ export function SearchPreferenceModal({
               </button>
             </div>
 
-            {/* 1.3 Selfie verified switch */}
+            {/* Selfie verified switch */}
             <div className="bg-[#FAF7F2] rounded-full px-5 py-2.5 flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-2 text-xs font-semibold text-[#16120F]">
                 <Camera className="w-4 h-4 text-[#9F1E19]" />
@@ -225,7 +236,7 @@ export function SearchPreferenceModal({
               </button>
             </div>
 
-            {/* 1.4 Smoking Radio Group */}
+            {/* Smoking Radio Group (click active option again to clear) */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-1.5">
                 Smoking
@@ -235,16 +246,18 @@ export function SearchPreferenceModal({
                   <button
                     key={opt}
                     type="button"
-                    onClick={() => setSmoking(opt)}
+                    onClick={() => setSmoking(smoking === opt ? null : opt)}
                     className={`flex-1 py-2 rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       smoking === opt
                         ? 'bg-[#16120F] text-white shadow-xs'
                         : 'text-[#6E6A63] hover:text-[#16120F]'
                     }`}
                   >
-                    <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
-                      smoking === opt ? 'border-white' : 'border-[#A39D93]'
-                    }`}>
+                    <span
+                      className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                        smoking === opt ? 'border-white' : 'border-[#A39D93]'
+                      }`}
+                    >
                       {smoking === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                     </span>
                     <span>{opt}</span>
@@ -253,7 +266,7 @@ export function SearchPreferenceModal({
               </div>
             </div>
 
-            {/* 1.5 Drinking Radio Group */}
+            {/* Drinking Radio Group */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-1.5">
                 Drinking
@@ -263,16 +276,18 @@ export function SearchPreferenceModal({
                   <button
                     key={opt}
                     type="button"
-                    onClick={() => setDrinking(opt)}
+                    onClick={() => setDrinking(drinking === opt ? null : opt)}
                     className={`flex-1 py-2 rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       drinking === opt
                         ? 'bg-[#16120F] text-white shadow-xs'
                         : 'text-[#6E6A63] hover:text-[#16120F]'
                     }`}
                   >
-                    <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
-                      drinking === opt ? 'border-white' : 'border-[#A39D93]'
-                    }`}>
+                    <span
+                      className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                        drinking === opt ? 'border-white' : 'border-[#A39D93]'
+                      }`}
+                    >
                       {drinking === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                     </span>
                     <span>{opt}</span>
@@ -281,7 +296,7 @@ export function SearchPreferenceModal({
               </div>
             </div>
 
-            {/* 1.6 Children Radio Group */}
+            {/* Children Radio Group */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-1.5">
                 Children
@@ -291,16 +306,18 @@ export function SearchPreferenceModal({
                   <button
                     key={opt}
                     type="button"
-                    onClick={() => setChildren(opt)}
+                    onClick={() => setChildren(children === opt ? null : opt)}
                     className={`flex-1 py-2 rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       children === opt
                         ? 'bg-[#16120F] text-white shadow-xs'
                         : 'text-[#6E6A63] hover:text-[#16120F]'
                     }`}
                   >
-                    <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
-                      children === opt ? 'border-white' : 'border-[#A39D93]'
-                    }`}>
+                    <span
+                      className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                        children === opt ? 'border-white' : 'border-[#A39D93]'
+                      }`}
+                    >
                       {children === opt && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                     </span>
                     <span>{opt}</span>
@@ -308,15 +325,11 @@ export function SearchPreferenceModal({
                 ))}
               </div>
             </div>
-
           </div>
 
-          {/* ========================================================== */}
-          {/* COLUMN 2: LOOKING FOR, BODY TYPES, EDUCATION               */}
-          {/* ========================================================== */}
+          {/* COLUMN 2: LOOKING FOR, BODY TYPES, EDUCATION */}
           <div className="space-y-5 sm:space-y-6">
-            
-            {/* 2.1 Looking For Checkbox Card */}
+            {/* Looking For Checkbox Card */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-1.5">
                 Looking For
@@ -355,7 +368,7 @@ export function SearchPreferenceModal({
               </div>
             </div>
 
-            {/* 2.2 Body Types Checkbox Card */}
+            {/* Body Types Checkbox Card */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-1.5">
                 Body Types
@@ -395,7 +408,7 @@ export function SearchPreferenceModal({
               </div>
             </div>
 
-            {/* 2.3 Education Checkbox Card */}
+            {/* Education Checkbox Card */}
             <div>
               <label className="block text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-1.5">
                 Education
@@ -405,8 +418,8 @@ export function SearchPreferenceModal({
                   {[
                     'High school',
                     'Graduate degree',
-                    'Bachelor\'s degree',
-                    'Associate\'s degree',
+                    "Bachelor's degree",
+                    "Associate's degree",
                     'Some college',
                     'Post-doctoral degree',
                   ].map((item) => {
@@ -433,16 +446,12 @@ export function SearchPreferenceModal({
                 </div>
               </div>
             </div>
-
           </div>
 
-          {/* ========================================================== */}
-          {/* COLUMN 3: AGE, HEIGHT, PROFILE KEYWORDS, ACTIONS           */}
-          {/* ========================================================== */}
+          {/* COLUMN 3: AGE, HEIGHT, PROFILE KEYWORDS, ACTIONS */}
           <div className="space-y-5 sm:space-y-6 flex flex-col justify-between">
-            
             <div className="space-y-5 sm:space-y-6">
-              {/* 3.1 Age Range Slider */}
+              {/* Age Range (Min & Max Sliders) */}
               <div>
                 <div className="flex items-center justify-between text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-2">
                   <span>Age</span>
@@ -450,16 +459,36 @@ export function SearchPreferenceModal({
                     {minAge} - {maxAge}
                   </span>
                 </div>
-                <div className="relative pt-2 pb-1">
-                  <input
-                    type="range"
-                    min="18"
-                    max="60"
-                    value={maxAge}
-                    onChange={(e) => setMaxAge(Number(e.target.value))}
-                    className="w-full accent-[#9F1E19] h-1.5 bg-[#4A453E] rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-[11px] text-[#A39D93] mt-1">
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-[#A39D93] w-7">Min</span>
+                    <input
+                      type="range"
+                      min="18"
+                      max="60"
+                      value={minAge}
+                      onChange={(e) => {
+                        const v = Number(e.target.value);
+                        setMinAge(Math.min(v, maxAge));
+                      }}
+                      className="w-full accent-[#9F1E19] h-1.5 bg-[#4A453E] rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-[#A39D93] w-7">Max</span>
+                    <input
+                      type="range"
+                      min="18"
+                      max="60"
+                      value={maxAge}
+                      onChange={(e) => {
+                        const v = Number(e.target.value);
+                        setMaxAge(Math.max(v, minAge));
+                      }}
+                      className="w-full accent-[#9F1E19] h-1.5 bg-[#4A453E] rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-[#A39D93] pl-9">
                     <span>18</span>
                     <span>35</span>
                     <span>60+</span>
@@ -467,7 +496,7 @@ export function SearchPreferenceModal({
                 </div>
               </div>
 
-              {/* 3.2 Height Range Slider */}
+              {/* Height Range (Min & Max Sliders) */}
               <div>
                 <div className="flex items-center justify-between text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-2">
                   <span>Height</span>
@@ -475,21 +504,36 @@ export function SearchPreferenceModal({
                     {heightMin} - {heightMax}
                   </span>
                 </div>
-                <div className="relative pt-2 pb-1">
-                  <input
-                    type="range"
-                    min="58"
-                    max="80"
-                    defaultValue="75"
-                    onChange={(e) => {
-                      const inches = Number(e.target.value);
-                      const feet = Math.floor(inches / 12);
-                      const rem = inches % 12;
-                      setHeightMax(`${feet}'0${rem}"`.replace(/0(\d{2})/, '$1'));
-                    }}
-                    className="w-full accent-[#9F1E19] h-1.5 bg-[#4A453E] rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-[11px] text-[#A39D93] mt-1">
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-[#A39D93] w-7">Min</span>
+                    <input
+                      type="range"
+                      min="58"
+                      max="80"
+                      value={heightMinInches}
+                      onChange={(e) => {
+                        const v = Number(e.target.value);
+                        setHeightMinInches(Math.min(v, heightMaxInches));
+                      }}
+                      className="w-full accent-[#9F1E19] h-1.5 bg-[#4A453E] rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-[#A39D93] w-7">Max</span>
+                    <input
+                      type="range"
+                      min="58"
+                      max="80"
+                      value={heightMaxInches}
+                      onChange={(e) => {
+                        const v = Number(e.target.value);
+                        setHeightMaxInches(Math.max(v, heightMinInches));
+                      }}
+                      className="w-full accent-[#9F1E19] h-1.5 bg-[#4A453E] rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-[#A39D93] pl-9">
                     <span>4'10"</span>
                     <span>5'08"</span>
                     <span>6'08"+</span>
@@ -497,7 +541,7 @@ export function SearchPreferenceModal({
                 </div>
               </div>
 
-              {/* 3.3 Profile Keywords Input */}
+              {/* Profile Keywords Input */}
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-1.5">
                   Profile Keywords
@@ -512,7 +556,7 @@ export function SearchPreferenceModal({
               </div>
             </div>
 
-            {/* 3.4 Action Buttons: Apply Filters & Reset Filters */}
+            {/* Action Buttons */}
             <div className="space-y-3 pt-4 sm:pt-6">
               <button
                 type="button"
@@ -530,13 +574,9 @@ export function SearchPreferenceModal({
                 Reset Filters
               </button>
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }

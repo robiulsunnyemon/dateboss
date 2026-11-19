@@ -29,9 +29,9 @@ const services = [
     url: 'http://localhost:3000',
   },
   {
-    name: 'DASHBOARD',
+    name: 'CLIENT-DASHBOARD',
     color: '\x1b[33m', // Yellow
-    dir: path.join(__dirname, 'dashboard'),
+    dir: path.join(__dirname, 'client-dashboard'),
     args: ['run', 'dev'],
     port: 3001,
     url: 'http://localhost:3001',

@@ -1,163 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   ArrowLeft,
   Search,
   MoreVertical,
   Send,
   CheckCircle2,
-  Check,
+  Flag,
+  MessageCircle,
+  Loader2,
 } from 'lucide-react';
+import { api } from '../../services/api';
+import { getSocket } from '../../services/socket';
+import { useAuth } from '../../context/AuthContext';
 
 export interface ChatContact {
-  id: string;
+  offerId: string;
+  partnerId: string;
   name: string;
   avatar: string;
+  venueName: string;
   lastMessage: string;
   time: string;
-  unreadCount?: number;
-  online?: boolean;
-  verified?: boolean;
+  unreadCount: number;
+  verified: boolean;
 }
 
 export interface ChatMessage {
   id: string;
+  senderId: string;
   sender: 'me' | 'them';
   text: string;
-  time?: string;
+  time: string;
+  isFlagged?: boolean;
 }
 
 export interface MessagesChatViewProps {
   onClose: () => void;
   initialContactName?: string;
+  initialOfferId?: string;
 }
-
-// Contact list matching Figma screenshot (media_1794977743525_e2ec0c4f.png)
-const INITIAL_CONTACTS: ChatContact[] = [
-  {
-    id: 'guy',
-    name: 'Guy Hawkins',
-    avatar: '/assets/julian-gallery-2.jpg',
-    lastMessage: 'Have you spoken to the delivery man? He is more tha...',
-    time: '01:11',
-    unreadCount: 5,
-    online: true,
-    verified: true,
-  },
-  {
-    id: 'kristin',
-    name: 'Kristin Watson',
-    avatar: '/assets/discover-card-1.jpg',
-    lastMessage: "Let's catch up",
-    time: '02:11',
-    unreadCount: 0,
-    online: true,
-    verified: false,
-  },
-  {
-    id: 'cameron',
-    name: 'Cameron Williamson',
-    avatar: '/assets/discover-card-3.jpg',
-    lastMessage: 'Have you spoken to the delivery man? He is more tha...',
-    time: '02:11',
-    unreadCount: 2,
-    online: true,
-    verified: false,
-  },
-  {
-    id: 'jacob',
-    name: 'Jacob Jones',
-    avatar: '/assets/discover-card-2.jpg',
-    lastMessage: 'You just matched',
-    time: '02:11',
-    unreadCount: 0,
-    online: true,
-    verified: false,
-  },
-  {
-    id: 'brooklyn',
-    name: 'Brooklyn Simmons',
-    avatar: '/assets/julian-gallery-1.jpg',
-    lastMessage: 'Have you spoken to the delivery man? He is more tha...',
-    time: '02:11',
-    unreadCount: 1,
-    online: true,
-    verified: false,
-  },
-  {
-    id: 'savannah',
-    name: 'Savannah Nguyen',
-    avatar: '/assets/julian-gallery-3.jpg',
-    lastMessage: 'Have you spoken to the delivery man? He is more than an...',
-    time: '02:11',
-    unreadCount: 0,
-    online: true,
-    verified: false,
-  },
-  {
-    id: 'devon',
-    name: 'Devon Lane',
-    avatar: '/assets/julian-gallery-5.jpg',
-    lastMessage: 'Have you spoken to the delivery man? He is more than an...',
-    time: '02:11',
-    unreadCount: 0,
-    online: true,
-    verified: false,
-  },
-  {
-    id: 'chats',
-    name: 'Chats',
-    avatar: '/assets/julian-gallery-4.jpg',
-    lastMessage: 'Have you spoken to the delivery man? He is more than an...',
-    time: '02:11',
-    unreadCount: 0,
-    online: true,
-    verified: false,
-  },
-];
-
-// Active stories avatars matching top row
-const STORY_AVATARS = [
-  { id: 's1', avatar: '/assets/julian-gallery-1.jpg', online: true },
-  { id: 's2', avatar: '/assets/julian-gallery-2.jpg', online: true },
-  { id: 's3', avatar: '/assets/discover-card-3.jpg', online: true },
-  { id: 's4', avatar: '/assets/discover-card-1.jpg', online: true },
-  { id: 's5', avatar: '/assets/discover-card-2.jpg', online: true },
-  { id: 's6', avatar: '/assets/face-center-stage.png', online: true },
-  { id: 's7', avatar: '/assets/julian-avatar.png', online: false },
-];
-
-// Conversation threads
-const DEFAULT_CONVERSATIONS: Record<string, ChatMessage[]> = {
-  guy: [
-    {
-      id: 'm1',
-      sender: 'them',
-      text: 'Good afternoon Sophia. Delighted you accepted the invitation to Caviar Russe.',
-    },
-    {
-      id: 'm2',
-      sender: 'them',
-      text: 'Thank you Julian! I have been looking forward to trying their new tasting menu. Should we meet directly at the bar?',
-    },
-    {
-      id: 'm3',
-      sender: 'me',
-      text: 'Yes, exactly. I have asked the sommelier to chill a bottle of 2012 Dom Pérignon for our arrival.',
-    },
-    {
-      id: 'm4',
-      sender: 'them',
-      text: 'Sounds perfection. See you Friday at 8:30 PM!',
-    },
-  ],
-  jacob: [
-    {
-      id: 'm1',
-      sender: 'them',
-      text: 'Hello Julian! Looking forward to connecting.',
-    },
-  ],
-};
 
 const QUICK_REPLIES = [
   'Looking forward to our table!',
@@ -165,81 +46,240 @@ const QUICK_REPLIES = [
   "Let's meet by the lounge bar",
 ];
 
+function formatMsgTime(iso?: string): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+
 export function MessagesChatView({
   onClose,
   initialContactName,
+  initialOfferId,
 }: MessagesChatViewProps) {
-  const [contacts] = useState<ChatContact[]>(INITIAL_CONTACTS);
+  const { user } = useAuth();
+  const [contacts, setContacts] = useState<ChatContact[]>([]);
+  const [isLoadingContacts, setIsLoadingContacts] = useState(true);
+  const [activeOfferId, setActiveOfferId] = useState<string>(initialOfferId || '');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Find initial contact if provided
-  const matchedContact = initialContactName
-    ? contacts.find((c) =>
-        c.name.toLowerCase().includes(initialContactName.toLowerCase())
-      )
-    : null;
-
-  const [activeContactId, setActiveContactId] = useState<string>(
-    matchedContact?.id || 'guy'
-  );
-
-  // Mobile view state: default to 'list' unless specifically opened with a contact name!
-  const [mobileView, setMobileView] = useState<'list' | 'chat'>(
-    initialContactName ? 'chat' : 'list'
-  );
-
-  // Messages state
-  const [conversations, setConversations] =
-    useState<Record<string, ChatMessage[]>>(DEFAULT_CONVERSATIONS);
   const [inputMessage, setInputMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [partnerTyping, setPartnerTyping] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [mobileView, setMobileView] = useState<'list' | 'chat'>(
+    initialOfferId || initialContactName ? 'chat' : 'list'
+  );
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const activeContact =
-    contacts.find((c) => c.id === activeContactId) || contacts[0];
-  const activeMessages = conversations[activeContactId] || [
-    {
-      id: 'm-default',
-      sender: 'them',
-      text: `Hello Julian! Looking forward to connecting.`,
-    },
-  ];
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
 
+  // Load unlocked conversations
+  const loadConversations = useCallback(async () => {
+    setIsLoadingContacts(true);
+    try {
+      const res = await api.messages.getConversations();
+      if (res.success && Array.isArray(res.data)) {
+        const mapped: ChatContact[] = res.data.map((c: any) => ({
+          offerId: c.offerId,
+          partnerId: c.partner?.id || '',
+          name: c.partner?.name || 'Member',
+          avatar: c.partner?.avatar || '/assets/discover-card-1.jpg',
+          venueName: c.venueName || 'Confirmed Date',
+          lastMessage: c.lastMessage?.content || `Date confirmed at ${c.venueName || 'venue'}`,
+          time: formatMsgTime(c.lastMessage?.createdAt),
+          unreadCount: Number(c.unreadCount) || 0,
+          verified: Boolean(c.partner?.isVerified),
+        }));
+        setContacts(mapped);
+
+        if (mapped.length > 0) {
+          if (initialOfferId && mapped.some((c) => c.offerId === initialOfferId)) {
+            setActiveOfferId(initialOfferId);
+          } else if (initialContactName) {
+            const found = mapped.find((c) =>
+              c.name.toLowerCase().includes(initialContactName.toLowerCase())
+            );
+            setActiveOfferId(found ? found.offerId : mapped[0].offerId);
+          } else {
+            setActiveOfferId((prev) =>
+              prev && mapped.some((c) => c.offerId === prev) ? prev : mapped[0].offerId
+            );
+          }
+        }
+      } else {
+        setContacts([]);
+      }
+    } catch {
+      setContacts([]);
+    } finally {
+      setIsLoadingContacts(false);
+    }
+  }, [initialOfferId, initialContactName]);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
+
+  // Load messages for selected offerId & wire Socket.io room
+  useEffect(() => {
+    if (!activeOfferId) {
+      setMessages([]);
+      return;
+    }
+
+    let isMounted = true;
+    setIsLoadingMessages(true);
+
+    api.messages
+      .getMessages(activeOfferId)
+      .then((res) => {
+        if (!isMounted) return;
+        if (res.success && Array.isArray(res.data)) {
+          setMessages(
+            res.data.map((m: any) => ({
+              id: m.id,
+              senderId: m.senderId,
+              sender: m.senderId === user?.id ? 'me' : 'them',
+              text: m.content,
+              time: formatMsgTime(m.createdAt),
+              isFlagged: Boolean(m.isFlagged),
+            }))
+          );
+          setContacts((prev) =>
+            prev.map((c) => (c.offerId === activeOfferId ? { ...c, unreadCount: 0 } : c))
+          );
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (isMounted) setIsLoadingMessages(false);
+      });
+
+    const socket = getSocket();
+    if (socket) {
+      socket.emit('join_offer', activeOfferId);
+
+      const handleNewMessage = (incoming: any) => {
+        if (incoming.offerId && incoming.offerId !== activeOfferId) return;
+        const formatted: ChatMessage = {
+          id: incoming.id,
+          senderId: incoming.senderId,
+          sender: incoming.senderId === user?.id ? 'me' : 'them',
+          text: incoming.content,
+          time: formatMsgTime(incoming.createdAt),
+          isFlagged: Boolean(incoming.isFlagged),
+        };
+        setMessages((prev) =>
+          prev.some((m) => m.id === formatted.id) ? prev : [...prev, formatted]
+        );
+        setContacts((prev) =>
+          prev.map((c) =>
+            c.offerId === activeOfferId
+              ? { ...c, lastMessage: formatted.text, time: formatted.time }
+              : c
+          )
+        );
+      };
+
+      const handleTyping = (payload: { userId: string; offerId: string; isTyping: boolean }) => {
+        if (payload.offerId === activeOfferId && payload.userId !== user?.id) {
+          setPartnerTyping(Boolean(payload.isTyping));
+        }
+      };
+
+      socket.on('new_message', handleNewMessage);
+      socket.on('user_typing', handleTyping);
+
+      return () => {
+        isMounted = false;
+        socket.emit('leave_offer', activeOfferId);
+        socket.off('new_message', handleNewMessage);
+        socket.off('user_typing', handleTyping);
+      };
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeOfferId, user?.id]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages.length, partnerTyping]);
+
+  const activeContact = contacts.find((c) => c.offerId === activeOfferId) || null;
   const filteredContacts = contacts.filter((c) =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSendMessage = (textToSend?: string) => {
-    const text = (textToSend || inputMessage).trim();
-    if (!text) return;
+  const handleSendMessage = async (textToSend?: string) => {
+    const text = (textToSend ?? inputMessage).trim();
+    if (!text || !activeOfferId || isSending) return;
 
-    const newMsg: ChatMessage = {
-      id: `msg-${Date.now()}`,
-      sender: 'me',
-      text,
-      time: 'Just now',
-    };
-
-    setConversations((prev) => ({
-      ...prev,
-      [activeContactId]: [...(prev[activeContactId] || []), newMsg],
-    }));
-
+    setIsSending(true);
     setInputMessage('');
+    const socket = getSocket();
+    socket?.emit('typing', { offerId: activeOfferId, isTyping: false });
+
+    try {
+      const res = await api.messages.sendMessage(activeOfferId, text);
+      if (res.success && res.data) {
+        const m = res.data;
+        const formatted: ChatMessage = {
+          id: m.id,
+          senderId: m.senderId,
+          sender: 'me',
+          text: m.content,
+          time: formatMsgTime(m.createdAt),
+        };
+        setMessages((prev) =>
+          prev.some((existing) => existing.id === formatted.id) ? prev : [...prev, formatted]
+        );
+        setContacts((prev) =>
+          prev.map((c) =>
+            c.offerId === activeOfferId
+              ? { ...c, lastMessage: formatted.text, time: formatted.time }
+              : c
+          )
+        );
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Unable to send message.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
-  const handleContactClick = (id: string) => {
-    setActiveContactId(id);
-    setMobileView('chat');
+  const handleFlagLatestMessage = async () => {
+    setMenuOpen(false);
+    const partnerMessages = messages.filter((m) => m.sender === 'them');
+    const target = partnerMessages[partnerMessages.length - 1] || messages[messages.length - 1];
+    if (!target) {
+      showToast('No messages available to flag.');
+      return;
+    }
+    try {
+      await api.messages.flagMessage(target.id, 'Inappropriate or unwanted contact');
+      setMessages((prev) =>
+        prev.map((m) => (m.id === target.id ? { ...m, isFlagged: true } : m))
+      );
+      showToast('Message flagged for Trust & Safety review.');
+    } catch (err: any) {
+      showToast(err?.message || 'Unable to flag message.');
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-[#FAF7F2] sm:bg-[#EFE7DA] flex flex-col sm:items-center sm:justify-center overflow-hidden font-sans antialiased text-[#16120F] animate-in fade-in duration-200">
-      
-      {/* Desktop Centered Card (sm+) / Mobile Full Viewport (h-full w-full) */}
       <div className="w-full max-w-[1040px] h-[100dvh] sm:h-[88vh] sm:max-h-[820px] sm:min-h-[660px] bg-[#FAF7F2] border-0 sm:border sm:border-[#E8DFD0] rounded-none sm:rounded-[32px] p-0 sm:p-7 lg:p-8 shadow-none sm:shadow-[0_10px_35px_rgba(22,18,15,0.05)] flex flex-col overflow-hidden">
-        
-        {/* ======================================================== */}
-        {/* DESKTOP HEADER (Back button + thedateboss Logo)          */}
-        {/* ======================================================== */}
+        {/* DESKTOP HEADER */}
         <div className="hidden sm:flex items-center gap-3 pb-4 border-b border-[#EADBCA]/70 shrink-0">
           <button
             type="button"
@@ -266,21 +306,14 @@ export function MessagesChatView({
           </a>
         </div>
 
-        {/* ======================================================== */}
-        {/* MAIN 2-COLUMN (DESKTOP) / SWITCHABLE (MOBILE)            */}
-        {/* ======================================================== */}
         <div className="flex-1 flex overflow-hidden sm:pt-4 h-full">
-          
-          {/* ------------------------------------------------------ */}
-          {/* LEFT COLUMN: CHAT LIST                                  */}
-          {/* (Visible on desktop always; on mobile when mobileView==='list') */}
-          {/* ------------------------------------------------------ */}
+          {/* LEFT COLUMN: CHAT LIST */}
           <div
             className={`w-full sm:w-[330px] lg:w-[350px] shrink-0 flex flex-col h-full sm:border-r sm:border-[#EADBCA]/70 overflow-hidden ${
               mobileView === 'list' ? 'flex' : 'hidden sm:flex'
             }`}
           >
-            {/* Mobile Header: Red Back Button + "Messages" Title (Hidden on desktop) */}
+            {/* Mobile Header */}
             <div className="sm:hidden p-4 flex items-center gap-3.5 shrink-0">
               <button
                 type="button"
@@ -295,7 +328,7 @@ export function MessagesChatView({
               </h1>
             </div>
 
-            {/* Search Input */}
+            {/* Search */}
             <div className="px-4 sm:px-0 sm:pr-6 mt-1 sm:mt-0 mb-3 shrink-0">
               <div className="relative">
                 <Search className="w-4 h-4 text-[#8A857D] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -309,223 +342,251 @@ export function MessagesChatView({
               </div>
             </div>
 
-            {/* Active stories / Online avatars row */}
-            <div className="px-4 sm:px-0 sm:pr-6 flex items-center gap-2.5 sm:gap-3 overflow-x-auto pb-2 scrollbar-none select-none shrink-0">
-              {STORY_AVATARS.map((st) => (
-                <div key={st.id} className="relative shrink-0 cursor-pointer">
-                  <img
-                    src={st.avatar}
-                    alt="Active contact"
-                    className="w-11 h-11 rounded-full object-cover border-2 border-[#FAF7F2] shadow-2xs"
-                  />
-                  {st.online && (
-                    <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#22C55E] border-2 border-white rounded-full absolute bottom-0 right-0"></span>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Section Header: Chats */}
-            <div className="px-4 sm:px-0 sm:pr-6 mt-3 mb-2 shrink-0">
+            <div className="px-4 sm:px-0 sm:pr-6 mt-2 mb-2 shrink-0">
               <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#16120F]">
                 Chats
               </h2>
             </div>
 
-            {/* Contact Items List */}
             <div className="flex-1 overflow-y-auto px-3 sm:px-0 sm:pr-6 space-y-1.5 pb-6">
-              {filteredContacts.map((contact) => {
-                const isActive = contact.id === activeContactId;
-                return (
-                  <div
-                    key={contact.id}
-                    onClick={() => handleContactClick(contact.id)}
-                    className={`flex items-center gap-3 p-2.5 rounded-[20px] cursor-pointer transition-all active:scale-[0.99] ${
-                      isActive
-                        ? 'bg-[#F5EFE6] border border-[#E09094]/40 shadow-2xs'
-                        : 'hover:bg-[#F5EFE6]/70 border border-transparent'
-                    }`}
-                  >
-                    {/* Avatar with online dot */}
-                    <div className="relative shrink-0">
-                      <img
-                        src={contact.avatar}
-                        alt={contact.name}
-                        className="w-11 h-11 rounded-full object-cover border border-[#E5DDD0]"
-                      />
-                      {contact.online && (
-                        <span className="w-2.5 h-2.5 bg-[#22C55E] border-2 border-white rounded-full absolute bottom-0 right-0"></span>
-                      )}
-                    </div>
+              {isLoadingContacts ? (
+                <div className="py-10 flex justify-center">
+                  <Loader2 className="w-5 h-5 animate-spin text-[#9F1E19]" />
+                </div>
+              ) : filteredContacts.length === 0 ? (
+                <div className="p-4 rounded-2xl bg-[#F5EFE6] border border-[#E5DDD0] text-center text-xs text-[#6E6A63]">
+                  Messages unlock once a date offer is accepted.
+                </div>
+              ) : (
+                filteredContacts.map((contact) => {
+                  const isActive = contact.offerId === activeOfferId;
+                  return (
+                    <div
+                      key={contact.offerId}
+                      onClick={() => {
+                        setActiveOfferId(contact.offerId);
+                        setMobileView('chat');
+                      }}
+                      className={`flex items-center gap-3 p-2.5 rounded-[20px] cursor-pointer transition-all active:scale-[0.99] ${
+                        isActive
+                          ? 'bg-[#F5EFE6] border border-[#E09094]/40 shadow-2xs'
+                          : 'hover:bg-[#F5EFE6]/70 border border-transparent'
+                      }`}
+                    >
+                      <div className="relative shrink-0">
+                        <img
+                          src={contact.avatar}
+                          alt={contact.name}
+                          className="w-11 h-11 rounded-full object-cover border border-[#E5DDD0]"
+                        />
+                        <span className="w-2.5 h-2.5 bg-[#22C55E] border-2 border-white rounded-full absolute bottom-0 right-0" />
+                      </div>
 
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="font-serif font-bold text-sm text-[#16120F] truncate">
-                            {contact.name}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1 min-w-0">
+                            <span className="font-semibold text-xs sm:text-[13px] text-[#16120F] truncate">
+                              {contact.name}
+                            </span>
+                            {contact.verified && (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-[#3B82F6] shrink-0" />
+                            )}
+                          </div>
+                          <span className="text-[10px] text-[#8A857D] shrink-0">
+                            {contact.time}
                           </span>
-                          {contact.verified && (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-[#3B82F6] shrink-0" />
+                        </div>
+                        <div className="flex items-center justify-between gap-2 mt-0.5">
+                          <p className="text-[11px] text-[#6E6A63] truncate">
+                            {contact.lastMessage}
+                          </p>
+                          {contact.unreadCount > 0 && (
+                            <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#9F1E19] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                              {contact.unreadCount}
+                            </span>
                           )}
                         </div>
-                        <span className="text-[11px] text-[#8A857D] shrink-0 ml-1">
-                          {contact.time}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-xs text-[#6E6A63] truncate leading-tight pr-2">
-                          {contact.lastMessage}
-                        </p>
-                        {contact.unreadCount && contact.unreadCount > 0 ? (
-                          <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#16A34A] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
-                            {contact.unreadCount}
-                          </span>
-                        ) : null}
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 
-          {/* ------------------------------------------------------ */}
-          {/* RIGHT COLUMN: OPEN CHAT CONVERSATION                    */}
-          {/* (Visible on desktop always; on mobile when mobileView==='chat') */}
-          {/* ------------------------------------------------------ */}
+          {/* RIGHT COLUMN: ACTIVE CHAT */}
           <div
-            className={`flex-1 flex flex-col h-full overflow-hidden pl-0 sm:pl-6 ${
+            className={`flex-1 flex flex-col h-full overflow-hidden sm:pl-6 ${
               mobileView === 'chat' ? 'flex' : 'hidden sm:flex'
             }`}
           >
-            {/* Header: Contact Info & Options */}
-            <div className="p-3.5 sm:p-0 sm:pb-3.5 border-b border-[#EADBCA]/70 flex items-center justify-between shrink-0 bg-[#FAF7F2]">
-              <div className="flex items-center gap-3 min-w-0">
-                {/* Mobile back button: returns to 'list' view */}
-                <button
-                  type="button"
-                  onClick={() => setMobileView('list')}
-                  className="sm:hidden w-10 h-10 rounded-xl bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
-                  aria-label="Back to messages list"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-
-                <div className="relative shrink-0">
-                  <img
-                    src={activeContact.avatar}
-                    alt={activeContact.name}
-                    className="w-10 h-10 rounded-full object-cover border border-[#E5DDD0]"
-                  />
-                  {activeContact.online && (
-                    <span className="w-2.5 h-2.5 bg-[#22C55E] border-2 border-white rounded-full absolute bottom-0 right-0"></span>
-                  )}
-                </div>
-
-                <div className="min-w-0">
-                  <h3 className="font-serif font-bold text-sm sm:text-base text-[#16120F] leading-tight truncate">
-                    {activeContact.name}
-                  </h3>
-                  <div className="flex items-center gap-2 text-[11px] mt-0.5">
-                    {activeContact.online && (
-                      <span className="text-[#22C55E] font-medium flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]"></span>
-                        Online
-                      </span>
-                    )}
-                    {activeContact.verified && (
-                      <span className="text-[#3B82F6] font-medium flex items-center gap-1">
-                        <Check className="w-3 h-3 stroke-[3]" />
-                        ID Verified
-                      </span>
-                    )}
-                  </div>
-                </div>
+            {!activeContact ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+                <MessageCircle className="w-10 h-10 text-[#9F1E19]/50 mb-3" />
+                <h3 className="font-serif font-bold text-lg text-[#16120F]">
+                  Chat Opens After Yes
+                </h3>
+                <p className="text-xs text-[#6E6A63] max-w-sm mt-1 leading-relaxed">
+                  Private messaging unlocks automatically once a date offer is accepted.
+                </p>
               </div>
-
-              {/* 3 dots menu button */}
-              <button
-                type="button"
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F5EFE6] text-[#8A857D] transition-colors cursor-pointer"
-                aria-label="Options"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Messages Scroll Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {activeMessages.map((msg) => {
-                const isMe = msg.sender === 'me';
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[85%] sm:max-w-[78%] p-3.5 text-xs sm:text-[13px] leading-relaxed select-text ${
-                        isMe
-                          ? 'bg-[#9F1E19] text-white rounded-[20px] rounded-tr-xs shadow-2xs'
-                          : 'bg-[#FAF7F2] border border-[#E5DDD0] text-[#16120F] rounded-[20px] rounded-tl-xs shadow-2xs'
-                      }`}
+            ) : (
+              <>
+                {/* Active Chat Header */}
+                <div className="px-4 sm:px-0 py-3 sm:py-0 sm:pb-3 border-b border-[#EADBCA]/70 flex items-center justify-between shrink-0 relative">
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setMobileView('list')}
+                      className="sm:hidden w-9 h-9 rounded-xl bg-[#9F1E19] text-white flex items-center justify-center"
+                      aria-label="Back to chats"
                     >
-                      {msg.text}
+                      <ArrowLeft className="w-4 h-4" />
+                    </button>
+                    <img
+                      src={activeContact.avatar}
+                      alt={activeContact.name}
+                      className="w-10 h-10 rounded-full object-cover border border-[#E5DDD0]"
+                    />
+                    <div>
+                      <h3 className="font-serif font-bold text-sm sm:text-base text-[#16120F] flex items-center gap-1.5">
+                        <span>{activeContact.name}</span>
+                        {activeContact.verified && (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#3B82F6]" />
+                        )}
+                      </h3>
+                      <p className="text-[11px] text-[#6E6A63]">
+                        {partnerTyping ? 'Typing...' : activeContact.venueName}
+                      </p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
 
-            {/* Bottom Area: Quick replies + Input bar pinned firmly at bottom */}
-            <div className="shrink-0 p-3 sm:p-0 bg-[#FAF7F2] border-t border-[#EADBCA]/50 sm:border-t-0">
-              {/* Quick Reply Pills */}
-              <div className="pb-2.5 flex items-center gap-2 overflow-x-auto scrollbar-none">
-                {QUICK_REPLIES.map((reply, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleSendMessage(reply)}
-                    className="border border-[#E09094] bg-[#FBEFF0]/50 hover:bg-[#FBEFF0] text-[#9F1E19] text-[11px] font-medium px-3.5 py-1.5 rounded-full whitespace-nowrap cursor-pointer transition-colors active:scale-95 shrink-0"
-                  >
-                    {reply}
-                  </button>
-                ))}
-              </div>
-
-              {/* Input Message Bar */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSendMessage();
-                }}
-              >
-                <div className="flex items-center gap-2 bg-[#FAF7F2] border border-[#E5DDD0] rounded-full pl-5 pr-2 py-1.5 focus-within:border-[#9F1E19] transition-colors">
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Type your message"
-                    className="flex-1 bg-transparent text-xs sm:text-sm text-[#16120F] placeholder-[#8A857D] focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!inputMessage.trim()}
-                    className="w-9 h-9 rounded-full bg-[#9F1E19] hover:bg-[#851713] disabled:opacity-40 text-white flex items-center justify-center transition-colors shadow-xs shrink-0 cursor-pointer active:scale-95"
-                    aria-label="Send message"
-                  >
-                    <Send className="w-4 h-4 rotate-45" />
-                  </button>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setMenuOpen((prev) => !prev)}
+                      className="w-9 h-9 rounded-full hover:bg-[#F5EFE6] text-[#6E6A63] flex items-center justify-center cursor-pointer"
+                      aria-label="Chat options"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                    {menuOpen && (
+                      <div className="absolute right-0 mt-1 w-48 bg-[#FAF7F2] border border-[#E5DDD0] rounded-xl shadow-lg py-1 z-30">
+                        <button
+                          type="button"
+                          onClick={handleFlagLatestMessage}
+                          className="w-full px-4 py-2 text-left text-xs font-semibold text-[#9F1E19] hover:bg-[#F5EFE6] flex items-center gap-2 cursor-pointer"
+                        >
+                          <Flag className="w-3.5 h-3.5" />
+                          <span>Flag for Safety Review</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </form>
-            </div>
 
+                {/* Messages Feed */}
+                <div className="flex-1 overflow-y-auto px-4 sm:px-0 py-4 space-y-3">
+                  {isLoadingMessages ? (
+                    <div className="py-12 flex justify-center">
+                      <Loader2 className="w-6 h-6 animate-spin text-[#9F1E19]" />
+                    </div>
+                  ) : messages.length === 0 ? (
+                    <div className="py-10 text-center text-xs text-[#6E6A63]">
+                      Say hello to confirm your plans for {activeContact.venueName}!
+                    </div>
+                  ) : (
+                    messages.map((msg) => {
+                      const isMe = msg.sender === 'me';
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
+                        >
+                          <div
+                            className={`max-w-[82%] sm:max-w-[72%] px-4 py-2.5 rounded-2xl text-xs sm:text-[13px] leading-relaxed ${
+                              isMe
+                                ? 'bg-[#9F1E19] text-white rounded-br-sm'
+                                : msg.isFlagged
+                                ? 'bg-[#FBEFF0] border border-[#F3C5C7] text-[#16120F] rounded-bl-sm'
+                                : 'bg-[#F5EFE6] border border-[#E5DDD0] text-[#16120F] rounded-bl-sm'
+                            }`}
+                          >
+                            <p>{msg.text}</p>
+                            {msg.isFlagged && (
+                              <p className="mt-1 text-[10px] font-semibold text-[#9F1E19] inline-flex items-center gap-1">
+                                <Flag className="w-3 h-3" /> Flagged for review
+                              </p>
+                            )}
+                          </div>
+                          {msg.time && (
+                            <span className="text-[10px] text-[#8A857D] mt-1 px-1">
+                              {msg.time}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                  <div ref={bottomRef} />
+                </div>
+
+                {/* Quick Replies + Input */}
+                <div className="px-4 sm:px-0 pt-2 pb-4 sm:pb-0 border-t border-[#EADBCA]/70 shrink-0 space-y-2.5">
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                    {QUICK_REPLIES.map((qr, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSendMessage(qr)}
+                        className="px-3 py-1 rounded-full bg-[#F5EFE6] hover:bg-[#EFE7DA] border border-[#E5DDD0] text-[11px] font-medium text-[#16120F] whitespace-nowrap cursor-pointer"
+                      >
+                        {qr}
+                      </button>
+                    ))}
+                  </div>
+
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <input
+                      type="text"
+                      value={inputMessage}
+                      onChange={(e) => {
+                        setInputMessage(e.target.value);
+                        getSocket()?.emit('typing', {
+                          offerId: activeOfferId,
+                          isTyping: e.target.value.length > 0,
+                        });
+                      }}
+                      placeholder={`Message ${activeContact.name}...`}
+                      className="flex-1 bg-[#F5EFE6] border border-[#E5DDD0] rounded-full px-4 py-2.5 text-xs sm:text-sm text-[#16120F] placeholder-[#8A857D] focus:outline-none focus:border-[#9F1E19]"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isSending || !inputMessage.trim()}
+                      className="w-10 h-10 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white flex items-center justify-center shrink-0 transition-colors cursor-pointer disabled:opacity-50"
+                      aria-label="Send message"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </form>
+                </div>
+              </>
+            )}
           </div>
-
         </div>
-
       </div>
+
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#16120F] text-white text-xs px-5 py-3 rounded-full shadow-lg z-50">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Mail, X, Check, Lock, AlertCircle, ArrowRight } from 'lucide-react';
-import { api } from '../../services/api';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Mail, Check, AlertCircle, ArrowRight, X } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 interface Step3AccountProps {
   onBack: () => void;
   onComplete?: (method: 'google' | 'apple' | 'email') => void;
-  onSignIn?: () => void;
+  onSignIn?: (hasSubscription: boolean) => void;
   userRole?: 'host' | 'guest';
   gender?: 'MAN' | 'WOMAN' | 'OTHER';
   targetGender?: 'MEN' | 'WOMEN' | 'EVERYONE';
+  initialAuthMode?: 'options' | 'email-signup' | 'signin' | 'google-modal';
 }
 
 export function Step3Account({
@@ -18,87 +19,34 @@ export function Step3Account({
   userRole = 'guest',
   gender = 'WOMAN',
   targetGender = 'MEN',
+  initialAuthMode = 'options',
 }: Step3AccountProps) {
-  // Mode: 'options' | 'email-signup' | 'signin' | 'google-modal'
-  const [authMode, setAuthMode] = useState<'options' | 'email-signup' | 'signin' | 'google-modal'>('options');
+  const { login, register } = useAuth();
+  const [authMode, setAuthMode] = useState<'options' | 'email-signup' | 'signin' | 'google-modal'>(
+    initialAuthMode
+  );
+  const [socialUnavailableProvider, setSocialUnavailableProvider] = useState<'Google' | 'Apple' | null>(
+    null
+  );
+
+  useEffect(() => {
+    setAuthMode(initialAuthMode);
+  }, [initialAuthMode]);
 
   // Form inputs for real account registration
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
-  
-  // Custom Google email input
-  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
 
   // Status & Feedback
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 1. Social Authentication (Google)
-  const handleGoogleAuth = async (googleEmailInput?: string, googleNameInput?: string) => {
-    const emailToUse = (googleEmailInput || customGoogleEmail || '').trim();
-    if (!emailToUse || !emailToUse.includes('@')) {
-      setErrorMsg('Please enter a valid Google email address');
-      return;
-    }
-
-    setIsSubmitting(true);
+  // 1 & 2. Social Authentication Notice Popup (Google & Apple not implemented yet)
+  const handleSocialUnavailable = (provider: 'Google' | 'Apple') => {
     setErrorMsg(null);
-
-    try {
-      const res = await api.auth.social({
-        provider: 'google',
-        email: emailToUse,
-        name: googleNameInput || emailToUse.split('@')[0],
-        avatar: '/assets/avatar-1.png',
-        role: userRole === 'host' ? 'HOST' : 'GUEST',
-        gender,
-        targetGender,
-      });
-
-      if (res.success && res.data) {
-        localStorage.setItem('thedateboss_token', res.data.token);
-        setSuccessMsg('Google account verified! Proceeding...');
-        setTimeout(() => {
-          if (onComplete) onComplete('google');
-        }, 600);
-      }
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Google authentication failed');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // 2. Social Authentication (Apple)
-  const handleAppleAuth = async () => {
-    setIsSubmitting(true);
-    setErrorMsg(null);
-
-    try {
-      const appleEmail = `apple.user.${Date.now().toString().slice(-4)}@privaterelay.appleid.com`;
-      const res = await api.auth.social({
-        provider: 'apple',
-        email: appleEmail,
-        name: userRole === 'host' ? 'Host' : 'Guest of Honor',
-        role: userRole === 'host' ? 'HOST' : 'GUEST',
-        gender,
-        targetGender,
-      });
-
-      if (res.success && res.data) {
-        localStorage.setItem('thedateboss_token', res.data.token);
-        setSuccessMsg('Apple ID verified! Proceeding...');
-        setTimeout(() => {
-          if (onComplete) onComplete('apple');
-        }, 600);
-      }
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Apple authentication failed');
-    } finally {
-      setIsSubmitting(false);
-    }
+    setSocialUnavailableProvider(provider);
   };
 
   // 3. Email Registration Submit (Real Account Creation)
@@ -120,7 +68,7 @@ export function Step3Account({
     setErrorMsg(null);
 
     try {
-      const res = await api.auth.register({
+      await register({
         email: cleanEmail,
         password: cleanPassword,
         nickname: nickname.trim() || undefined,
@@ -129,13 +77,10 @@ export function Step3Account({
         targetGender,
       });
 
-      if (res.success && res.data) {
-        localStorage.setItem('thedateboss_token', res.data.token);
-        setSuccessMsg('Account created successfully! Saving preferences...');
-        setTimeout(() => {
-          if (onComplete) onComplete('email');
-        }, 700);
-      }
+      setSuccessMsg('Account created successfully! Saving preferences...');
+      setTimeout(() => {
+        if (onComplete) onComplete('email');
+      }, 600);
     } catch (err: any) {
       setErrorMsg(err.message || 'Registration failed. Please check your credentials.');
     } finally {
@@ -143,7 +88,7 @@ export function Step3Account({
     }
   };
 
-  // 4. Existing Member Sign In Submit
+  // 4. Existing Member Sign In Submit (Real DB Auth only)
   const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanEmail = email.trim();
@@ -158,48 +103,22 @@ export function Step3Account({
     setErrorMsg(null);
 
     try {
-      let resolvedRole: 'host' | 'guest' = userRole;
-      const lower = cleanEmail.toLowerCase();
-      if (lower.includes('camila') || lower.includes('sophia') || lower.includes('elena') || lower.includes('maya')) {
-        resolvedRole = 'guest';
-      } else if (lower.includes('alexandre') || lower.includes('julian') || lower.includes('farhan') || lower.includes('marcus')) {
-        resolvedRole = 'host';
-      }
+      const loggedInUser = await login(cleanEmail, cleanPassword);
+      const hasSub =
+        loggedInUser.role === 'GUEST' ||
+        loggedInUser.role === 'ADMIN' ||
+        loggedInUser.subscription?.status === 'ACTIVE';
 
-      let loginSuccess = false;
-      try {
-        const res = await api.auth.login({
-          email: cleanEmail,
-          password: cleanPassword,
-        });
-
-        if (res.success && res.data) {
-          localStorage.setItem('thedateboss_token', res.data.token);
-          if (res.data.user?.role === 'GUEST') resolvedRole = 'guest';
-          else if (res.data.user?.role === 'HOST') resolvedRole = 'host';
-          loginSuccess = true;
+      setSuccessMsg(
+        `Signed in as ${loggedInUser.nickname || loggedInUser.email}! Redirecting...`
+      );
+      setTimeout(() => {
+        if (onSignIn) {
+          onSignIn(hasSub);
+        } else if (onComplete) {
+          onComplete('email');
         }
-      } catch (backendErr) {
-        // Fallback for seeded test accounts in development
-        if (cleanEmail.includes('camila') || cleanEmail.includes('alexandre') || cleanEmail.includes('admin')) {
-          localStorage.setItem('thedateboss_token', 'mock_token_' + Date.now());
-          loginSuccess = true;
-        } else {
-          throw backendErr;
-        }
-      }
-
-      if (loginSuccess) {
-        localStorage.setItem('thedateboss_active_role', resolvedRole);
-        setSuccessMsg(`Signed in successfully as ${resolvedRole === 'guest' ? 'Guest (Camila)' : 'Host (Alexandre)'}! Redirecting...`);
-        setTimeout(() => {
-          if (onSignIn) {
-            onSignIn();
-          } else if (onComplete) {
-            onComplete('email');
-          }
-        }, 600);
-      }
+      }, 500);
     } catch (err: any) {
       setErrorMsg(err.message || 'Invalid email or password');
     } finally {
@@ -284,10 +203,7 @@ export function Step3Account({
               {/* Button 1: Continue with Google */}
               <button
                 type="button"
-                onClick={() => {
-                  setErrorMsg(null);
-                  setAuthMode('google-modal');
-                }}
+                onClick={() => handleSocialUnavailable('Google')}
                 disabled={isSubmitting}
                 className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 px-4 sm:px-5 rounded-full flex items-center justify-center gap-2.5 shadow-sm transition-all active:scale-[0.99] cursor-pointer"
               >
@@ -305,7 +221,7 @@ export function Step3Account({
               {/* Button 2: Continue with Apple */}
               <button
                 type="button"
-                onClick={handleAppleAuth}
+                onClick={() => handleSocialUnavailable('Apple')}
                 disabled={isSubmitting}
                 className="w-full bg-transparent border border-[#E5DECF] hover:border-[#16120F] text-[#16120F] font-medium text-xs sm:text-sm py-3.5 px-4 sm:px-5 rounded-full flex items-center justify-center gap-2.5 transition-all active:scale-[0.99] cursor-pointer"
               >
@@ -522,55 +438,64 @@ export function Step3Account({
         )}
 
         {/* ============================================================ */}
-        {/* VIEW 4: GOOGLE AUTH INPUT & PICKER                           */}
+        {/* POPUP MODAL: GOOGLE / APPLE NOT IMPLEMENTED YET              */}
         {/* ============================================================ */}
-        {authMode === 'google-modal' && (
-          <div className="space-y-4 max-w-[500px] animate-in fade-in duration-200">
-            <div className="p-4 bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] space-y-3">
-              <h4 className="text-xs font-semibold text-[#16120F]">
-                Enter your real Google Account email:
-              </h4>
-              <div className="flex items-center gap-2">
-                <input
-                  type="email"
-                  value={customGoogleEmail}
-                  onChange={(e) => setCustomGoogleEmail(e.target.value)}
-                  placeholder="yourname@gmail.com"
-                  className="flex-1 bg-[#F5F1E6] border border-[#EADBCA] rounded-full px-4 py-2.5 text-xs sm:text-sm text-[#16120F] focus:outline-none focus:border-[#9F1E19]"
-                />
+        {socialUnavailableProvider && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={() => setSocialUnavailableProvider(null)}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-[440px] bg-[#FAF7F2] border border-[#EADBCA] rounded-[28px] p-6 sm:p-7 shadow-2xl relative animate-in zoom-in-95 duration-200 text-center"
+            >
+              <button
+                type="button"
+                onClick={() => setSocialUnavailableProvider(null)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full hover:bg-[#EFE7DA] text-[#6E6A63] hover:text-[#16120F] flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Close popup"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="w-12 h-12 rounded-2xl bg-[#FAF0F1] border border-[#F3C5C7] text-[#9F1E19] flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-6 h-6" />
+              </div>
+
+              <h3 className="font-serif font-bold text-xl sm:text-2xl text-[#16120F]">
+                {socialUnavailableProvider} Sign-In Not Available Yet
+              </h3>
+
+              <p className="text-xs sm:text-sm text-[#6E6A63] mt-2.5 leading-relaxed">
+                {socialUnavailableProvider} login is not implemented yet. Please sign up or log in
+                using your <span className="font-semibold text-[#16120F]">Email</span> instead.
+              </p>
+
+              <div className="mt-6 flex flex-col gap-2.5">
                 <button
                   type="button"
-                  onClick={() => handleGoogleAuth(customGoogleEmail)}
-                  disabled={isSubmitting || !customGoogleEmail}
-                  className="bg-[#9F1E19] hover:bg-[#851713] text-white text-xs font-bold px-5 py-2.5 rounded-full transition-colors disabled:opacity-50 cursor-pointer"
+                  onClick={() => {
+                    setSocialUnavailableProvider(null);
+                    setAuthMode('email-signup');
+                  }}
+                  className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs sm:text-sm py-3.5 px-6 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  Verify
+                  <Mail className="w-4 h-4" />
+                  <span>Continue with Email (Sign Up)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSocialUnavailableProvider(null);
+                    setAuthMode('signin');
+                  }}
+                  className="w-full bg-[#F5F1E6] hover:bg-[#EFE7DA] border border-[#E5DECF] text-[#16120F] font-semibold text-xs sm:text-sm py-3 px-6 rounded-full transition-colors cursor-pointer"
+                >
+                  Already have an account? Sign In with Email
                 </button>
               </div>
-
-              <div className="border-t border-[#EADBCA] pt-3">
-                <span className="text-[11px] text-[#6E6A63] block mb-2 font-medium">
-                  Or continue with standard test identity:
-                </span>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleGoogleAuth('member.google@gmail.com', 'Google Member')}
-                    className="px-3 py-1.5 rounded-full bg-[#F5F1E6] border border-[#EADBCA] hover:border-[#9F1E19] text-xs font-medium text-[#16120F]"
-                  >
-                    member.google@gmail.com
-                  </button>
-                </div>
-              </div>
             </div>
-
-            <button
-              type="button"
-              onClick={() => setAuthMode('options')}
-              className="text-xs text-[#6E6A63] hover:text-[#16120F]"
-            >
-              Cancel
-            </button>
           </div>
         )}
 

@@ -5,7 +5,7 @@ export type { SearchPreferenceFilters } from './SearchPreferenceModal';
 export { OfferEventsView } from './OfferEventsView';
 export type { OfferEventsViewProps } from './OfferEventsView';
 export { OffersView } from './OffersView';
-export type { OfferFilterType, OfferItem, CounterOfferItem, PassOfferItem } from './OffersView';
+export type { OfferFilterType, OfferItem } from './OffersView';
 export { ConfirmedDatesView } from './ConfirmedDatesView';
 export type { ConfirmedDateItem } from './ConfirmedDatesView';
 export { ProfileView } from './ProfileView';

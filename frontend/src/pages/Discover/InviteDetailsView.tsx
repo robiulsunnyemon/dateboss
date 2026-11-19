@@ -1,5 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Send, ShieldCheck, Plus } from 'lucide-react';
+import { api } from '../../services/api';
+
+interface VenueOption {
+  id: string;
+  name: string;
+  neighborhood?: string;
+  city?: string;
+}
 
 export interface InviteDetailsViewProps {
   targetProfileName?: string;
@@ -20,8 +28,19 @@ export function InviteDetailsView({
   onBack,
   onSendOffer,
 }: InviteDetailsViewProps) {
-  // Occasion selection (Dinner, Lunch, Events) - default Dinner matching Figma
-  const [occasion, setOccasion] = useState<string>('Dinner');
+  const [occasion, setOccasion] = useState<string>(selectedEvents[0] || 'Dinner');
+  const [venues, setVenues] = useState<VenueOption[]>([]);
+
+  useEffect(() => {
+    api.venues
+      .getAll()
+      .then((res) => {
+        if (res.success && Array.isArray(res.data)) {
+          setVenues(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // When selection options
   const whenOptions = [
@@ -189,9 +208,31 @@ export function InviteDetailsView({
               type="text"
               value={whereLocation}
               onChange={(e) => setWhereLocation(e.target.value)}
-              placeholder="Neighborhood or city"
+              placeholder="Neighborhood, venue, or city"
               className="w-full bg-[#FAF7F2] border border-[#E5DDD0] rounded-full px-5 py-3 text-xs sm:text-sm text-[#16120F] placeholder-[#8A857D] focus:outline-none focus:border-[#9F1E19] transition-colors"
             />
+            {venues.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2.5">
+                {venues.slice(0, 6).map((v) => {
+                  const label = v.neighborhood ? `${v.name}, ${v.neighborhood}` : v.name;
+                  const isPicked = whereLocation === label;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => setWhereLocation(label)}
+                      className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${
+                        isPicked
+                          ? 'bg-[#16120F] text-white'
+                          : 'bg-[#F5F1E6] border border-[#E5DDD0] text-[#6E6A63] hover:border-[#9F1E19] hover:text-[#16120F]'
+                      }`}
+                    >
+                      {v.name}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* 4. Gift Amount */}

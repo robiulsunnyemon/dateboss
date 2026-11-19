@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Check,
-  ChevronLeft,
-  ChevronRight,
   Plus,
   Minus,
   MessageSquare,
@@ -12,26 +10,26 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import { api } from '../../services/api';
 
 interface LandingPageProps {
   onJoinNow: () => void;
   onJoinAsHost: () => void;
   onJoinAsGuest: () => void;
+  onSignIn?: () => void;
 }
 
 export function LandingPage({
   onJoinNow,
   onJoinAsHost,
   onJoinAsGuest,
+  onSignIn,
 }: LandingPageProps) {
   // Mobile navigation drawer toggle
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Carousel state for mobile metrics ($99 and 25%)
   const [activeMetricSlide, setActiveMetricSlide] = useState(0);
-
-  // Carousel state for mobile testimonials
-  const [activeReviewSlide, setActiveReviewSlide] = useState(0);
 
   // State for FAQ accordion
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -57,9 +55,17 @@ export function LandingPage({
     },
   ];
 
-  const testimonials = [
+  const TESTIMONIAL_VIDEOS: (string | undefined)[] = [
+    '/assets/testimonial-1.mp4',
+    '/assets/testimonial-2.mp4',
+  ];
+
+  const [testimonials, setTestimonials] = useState<
+    Array<{ id: number | string; quote: string; name: string; role: string; avatar: string; video?: string }>
+  >([
     {
       id: 1,
+      video: '/assets/testimonial-1.mp4',
       quote:
         '"I had the best experience with a date! We tried paddle boarding! It was so windy that we got blown backwards and we laughed the whole time as I struggled! We saw seals in the harbor and it was something I always wanted to do! It was a fun, exciting, great first date, and we are still seeing each other!"',
       name: 'Farhan Ahmed',
@@ -68,6 +74,7 @@ export function LandingPage({
     },
     {
       id: 2,
+      video: '/assets/testimonial-2.mp4',
       quote:
         '"An exceptional, easy-to-navigate platform that makes meeting generous and established local men completely stress-free. Backed by top-tier safety and verified profiles, I was reviewing tailored offers and arranging memorable dates within days. It delivers an effortless, premium dating experience from the very first step."',
       name: 'Farhana Ahmed',
@@ -82,15 +89,7 @@ export function LandingPage({
       role: 'Host',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
     },
-  ];
-
-  const handlePrevReview = () => {
-    setActiveReviewSlide((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
-  };
-
-  const handleNextReview = () => {
-    setActiveReviewSlide((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
-  };
+  ]);
 
   const features = [
     {
@@ -115,7 +114,7 @@ export function LandingPage({
     },
   ];
 
-  const faqs = [
+  const [faqs, setFaqs] = useState([
     {
       question: '1. Do Guests Of Honor Ever Pay?',
       answer:
@@ -136,25 +135,64 @@ export function LandingPage({
       answer:
         'Yes! Every member has full versatility. You can switch between initiating date offers as a Host and receiving curated date proposals as a Guest of Honor whenever you like.',
     },
-  ];
+  ]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadContent() {
+      try {
+        const [tRes, fRes] = await Promise.all([
+          api.content.getTestimonials().catch(() => null),
+          api.content.getFaqs().catch(() => null),
+        ]);
+        if (!mounted) return;
+        if (tRes?.success && Array.isArray(tRes.data) && tRes.data.length > 0) {
+          setTestimonials(
+            tRes.data.map((item: any, idx: number) => ({
+              id: item.id || idx + 1,
+              quote: item.quote || item.content || '',
+              name: item.name || item.author || 'Member',
+              role: item.role || 'Member',
+              avatar: item.avatar || '/assets/avatar-1.png',
+              video: item.video || TESTIMONIAL_VIDEOS[idx],
+            }))
+          );
+        }
+        if (fRes?.success && Array.isArray(fRes.data) && fRes.data.length > 0) {
+          setFaqs(
+            fRes.data.map((item: any, idx: number) => ({
+              question: item.question || `${idx + 1}. Question`,
+              answer: item.answer || '',
+            }))
+          );
+        }
+      } catch {
+        // Keep fallback copy if API unavailable
+      }
+    }
+    loadContent();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#F5F1E6] text-[#16120F] font-sans antialiased selection:bg-[#9F1E19] selection:text-white flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen bg-[#EFE7DA] text-[#16120F] font-sans antialiased selection:bg-[#9F1E19] selection:text-white flex flex-col justify-between overflow-x-hidden">
       
       {/* =========================================================================
           HERO SECTION WRAPPER
-          - Desktop: Header + Left Content + Right Sweeping Curved Couple Photo
+          - Desktop: Header + Left Content + Right Smooth Arched Couple Photo
           - Mobile: Clean header with hamburger menu, stacked cards, photo hidden
          ========================================================================= */}
-      <section className="relative w-full bg-[#F5F1E6] overflow-hidden min-h-0 lg:h-[730px] xl:h-[770px] flex flex-col justify-between">
+      <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-0 lg:h-[730px] xl:h-[770px] flex flex-col justify-between border-b border-[#E5DDD0]/70">
         
-        {/* SVG ClipPath Definition matching the exact user-drawn sweeping arc */}
+        {/* SVG ClipPath Definition: smooth organic sweeping arch matching Figma */}
         <svg width="0" height="0" className="absolute">
           <defs>
             <clipPath id="heroUserDrawnArc" clipPathUnits="objectBoundingBox">
-              <path d="M 0.44, 0 
-                       C 0.28, 0.16, 0.12, 0.34, 0.04, 0.52 
-                       C -0.01, 0.68, 0.01, 0.84, 0.04, 1 
+              <path d="M 0.40, 0 
+                       C 0.18, 0.14, 0.02, 0.42, 0.02, 0.76 
+                       C 0.02, 0.88, 0.04, 0.95, 0.06, 1 
                        L 1, 1 
                        L 1, 0 
                        Z" />
@@ -163,7 +201,7 @@ export function LandingPage({
         </svg>
 
         {/* Right Photo: Visible strictly on desktop (hidden on mobile/tablet) */}
-        <div className="absolute right-0 top-0 bottom-0 w-[50%] h-full z-10 pointer-events-none hidden lg:block overflow-hidden">
+        <div className="absolute right-0 top-0 bottom-0 w-[48%] xl:w-[49%] h-full z-10 pointer-events-none hidden lg:block overflow-hidden">
           <div
             className="w-full h-full relative"
             style={{ clipPath: 'url(#heroUserDrawnArc)' }}
@@ -171,10 +209,10 @@ export function LandingPage({
             <img
               src="/assets/hero-couple.jpg"
               alt="Romantic couple dining with wine glasses at restaurant table"
-              className="w-full h-full object-cover object-[center_right] pointer-events-auto"
+              className="w-full h-full object-cover object-[96%_center] pointer-events-auto"
             />
             {/* Subtle warm lighting vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/15 pointer-events-none" />
           </div>
         </div>
 
@@ -208,14 +246,25 @@ export function LandingPage({
               <a href="#faq" className="hover:text-[#9F1E19] transition-colors">FAQ</a>
             </nav>
 
-            {/* Right: Join now Button */}
-            <button
-              type="button"
-              onClick={onJoinNow}
-              className="bg-[#9F1E19] hover:bg-[#851713] text-white text-xs font-semibold px-4 sm:px-6 py-2 sm:py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0"
-            >
-              Join now
-            </button>
+            {/* Right: Sign in + Join now Buttons */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {onSignIn && (
+                <button
+                  type="button"
+                  onClick={onSignIn}
+                  className="bg-[#FAF7F2]/90 hover:bg-white text-[#16120F] border border-[#E5DECF] text-xs font-semibold px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full transition-all shadow-sm shrink-0 cursor-pointer"
+                >
+                  Sign in
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onJoinNow}
+                className="bg-[#9F1E19] hover:bg-[#851713] text-white text-xs font-semibold px-4 sm:px-6 py-2 sm:py-2.5 rounded-full transition-all shadow-sm hover:shadow shrink-0 cursor-pointer"
+              >
+                Join now
+              </button>
+            </div>
 
           </div>
         </header>
@@ -298,10 +347,10 @@ export function LandingPage({
             </p>
 
             {/* Two Action Cards (Stacked vertically on mobile, side-by-side on tablet/desktop) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-1 max-w-xl">
+            <div id="roles" className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-1 max-w-xl">
               
               {/* Card 1: Host */}
-              <div className="bg-[#F5F1E6] border border-[#E8E1D3] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#F3A83B] transition-colors">
+              <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#F3A83B] transition-colors">
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
                     <span className="text-[#F3A83B] text-sm leading-none">👑</span>
@@ -322,7 +371,7 @@ export function LandingPage({
               </div>
 
               {/* Card 2: Guest of Honor */}
-              <div className="bg-[#F5F1E6] border border-[#E8E1D3] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#9F1E19] transition-colors">
+              <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#9F1E19] transition-colors">
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
                     <span className="text-[#8E8A83] text-sm leading-none">👑</span>
@@ -373,7 +422,7 @@ export function LandingPage({
       <section id="how-it-works" className="w-full max-w-[1360px] mx-auto px-4 sm:px-10 lg:px-14 py-8 sm:py-12 lg:py-16">
         
         {/* Large Rounded Container Card */}
-        <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[24px] sm:rounded-[32px] p-5 sm:p-12 lg:p-16 shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
+        <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[24px] sm:rounded-[32px] p-5 sm:p-12 lg:p-16 shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
           
           {/* Top Label */}
           <div className="flex items-center gap-2 mb-3">
@@ -499,7 +548,7 @@ export function LandingPage({
       <section id="why-us" className="w-full max-w-[1360px] mx-auto px-4 sm:px-10 lg:px-14 pb-10 sm:pb-20">
         
         {/* Large Rounded Container Card */}
-        <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[24px] sm:rounded-[32px] p-5 sm:p-12 lg:p-16 text-center shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
+        <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[24px] sm:rounded-[32px] p-5 sm:p-12 lg:p-16 text-center shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
           
           {/* Top Label */}
           <div className="flex items-center justify-center gap-2 mb-3">
@@ -603,73 +652,36 @@ export function LandingPage({
           </h2>
         </div>
 
-        {/* MOBILE SINGLE CARD VIEW (< md) */}
-        <div className="md:hidden mb-6">
-          <div className="bg-[#F5F1E6] border border-[#E8E1D3] rounded-2xl p-5 shadow-sm flex flex-col justify-between min-h-[220px]">
-            <p className="text-[#6E6A63] text-xs leading-relaxed mb-5 font-normal">
-              {testimonials[activeReviewSlide].quote}
-            </p>
-
-            <div className="flex items-center gap-3 pt-3 border-t border-[#EAE3D5]">
-              <img
-                src={testimonials[activeReviewSlide].avatar}
-                alt={testimonials[activeReviewSlide].name}
-                className="w-9 h-9 rounded-full object-cover border border-[#9F1E19]/30"
-              />
-              <div>
-                <h4 className="font-bold text-xs text-[#16120F]">
-                  {testimonials[activeReviewSlide].name}
-                </h4>
-                <p className="text-[10px] text-[#6E6A63]">
-                  {testimonials[activeReviewSlide].role}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* DESKTOP 3-CARD GRID VIEW (md+) */}
-        <div className="hidden md:grid grid-cols-3 gap-6 mb-10">
-          {testimonials.map((t) => (
-            <div
-              key={t.id}
-              className="bg-[#F5F1E6] border border-[#E8E1D3] rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[240px]"
-            >
-              <p className="text-[#6E6A63] text-xs sm:text-[13px] leading-relaxed mb-6 font-normal">
-                {t.quote}
-              </p>
-
-              <div className="flex items-center gap-3 pt-3 border-t border-[#EAE3D5]">
-                <img
-                  src={t.avatar}
-                  alt={t.name}
-                  className="w-10 h-10 rounded-full object-cover border border-[#9F1E19]/30"
+        {/* VIDEO TESTIMONIALS GRID (1 column on mobile, 2 columns on md+) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          {testimonials
+            .filter((t) => Boolean(t.video))
+            .map((t) => (
+              <div
+                key={t.id}
+                className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between"
+              >
+                <video
+                  src={t.video}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full aspect-[9/16] max-h-[420px] rounded-xl bg-black object-cover mb-5 sm:mb-6"
                 />
-                <div>
-                  <h4 className="font-bold text-xs text-[#16120F]">{t.name}</h4>
-                  <p className="text-[10px] text-[#6E6A63]">{t.role}</p>
+
+                <div className="flex items-center gap-3 pt-3 border-t border-[#EAE3D5]">
+                  <img
+                    src={t.avatar}
+                    alt={t.name}
+                    className="w-10 h-10 rounded-full object-cover border border-[#9F1E19]/30"
+                  />
+                  <div>
+                    <h4 className="font-bold text-xs text-[#16120F]">{t.name}</h4>
+                    <p className="text-[10px] text-[#6E6A63]">{t.role}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Carousel Navigation Buttons */}
-        <div className="flex items-center justify-center gap-3">
-          <button
-            onClick={handlePrevReview}
-            aria-label="Previous review"
-            className="w-9 h-9 rounded-full bg-white border border-[#D5CEC2] flex items-center justify-center text-[#6E6A63] hover:bg-stone-50 transition-colors shadow-sm"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button
-            onClick={handleNextReview}
-            aria-label="Next review"
-            className="w-9 h-9 rounded-full bg-[#9F1E19] text-white flex items-center justify-center hover:bg-[#851713] transition-colors shadow-sm"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+            ))}
         </div>
 
       </section>
@@ -697,12 +709,12 @@ export function LandingPage({
             Built Against Ghosting.
           </h2>
 
-          {/* 4 Feature Items (Cards on mobile, rows on desktop) */}
-          <div className="space-y-3 sm:space-y-4 md:space-y-8">
+          {/* 4 Feature Items (Cards on mobile, rows with subtle dividers on desktop) */}
+          <div className="space-y-3 sm:space-y-4 md:space-y-0 md:divide-y md:divide-white/10">
             {features.map((f, i) => (
               <div
                 key={i}
-                className="bg-[#1C1C1C] md:bg-transparent border border-white/10 md:border-transparent rounded-2xl md:rounded-none p-4 md:p-0 flex items-start gap-3.5 sm:gap-4 transition-colors"
+                className="bg-[#1C1C1C] md:bg-transparent border border-white/10 md:border-transparent rounded-2xl md:rounded-none p-4 md:py-7 md:px-0 first:md:pt-0 last:md:pb-0 flex items-start gap-3.5 sm:gap-4 transition-colors"
               >
                 <div className="w-9 h-9 rounded-full border border-[#9F1E19] bg-transparent flex items-center justify-center shrink-0 text-[#E63946] mt-0.5">
                   {f.icon}
@@ -779,7 +791,7 @@ export function LandingPage({
          ========================================================================= */}
       <section className="max-w-[1360px] mx-auto w-full px-4 sm:px-10 lg:px-14 pb-12 sm:pb-20">
         
-        <div className="bg-[#F4EFE6] border border-[#E8DFD0] rounded-[24px] sm:rounded-[32px] p-6 sm:p-14 lg:p-16 text-center shadow-sm">
+        <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[24px] sm:rounded-[32px] p-6 sm:p-14 lg:p-16 text-center shadow-sm">
           
           <div className="flex flex-col items-center max-w-xl mx-auto space-y-4">
             
@@ -826,7 +838,7 @@ export function LandingPage({
       {/* =========================================================================
           9. FOOTER (SECTION 8)
          ========================================================================= */}
-      <footer className="w-full border-t border-[#ECE3D4] py-6 sm:py-8 bg-[#F5F1E6]">
+      <footer className="w-full border-t border-[#E0D7C8] py-6 sm:py-8 bg-[#EFE7DA]">
         <div className="max-w-[1360px] mx-auto px-4 sm:px-10 lg:px-14 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           
           {/* Left: Official Wax Seal + Copyright */}

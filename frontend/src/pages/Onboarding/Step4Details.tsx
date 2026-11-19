@@ -3,12 +3,20 @@ import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 interface Step4DetailsProps {
   onBack: () => void;
-  onComplete?: (data: { nickname: string; location: string }) => void;
+  onComplete?: (data: {
+    nickname: string;
+    age: number;
+    location: string;
+    latitude?: number;
+    longitude?: number;
+  }) => void;
 }
 
 export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
   const [nickname, setNickname] = useState('');
+  const [age, setAge] = useState('28');
   const [location, setLocation] = useState('');
+  const [coords, setCoords] = useState<{ latitude?: number; longitude?: number }>({});
   const [isLocating, setIsLocating] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -19,7 +27,10 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setIsLocating(false);
-          // If in real environment or demo, show friendly detected city or coordinates
+          setCoords({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
           setLocation('Current Location');
         },
         () => {
@@ -39,7 +50,10 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
     if (onComplete) {
       onComplete({
         nickname: nickname.trim() || 'Boss Member',
+        age: Math.max(18, Math.min(80, Number(age) || 28)),
         location: location.trim() || 'New York, NY',
+        latitude: coords.latitude,
+        longitude: coords.longitude,
       });
     }
   };
@@ -82,22 +96,42 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
 
         {/* Form Fields */}
         <form onSubmit={handleSubmit} className="w-full space-y-5">
-          {/* Field 1: First Name / Nickname */}
-          <div>
-            <label
-              htmlFor="nickname-input"
-              className="block font-serif font-bold text-sm text-[#16120F] mb-2"
-            >
-              First Name/Nickname
-            </label>
-            <input
-              id="nickname-input"
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="Type your Nickname here.."
-              className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-full px-5 py-3.5 text-xs sm:text-sm text-[#16120F] placeholder:text-[#6E6A63] focus:outline-none focus:border-[#9F1E19] focus:ring-1 focus:ring-[#9F1E19] transition-colors"
-            />
+          {/* Field 1: First Name / Nickname & Age */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="nickname-input"
+                className="block font-serif font-bold text-sm text-[#16120F] mb-2"
+              >
+                First Name/Nickname
+              </label>
+              <input
+                id="nickname-input"
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="Type your Nickname here.."
+                className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-full px-5 py-3.5 text-xs sm:text-sm text-[#16120F] placeholder:text-[#6E6A63] focus:outline-none focus:border-[#9F1E19] focus:ring-1 focus:ring-[#9F1E19] transition-colors"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="age-input"
+                className="block font-serif font-bold text-sm text-[#16120F] mb-2"
+              >
+                Age (18+)
+              </label>
+              <input
+                id="age-input"
+                type="number"
+                min={18}
+                max={80}
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="28"
+                className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-full px-5 py-3.5 text-xs sm:text-sm text-[#16120F] placeholder:text-[#6E6A63] focus:outline-none focus:border-[#9F1E19] focus:ring-1 focus:ring-[#9F1E19] transition-colors"
+              />
+            </div>
           </div>
 
           {/* Field 2: Location */}
@@ -158,7 +192,6 @@ export function Step4Details({ onBack, onComplete }: Step4DetailsProps) {
               By creating an account, you agree to{' '}
               <a
                 href="#terms"
-                onClick={(e) => e.preventDefault()}
                 className="underline hover:text-[#9F1E19] transition-colors"
               >
                 Terms of Use.

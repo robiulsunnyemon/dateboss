@@ -1,23 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Calendar,
-  MapPin,
   Clock,
   ShieldCheck,
-  MessageCircle,
   Check,
-  AlertCircle,
-  ChevronRight,
-  X,
-  RotateCcw,
+  Loader2,
 } from 'lucide-react';
 import { useRole } from '../../context/RoleContext';
+import { api } from '../../services/api';
 import { CounterOfferModal } from './CounterOfferModal';
 
 export type OfferFilterType = 'sent' | 'counter' | 'pass' | 'received' | 'expired';
 
 export interface OfferItem {
   id: string;
+  rawStatus: string;
   statusHeader: string;
   statusType: 'awaiting' | 'accepted' | 'counter' | 'pass' | 'expired';
   statusBadgeText?: string;
@@ -33,290 +29,246 @@ export interface OfferItem {
   venueLocation: string;
   note: string;
   chatOpen?: boolean;
+  counterVenue?: string;
+  counterTime?: string;
+  counterNote?: string;
 }
-
-export interface CounterOfferItem {
-  id: string;
-  statusHeader: string;
-  respondTime: string;
-  userName: string;
-  userAvatar: string;
-  reliability: number;
-  isVerified: boolean;
-  guestName: string;
-  note: string;
-  originalOccasion: string;
-  originalTime: string;
-  originalEscrow: number;
-  originalVenue: string;
-  originalLocation: string;
-  suggestedOccasion: string;
-  suggestedTime: string;
-  suggestedEscrow: number;
-  suggestedVenue: string;
-  suggestedLocation: string;
-}
-
-export interface PassOfferItem {
-  id: string;
-  statusHeader: string;
-  refundBadge: string;
-  userName: string;
-  userAvatar: string;
-  reliability: number;
-  isVerified: boolean;
-  note: string;
-  registryNote: string;
-  buttonLabel: 'Explore' | 'Discover' | 'See More';
-}
-
-const SAMPLE_HOST_SENT_OFFERS: OfferItem[] = [
-  {
-    id: 'off-1',
-    statusHeader: 'Awaiting Guest Decision',
-    statusType: 'awaiting',
-    remainingTime: '~47h 38m remaining',
-    userName: 'Farhan Ahmed',
-    userAvatar: '/assets/discover-card-2.jpg',
-    reliability: 4.97,
-    isVerified: true,
-    occasion: 'Fine French Dinner & Wine Pairing',
-    timeText: 'Tomorrow at 8:00 PM',
-    escrowAmount: 150,
-    venueName: 'Le Bernardin',
-    venueLocation: 'Midtown Manhattan · Fine French & Seafood',
-    note: 'Good evening Victoria, I have a reserved corner table at Le Bernardin tomorrow night. Would be delighted to have you join me for the chef tasting menu.',
-    chatOpen: false,
-  },
-  {
-    id: 'off-2',
-    statusHeader: 'Offer Accepted · Date Confirmed',
-    statusType: 'accepted',
-    statusBadgeText: 'Chat Unlocked',
-    userName: 'Sophia Laurent',
-    userAvatar: '/assets/discover-card-1.jpg',
-    reliability: 4.97,
-    isVerified: true,
-    occasion: 'Fine French Dinner & Wine Pairing',
-    timeText: 'Tomorrow at 8:00 PM',
-    escrowAmount: 150,
-    venueName: 'Le Bernardin',
-    venueLocation: 'Midtown Manhattan · Fine French & Seafood',
-    note: 'Table reserved at Caviar Russe. Delighted to host you.',
-    chatOpen: true,
-  },
-];
-
-const SAMPLE_GUEST_RECEIVED_OFFERS: OfferItem[] = [
-  {
-    id: 'g-off-1',
-    statusHeader: 'Awaiting your decision',
-    statusType: 'awaiting',
-    remainingTime: '~41h 56m remaining',
-    userName: 'Farhan Ahmed',
-    userAvatar: '/assets/discover-card-2.jpg',
-    reliability: 4.97,
-    isVerified: true,
-    occasion: 'Fine French Dinner & Wine Pairing',
-    timeText: 'Tomorrow at 8:00 PM',
-    escrowAmount: 150,
-    venueName: 'Le Bernardin',
-    venueLocation: 'Midtown Manhattan · Fine French & Seafood',
-    note: "Good evening Victoria, I have a reserved corner table at Le Bernardin tomorrow night. Would be delighted to have you join me for the chef's tasting menu.",
-    chatOpen: false,
-  },
-  {
-    id: 'g-off-2',
-    statusHeader: 'Offer Accepted · Date Confirmed',
-    statusType: 'accepted',
-    statusBadgeText: 'Chat Unlocked',
-    userName: 'Jenny Wilson',
-    userAvatar: '/assets/discover-card-1.jpg',
-    reliability: 4.97,
-    isVerified: true,
-    occasion: 'Fine French Dinner & Wine Pairing',
-    timeText: 'Tomorrow at 8:00 PM',
-    escrowAmount: 150,
-    venueName: 'Le Bernardin',
-    venueLocation: 'Midtown Manhattan · Fine French & Seafood',
-    note: 'Table reserved at Caviar Russe. Delighted to host you.',
-    chatOpen: true,
-  },
-];
-
-const SAMPLE_COUNTER_OFFERS: CounterOfferItem[] = [
-  {
-    id: 'cnt-1',
-    statusHeader: 'Counter is pending - Action Required',
-    respondTime: '~42h 36m remaining',
-    userName: 'Farhan Ahmed',
-    userAvatar: '/assets/discover-card-2.jpg',
-    reliability: 4.97,
-    isVerified: true,
-    guestName: 'Elena Rostova',
-    note: 'Thank you Julian, the invitation is lovely! Thursday is difficult due to rehearsal at Lincoln Center. Would Saturday 8:30 at Le Bernardin suit your schedule instead?',
-    originalOccasion: 'Fine French Dinner & Wine Pairing',
-    originalTime: 'Tomorrow at 8:00 PM',
-    originalEscrow: 150,
-    originalVenue: 'Le Bernardin',
-    originalLocation: 'Midtown Manhattan · Fine French & Seafood',
-    suggestedOccasion: 'Carbone',
-    suggestedTime: 'Tomorrow at 10:00 PM',
-    suggestedEscrow: 200,
-    suggestedVenue: 'Le Bernardin',
-    suggestedLocation: 'Midtown Manhattan · Fine French & Seafood',
-  },
-];
-
-const SAMPLE_GUEST_SENT_REQUESTS: OfferItem[] = [
-  {
-    id: 'g-sent-1',
-    statusHeader: 'Awaiting Host Decision',
-    statusType: 'awaiting',
-    remainingTime: '~43h 36m remaining',
-    userName: 'Farhan Ahmed',
-    userAvatar: '/assets/discover-card-2.jpg',
-    reliability: 4.97,
-    isVerified: true,
-    occasion: 'Fine French Dinner & Wine Pairing',
-    timeText: 'Tomorrow at 8:00 PM',
-    escrowAmount: 150,
-    venueName: 'Le Bernardin',
-    venueLocation: 'Midtown Manhattan · Fine French & Seafood',
-    note: 'Taste tasting and lively conversation on Saturday evening.',
-    chatOpen: false,
-  },
-  {
-    id: 'g-sent-2',
-    statusHeader: 'Awaiting Host Decision',
-    statusType: 'awaiting',
-    remainingTime: '~45h 10m remaining',
-    userName: 'Marcus Montgomery',
-    userAvatar: '/assets/discover-card-3.jpg',
-    reliability: 4.98,
-    isVerified: true,
-    occasion: 'Concerts & Symphony',
-    timeText: 'Friday at 7:30 PM',
-    escrowAmount: 250,
-    venueName: 'Lincoln Center',
-    venueLocation: 'Upper West Side, NY',
-    note: 'Would love to see the philharmonic performance this weekend.',
-    chatOpen: false,
-  },
-];
-
-const SAMPLE_PASS_OFFERS: PassOfferItem[] = [
-  {
-    id: 'pass-1',
-    statusHeader: 'Invitation Graciously Declined',
-    refundBadge: 'Deposit Fully Returned',
-    userName: 'Liam Chen',
-    userAvatar: '/assets/discover-card-2.jpg',
-    reliability: 4.85,
-    isVerified: true,
-    note: 'Guest responded: "Regrettably, I have prior commitments at the tech conference this weekend."',
-    registryNote: 'Logged for user experience analysis',
-    buttonLabel: 'Explore',
-  },
-  {
-    id: 'pass-2',
-    statusHeader: 'Offer Courteously Passed',
-    refundBadge: 'Escrow 100% Refunded',
-    userName: 'Sophia Laurent',
-    userAvatar: '/assets/discover-card-1.jpg',
-    reliability: 4.97,
-    isVerified: true,
-    note: 'Guest was unable to accept this invitation: "Thank you for the thoughtful proposal, Julian. My schedule is occupied with previews this weekend."',
-    registryNote: 'Record kept for personal dating registry',
-    buttonLabel: 'Discover',
-  },
-];
 
 interface OffersViewProps {
-  onOpenChat?: (offer: OfferItem) => void;
   onNavigateExplore?: () => void;
+  onOpenChat?: (offer: OfferItem) => void;
 }
 
-export function OffersView({ onOpenChat, onNavigateExplore }: OffersViewProps) {
-  const { role, isGuest } = useRole();
+function parseEscrowAmount(guarantee?: string | null): number {
+  if (!guarantee) return 150;
+  const match = guarantee.match(/\$(\d+)/);
+  return match ? Number(match[1]) : 150;
+}
 
-  // Active filter tab
-  const [activeFilter, setActiveFilter] = useState<OfferFilterType>(() => {
-    return isGuest ? 'received' : 'sent';
+function formatRemaining(expiresAt?: string): string | undefined {
+  if (!expiresAt) return undefined;
+  const diffMs = new Date(expiresAt).getTime() - Date.now();
+  if (diffMs <= 0) return 'Expired';
+  const totalMins = Math.floor(diffMs / 60000);
+  const hrs = Math.floor(totalMins / 60);
+  const mins = totalMins % 60;
+  return `~${hrs}h ${mins}m remaining`;
+}
+
+function formatDateTime(dt?: string): string {
+  if (!dt) return 'Upcoming Evening';
+  const d = new Date(dt);
+  if (Number.isNaN(d.getTime())) return dt;
+  return d.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
   });
+}
 
-  const [guestOffers, setGuestOffers] = useState<OfferItem[]>(SAMPLE_GUEST_RECEIVED_OFFERS);
-  const [hostOffers, setHostOffers] = useState<OfferItem[]>(SAMPLE_HOST_SENT_OFFERS);
-  const [guestSentRequests, setGuestSentRequests] = useState<OfferItem[]>(SAMPLE_GUEST_SENT_REQUESTS);
-  const [counterList, setCounterList] = useState<CounterOfferItem[]>(SAMPLE_COUNTER_OFFERS);
+export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
+  const { isGuest } = useRole();
+  const [activeFilter, setActiveFilter] = useState<OfferFilterType>(
+    isGuest ? 'received' : 'sent'
+  );
+  const [allOffers, setAllOffers] = useState<OfferItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Counter Modal State
   const [activeCounterOffer, setActiveCounterOffer] = useState<OfferItem | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3000);
+    setTimeout(() => setToastMessage(null), 3200);
   };
 
-  // Guest Accept Action
-  const handleGuestAccept = (offerId: string, hostName: string) => {
-    setGuestOffers((prev) =>
-      prev.map((o) =>
-        o.id === offerId
-          ? {
-              ...o,
-              statusHeader: 'Offer Accepted · Date Confirmed',
-              statusType: 'accepted',
-              statusBadgeText: 'Chat Unlocked',
-              chatOpen: true,
-            }
-          : o
-      )
-    );
-    showToast(`You accepted ${hostName}'s offer! Date confirmed and chat is now open.`);
+  useEffect(() => {
+    setActiveFilter(isGuest ? 'received' : 'sent');
+  }, [isGuest]);
+
+  const loadOffers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await api.offers.getAll();
+      if (res.success && Array.isArray(res.data)) {
+        const mapped: OfferItem[] = res.data.map((raw: any) => {
+          const counterpart = isGuest ? raw.host : raw.guest;
+          const counterpartProfile = isGuest
+            ? counterpart?.hostProfile
+            : counterpart?.guestProfile;
+          const rawStatus: string = raw.status || 'PENDING';
+
+          let statusType: OfferItem['statusType'] = 'awaiting';
+          let statusHeader = isGuest ? 'Awaiting your decision' : 'Awaiting Guest Decision';
+          let statusBadgeText: string | undefined;
+
+          if (rawStatus === 'ACCEPTED') {
+            statusType = 'accepted';
+            statusHeader = 'Offer Accepted · Date Confirmed';
+            statusBadgeText = 'Chat Unlocked';
+          } else if (rawStatus === 'COUNTERED') {
+            statusType = 'counter';
+            statusHeader = isGuest
+              ? 'Counter Sent · Awaiting Host'
+              : 'Counter Received · Action Required';
+          } else if (rawStatus === 'PASSED') {
+            statusType = 'pass';
+            statusHeader = 'Offer Passed';
+          } else if (
+            rawStatus === 'EXPIRED' ||
+            rawStatus === 'CANCELLED' ||
+            rawStatus === 'COMPLETED'
+          ) {
+            statusType = 'expired';
+            statusHeader =
+              rawStatus === 'COMPLETED'
+                ? 'Completed Date'
+                : rawStatus === 'CANCELLED'
+                ? 'Withdrawn / Cancelled'
+                : 'Offer Expired (48h)';
+          }
+
+          return {
+            id: raw.id,
+            rawStatus,
+            statusHeader,
+            statusType,
+            statusBadgeText,
+            remainingTime:
+              rawStatus === 'PENDING' || rawStatus === 'COUNTERED'
+                ? formatRemaining(raw.expiresAt)
+                : undefined,
+            userName: counterpart?.nickname || counterpart?.email?.split('@')[0] || 'Member',
+            userAvatar: counterpartProfile?.photos?.[0] || '/assets/discover-card-1.jpg',
+            reliability: counterpartProfile?.reliabilityScore ?? 4.9,
+            isVerified: Boolean(counterpart?.isVerified),
+            occasion: raw.activityType || 'Dinner',
+            timeText: formatDateTime(raw.proposedDateTime),
+            escrowAmount: parseEscrowAmount(raw.hospitalityGuarantee),
+            venueName: raw.venueName || 'Curated Venue',
+            venueLocation: raw.venueAddress || 'New York',
+            note: raw.personalMessage || 'Looking forward to meeting you.',
+            chatOpen: rawStatus === 'ACCEPTED' || rawStatus === 'COMPLETED',
+            counterVenue: raw.counterVenue || undefined,
+            counterTime: raw.counterTime ? formatDateTime(raw.counterTime) : undefined,
+            counterNote: raw.counterNote || undefined,
+          };
+        });
+        setAllOffers(mapped);
+      } else {
+        setAllOffers([]);
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Unable to load offers.');
+      setAllOffers([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isGuest]);
+
+  useEffect(() => {
+    loadOffers();
+  }, [loadOffers]);
+
+  // Bucket offers cleanly by status
+  const activeOffers = allOffers.filter(
+    (o) => o.rawStatus === 'PENDING' || o.rawStatus === 'ACCEPTED'
+  );
+  const counterOffers = allOffers.filter((o) => o.rawStatus === 'COUNTERED');
+  const passedOffers = allOffers.filter((o) => o.rawStatus === 'PASSED');
+  const archivedOffers = allOffers.filter((o) =>
+    ['EXPIRED', 'CANCELLED', 'COMPLETED'].includes(o.rawStatus)
+  );
+
+  const handleGuestRespond = async (
+    offerId: string,
+    action: 'ACCEPT' | 'PASS',
+    hostName: string
+  ) => {
+    setBusyId(offerId);
+    try {
+      await api.offers.respond(offerId, { action });
+      showToast(
+        action === 'ACCEPT'
+          ? `You accepted ${hostName}'s offer! Date confirmed and chat is unlocked.`
+          : `Politely passed on ${hostName}'s offer.`
+      );
+      await loadOffers();
+    } catch (err: any) {
+      showToast(err?.message || 'Action failed.');
+    } finally {
+      setBusyId(null);
+    }
   };
 
-  // Guest Pass Action
-  const handleGuestPass = (offerId: string, hostName: string) => {
-    setGuestOffers((prev) => prev.filter((o) => o.id !== offerId));
-    showToast(`Politely passed on ${hostName}'s offer. Host escrow deposit refunded.`);
+  const handleHostRespondCounter = async (
+    offerId: string,
+    action: 'ACCEPT' | 'DECLINE'
+  ) => {
+    setBusyId(offerId);
+    try {
+      await api.offers.hostRespond(offerId, action);
+      showToast(
+        action === 'ACCEPT'
+          ? 'Counter-offer accepted! Date confirmed and chat unlocked.'
+          : 'Counter-offer declined.'
+      );
+      await loadOffers();
+    } catch (err: any) {
+      showToast(err?.message || 'Unable to respond to counter-offer.');
+    } finally {
+      setBusyId(null);
+    }
   };
 
-  // Withdraw Counter Action
-  const handleWithdrawCounter = (counterId: string) => {
-    setCounterList((prev) => prev.filter((c) => c.id !== counterId));
-    showToast('Counter offer withdrawn successfully.');
+  const handleWithdraw = async (offerId: string) => {
+    setBusyId(offerId);
+    try {
+      await api.offers.withdraw(offerId);
+      showToast('Offer withdrawn successfully.');
+      await loadOffers();
+    } catch (err: any) {
+      showToast(err?.message || 'Unable to withdraw offer.');
+    } finally {
+      setBusyId(null);
+    }
   };
 
-  // Withdraw Sent Offer Action
-  const handleWithdrawSentOffer = (offerId: string) => {
-    setGuestSentRequests((prev) => prev.filter((o) => o.id !== offerId));
-    showToast('Date request withdrawn successfully.');
-  };
+  const renderEmpty = (title: string, subtitle: string) => (
+    <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] p-8 text-center max-w-lg mx-auto">
+      <Clock className="w-9 h-9 text-[#8A857D] mx-auto mb-3" />
+      <h3 className="font-serif font-bold text-lg text-[#16120F] mb-1">{title}</h3>
+      <p className="text-xs text-[#6E6A63] leading-relaxed">{subtitle}</p>
+      {onNavigateExplore && (
+        <button
+          type="button"
+          onClick={onNavigateExplore}
+          className="mt-4 bg-[#9F1E19] hover:bg-[#851713] text-white text-xs font-semibold px-5 py-2 rounded-full cursor-pointer"
+        >
+          Explore Profiles
+        </button>
+      )}
+    </div>
+  );
 
   return (
     <div className="w-full animate-in fade-in duration-200">
-      
-      {/* Eyebrow: — Offers */}
+      {/* Eyebrow */}
       <div className="flex items-center gap-2 mb-1.5">
-        <span className="w-5 h-[1.5px] bg-[#9F1E19]"></span>
-        <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
-          Offers
-        </span>
+        <span className="w-5 h-[1.5px] bg-[#9F1E19]" />
+        <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">Offers</span>
       </div>
 
-      {/* Headline: The First Move, Organized. */}
+      {/* Headline */}
       <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#16120F] tracking-tight leading-tight mb-5 sm:mb-6">
         The First Move, Organized.
       </h1>
 
-      {/* Tabs Row matching Figma role layouts */}
+      {/* Tabs Row */}
       <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-2 sm:pb-3 no-scrollbar mb-6 sm:mb-8">
         {isGuest ? (
-          // Guest Tabs: Received (Primary) | Counter | Sent | Expired/History
           <>
             <button
               type="button"
@@ -327,9 +279,8 @@ export function OffersView({ onOpenChat, onNavigateExplore }: OffersViewProps) {
                   : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
               }`}
             >
-              Received
+              Received ({activeOffers.length})
             </button>
-
             <button
               type="button"
               onClick={() => setActiveFilter('counter')}
@@ -339,60 +290,8 @@ export function OffersView({ onOpenChat, onNavigateExplore }: OffersViewProps) {
                   : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
               }`}
             >
-              Counter
+              Counter ({counterOffers.length})
             </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter('sent')}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-                activeFilter === 'sent'
-                  ? 'bg-[#16120F] text-white shadow-xs'
-                  : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
-              }`}
-            >
-              Sent ({guestSentRequests.length})
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter('expired')}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-                activeFilter === 'expired'
-                  ? 'bg-[#16120F] text-white shadow-xs'
-                  : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
-              }`}
-            >
-              Expired/History
-            </button>
-          </>
-        ) : (
-          // Host Tabs: Sent (2) | Counter | Pass | Received | Expired/History
-          <>
-            <button
-              type="button"
-              onClick={() => setActiveFilter('sent')}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-                activeFilter === 'sent'
-                  ? 'bg-[#16120F] text-white shadow-xs'
-                  : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
-              }`}
-            >
-              Sent ({hostOffers.length})
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter('counter')}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-                activeFilter === 'counter'
-                  ? 'bg-[#16120F] text-white shadow-xs'
-                  : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
-              }`}
-            >
-              Counter
-            </button>
-
             <button
               type="button"
               onClick={() => setActiveFilter('pass')}
@@ -402,21 +301,8 @@ export function OffersView({ onOpenChat, onNavigateExplore }: OffersViewProps) {
                   : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
               }`}
             >
-              Pass
+              Passed ({passedOffers.length})
             </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter('received')}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-                activeFilter === 'received'
-                  ? 'bg-[#16120F] text-white shadow-xs'
-                  : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
-              }`}
-            >
-              Received
-            </button>
-
             <button
               type="button"
               onClick={() => setActiveFilter('expired')}
@@ -426,385 +312,418 @@ export function OffersView({ onOpenChat, onNavigateExplore }: OffersViewProps) {
                   : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
               }`}
             >
-              Expired/History
+              Expired/History ({archivedOffers.length})
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => setActiveFilter('sent')}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+                activeFilter === 'sent'
+                  ? 'bg-[#16120F] text-white shadow-xs'
+                  : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
+              }`}
+            >
+              Sent ({activeOffers.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter('counter')}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+                activeFilter === 'counter'
+                  ? 'bg-[#16120F] text-white shadow-xs'
+                  : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
+              }`}
+            >
+              Counter ({counterOffers.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter('pass')}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+                activeFilter === 'pass'
+                  ? 'bg-[#16120F] text-white shadow-xs'
+                  : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
+              }`}
+            >
+              Pass ({passedOffers.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter('expired')}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+                activeFilter === 'expired'
+                  ? 'bg-[#16120F] text-white shadow-xs'
+                  : 'bg-[#FAF7F2] text-[#6E6A63] border border-[#EADBCA] hover:text-[#16120F]'
+              }`}
+            >
+              Expired/History ({archivedOffers.length})
             </button>
           </>
         )}
       </div>
 
-      {/* ============================================================ */}
-      {/* 1. GUEST RECEIVED TAB (FIGMA SCREEN 3)                       */}
-      {/* ============================================================ */}
-      {isGuest && activeFilter === 'received' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-in fade-in duration-150">
-          {guestOffers.map((offer) => (
-            <div
-              key={offer.id}
-              className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] sm:rounded-[28px] p-4 sm:p-6 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
-            >
-              <div>
-                {/* Status Bar */}
-                <div className="flex items-center justify-between text-[11px] pb-3 mb-3 border-b border-[#EADBCA]/60">
-                  <span className="font-medium text-[#6E6A63]">
-                    {offer.statusHeader}
-                  </span>
-                  {offer.remainingTime && (
-                    <span className="text-[#9F1E19] font-semibold">
-                      {offer.remainingTime}
-                    </span>
-                  )}
-                </div>
-
-                {/* Host Profile Header */}
-                <div className="flex items-center gap-3 mb-4">
-                  <img
-                    src={offer.userAvatar}
-                    alt={offer.userName}
-                    className="w-12 h-12 rounded-full object-cover border border-[#EADBCA]"
-                  />
-                  <div>
-                    <h3 className="font-serif font-bold text-base text-[#16120F]">
-                      {offer.userName}
-                    </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-[#6E6A63] mt-0.5">
-                      <span>{offer.reliability} Reliability</span>
-                      <span>·</span>
-                      <span className="text-emerald-700 font-semibold flex items-center gap-0.5">
-                        <Check className="w-3 h-3" /> ID Verified
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Occasion & Time Card */}
-                <div className="bg-[#F5EFE6] rounded-2xl p-3.5 mb-3 space-y-2 border border-[#E5DDD0]">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-[#8A857D] tracking-wider block">
-                      Occasion & Time
-                    </span>
-                    <div className="text-xs sm:text-sm font-bold text-[#16120F] mt-0.5">
-                      {offer.occasion}
-                    </div>
-                    <div className="text-xs text-[#6E6A63] mt-0.5 flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-[#9F1E19]" />
-                      <span>{offer.timeText}</span>
-                    </div>
-                  </div>
-
-                  <div className="text-xs font-bold text-emerald-800 flex items-center gap-1">
-                    <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                    <span>${offer.escrowAmount} Locked in Escrow</span>
-                  </div>
-
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-[#8A857D] tracking-wider block">
-                      Venue Destination
-                    </span>
-                    <div className="text-xs font-bold text-[#16120F] mt-0.5">
-                      {offer.venueName}
-                    </div>
-                    <div className="text-[11px] text-[#6E6A63] mt-0.5">
-                      {offer.venueLocation}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Host Note */}
-                <div className="text-xs text-[#16120F] italic bg-[#FAF7F2] p-3 rounded-xl border border-[#EADBCA] mb-4">
-                  "{offer.note}"
-                </div>
-              </div>
-
-              {/* Action Buttons for Guest */}
-              {offer.statusType === 'accepted' ? (
-                <div className="pt-2 flex items-center justify-between border-t border-[#EADBCA]">
-                  <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
-                    <Check className="w-4 h-4" /> Date confirmed. Chat open.
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (onOpenChat) onOpenChat(offer);
-                      else showToast(`Opening chat with ${offer.userName}...`);
-                    }}
-                    className="bg-[#9F1E19] hover:bg-[#851713] text-white px-5 py-2 rounded-full text-xs font-semibold transition-all shadow-xs cursor-pointer active:scale-95"
-                  >
-                    Open chat
-                  </button>
-                </div>
-              ) : (
-                <div className="pt-2 flex items-center gap-2 border-t border-[#EADBCA]">
-                  <button
-                    type="button"
-                    onClick={() => handleGuestAccept(offer.id, offer.userName)}
-                    className="flex-1 bg-[#9F1E19] hover:bg-[#851713] text-white py-2.5 rounded-full text-xs font-semibold transition-all shadow-xs cursor-pointer active:scale-95 text-center"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveCounterOffer(offer)}
-                    className="flex-1 bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-95 text-center"
-                  >
-                    Counter
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleGuestPass(offer.id, offer.userName)}
-                    className="flex-1 bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#6E6A63] hover:text-[#16120F] py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-95 text-center"
-                  >
-                    Pass
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
+      {isLoading ? (
+        <div className="py-16 flex flex-col items-center justify-center gap-3 text-[#6E6A63]">
+          <Loader2 className="w-7 h-7 animate-spin text-[#9F1E19]" />
+          <span className="text-xs font-medium">Loading your offers...</span>
         </div>
-      )}
-
-      {/* ============================================================ */}
-      {/* 2. COUNTER TAB (FIGMA SCREEN 5)                              */}
-      {/* ============================================================ */}
-      {activeFilter === 'counter' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-in fade-in duration-150">
-          {counterList.map((cnt) => (
-            <div
-              key={cnt.id}
-              className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] sm:rounded-[28px] p-4 sm:p-6 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
-            >
-              <div>
-                <div className="flex items-center justify-between text-[11px] pb-3 mb-3 border-b border-[#EADBCA]/60">
-                  <span className="font-medium text-[#6E6A63]">{cnt.statusHeader}</span>
-                  <span className="text-[#9F1E19] font-semibold">{cnt.respondTime}</span>
-                </div>
-
-                <div className="flex items-center gap-3 mb-4">
-                  <img
-                    src={cnt.userAvatar}
-                    alt={cnt.userName}
-                    className="w-12 h-12 rounded-full object-cover border border-[#EADBCA]"
-                  />
-                  <div>
-                    <h3 className="font-serif font-bold text-base text-[#16120F]">
-                      {cnt.userName}
-                    </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-[#6E6A63] mt-0.5">
-                      <span>{cnt.reliability} Reliability</span>
-                      <span>·</span>
-                      <span className="text-emerald-700 font-semibold flex items-center gap-0.5">
-                        <Check className="w-3 h-3" /> ID Verified
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-xs text-[#16120F] italic bg-[#FAF7F2] p-3 rounded-xl border border-[#EADBCA] mb-3">
-                  "{cnt.note}"
-                </div>
-
-                {/* Proposed Modifications comparison */}
-                <div className="space-y-3 mb-4">
-                  {/* Original */}
-                  <div className="bg-[#F5EFE6] rounded-2xl p-3 border border-[#E5DDD0]">
-                    <span className="text-[10px] uppercase font-bold text-[#8A857D] block mb-1">
-                      Original Offer
-                    </span>
-                    <div className="text-xs font-bold text-[#16120F]">{cnt.originalOccasion}</div>
-                    <div className="text-[11px] text-[#6E6A63]">{cnt.originalTime}</div>
-                    <div className="text-xs font-semibold text-emerald-800 mt-1">
-                      ${cnt.originalEscrow} Locked in Escrow
-                    </div>
-                    <div className="text-[11px] text-[#6E6A63] mt-1">{cnt.originalVenue}</div>
-                  </div>
-
-                  {/* Alternative Requested */}
-                  <div className="bg-[#FAF7F2] rounded-2xl p-3 border-2 border-[#9F1E19]/30">
-                    <span className="text-[10px] uppercase font-bold text-[#9F1E19] block mb-1">
-                      Your Suggested Alternative (Requested)
-                    </span>
-                    <div className="text-xs font-bold text-[#16120F]">{cnt.suggestedOccasion}</div>
-                    <div className="text-[11px] text-[#6E6A63]">{cnt.suggestedTime}</div>
-                    <div className="text-xs font-semibold text-[#9F1E19] mt-1">
-                      ${cnt.suggestedEscrow} request for gift
-                    </div>
-                    <div className="text-[11px] text-[#6E6A63] mt-1">{cnt.suggestedVenue}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action */}
-              <div className="pt-2 border-t border-[#EADBCA]">
-                <button
-                  type="button"
-                  onClick={() => handleWithdrawCounter(cnt.id)}
-                  className="w-full bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-95 text-center"
-                >
-                  Withdraw Counter
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ============================================================ */}
-      {/* 3. SENT TAB (FOR GUEST: FIGMA SCREEN 6 / FOR HOST: OFFERS)    */}
-      {/* ============================================================ */}
-      {activeFilter === 'sent' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-in fade-in duration-150">
-          {(isGuest ? guestSentRequests : hostOffers).map((item) => (
-            <div
-              key={item.id}
-              className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] sm:rounded-[28px] p-4 sm:p-6 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
-            >
-              <div>
-                <div className="flex items-center justify-between text-[11px] pb-3 mb-3 border-b border-[#EADBCA]/60">
-                  <span className="font-medium text-[#6E6A63]">{item.statusHeader}</span>
-                  <span className="text-[#9F1E19] font-semibold">{item.remainingTime}</span>
-                </div>
-
-                <div className="flex items-center gap-3 mb-4">
-                  <img
-                    src={item.userAvatar}
-                    alt={item.userName}
-                    className="w-12 h-12 rounded-full object-cover border border-[#EADBCA]"
-                  />
-                  <div>
-                    <h3 className="font-serif font-bold text-base text-[#16120F]">
-                      {item.userName}
-                    </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-[#6E6A63] mt-0.5">
-                      <span>{item.reliability} Reliability</span>
-                      <span>·</span>
-                      <span className="text-emerald-700 font-semibold flex items-center gap-0.5">
-                        <Check className="w-3 h-3" /> ID Verified
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-[#F5EFE6] rounded-2xl p-3.5 mb-3 space-y-1.5 border border-[#E5DDD0]">
-                  <span className="text-[10px] uppercase font-bold text-[#8A857D] block">
-                    Occasion & Time
-                  </span>
-                  <div className="text-xs sm:text-sm font-bold text-[#16120F]">
-                    {item.occasion}
-                  </div>
-                  <div className="text-xs text-[#6E6A63] flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-[#9F1E19]" />
-                    <span>{item.timeText}</span>
-                  </div>
-                  <div className="text-xs font-semibold text-emerald-800 pt-1">
-                    ${item.escrowAmount} {isGuest ? "Gift I'm hoping for" : 'Locked in Escrow'}
-                  </div>
-                  <div className="text-[11px] text-[#6E6A63]">
-                    {item.venueName} · {item.venueLocation}
-                  </div>
-                </div>
-
-                <div className="text-xs text-[#16120F] italic bg-[#FAF7F2] p-3 rounded-xl border border-[#EADBCA] mb-3">
-                  "{item.note}"
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-[#EADBCA]">
-                {isGuest ? (
-                  <button
-                    type="button"
-                    onClick={() => handleWithdrawSentOffer(item.id)}
-                    className="w-full bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-95 text-center"
+      ) : (
+        <>
+          {/* 1. ACTIVE OFFERS TAB (Guest: Received | Host: Sent) */}
+          {((isGuest && activeFilter === 'received') || (!isGuest && activeFilter === 'sent')) && (
+            activeOffers.length === 0 ? (
+              renderEmpty(
+                isGuest ? 'No incoming offers yet' : 'No active offers sent yet',
+                isGuest
+                  ? 'Verified hosts can send you curated invitations at vetted public venues.'
+                  : 'Browse Discover to invite a Guest of Honor to a curated dinner or outing.'
+              )
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-in fade-in duration-150">
+                {activeOffers.map((offer) => (
+                  <div
+                    key={offer.id}
+                    className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] sm:rounded-[28px] p-4 sm:p-6 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
                   >
-                    Withdraw Offer
-                  </button>
-                ) : (
-                  <div className="flex items-center justify-between text-xs text-[#6E6A63]">
-                    <span>Awaiting guest acceptance</span>
-                    <span className="text-[#9F1E19] font-medium">Chat locked until accepted</span>
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] pb-3 mb-3 border-b border-[#EADBCA]/60">
+                        <span className="font-medium text-[#6E6A63]">{offer.statusHeader}</span>
+                        {offer.remainingTime ? (
+                          <span className="text-[#9F1E19] font-semibold">{offer.remainingTime}</span>
+                        ) : offer.statusBadgeText ? (
+                          <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            {offer.statusBadgeText}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <div className="flex items-center gap-3 mb-4">
+                        <img
+                          src={offer.userAvatar}
+                          alt={offer.userName}
+                          className="w-12 h-12 rounded-full object-cover border border-[#EADBCA]"
+                        />
+                        <div>
+                          <h3 className="font-serif font-bold text-base text-[#16120F]">
+                            {offer.userName}
+                          </h3>
+                          <div className="flex items-center gap-1.5 text-xs text-[#6E6A63] mt-0.5">
+                            <span>{offer.reliability.toFixed(2)} Reliability</span>
+                            <span>·</span>
+                            <span className="text-emerald-700 font-semibold flex items-center gap-0.5">
+                              <Check className="w-3 h-3" /> {offer.isVerified ? 'ID Verified' : 'Member'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-[#F5EFE6] rounded-2xl p-3.5 mb-3 space-y-2 border border-[#E5DDD0]">
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-[#8A857D] tracking-wider block">
+                            Occasion & Time
+                          </span>
+                          <div className="text-xs sm:text-sm font-bold text-[#16120F] mt-0.5">
+                            {offer.occasion}
+                          </div>
+                          <div className="text-xs text-[#6E6A63] mt-0.5 flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-[#9F1E19]" />
+                            <span>{offer.timeText}</span>
+                          </div>
+                        </div>
+
+                        <div className="text-xs font-bold text-emerald-800 flex items-center gap-1">
+                          <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                          <span>${offer.escrowAmount} Locked in Escrow</span>
+                        </div>
+
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-[#8A857D] tracking-wider block">
+                            Venue Destination
+                          </span>
+                          <div className="text-xs font-bold text-[#16120F] mt-0.5">
+                            {offer.venueName}
+                          </div>
+                          <div className="text-[11px] text-[#6E6A63] mt-0.5">
+                            {offer.venueLocation}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-xs text-[#16120F] italic bg-[#FAF7F2] p-3 rounded-xl border border-[#EADBCA] mb-4">
+                        &ldquo;{offer.note}&rdquo;
+                      </div>
+                    </div>
+
+                    {offer.statusType === 'accepted' ? (
+                      <div className="pt-2 flex items-center justify-between border-t border-[#EADBCA]">
+                        <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
+                          <Check className="w-4 h-4" /> Date confirmed. Chat open.
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => onOpenChat && onOpenChat(offer)}
+                          className="bg-[#9F1E19] hover:bg-[#851713] text-white px-5 py-2 rounded-full text-xs font-semibold transition-all shadow-xs cursor-pointer active:scale-95"
+                        >
+                          Open chat
+                        </button>
+                      </div>
+                    ) : isGuest ? (
+                      <div className="pt-2 flex items-center gap-2 border-t border-[#EADBCA]">
+                        <button
+                          type="button"
+                          disabled={busyId === offer.id}
+                          onClick={() => handleGuestRespond(offer.id, 'ACCEPT', offer.userName)}
+                          className="flex-1 bg-[#9F1E19] hover:bg-[#851713] text-white py-2.5 rounded-full text-xs font-semibold transition-all shadow-xs cursor-pointer active:scale-95 text-center disabled:opacity-50"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busyId === offer.id}
+                          onClick={() => setActiveCounterOffer(offer)}
+                          className="flex-1 bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-95 text-center disabled:opacity-50"
+                        >
+                          Counter
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busyId === offer.id}
+                          onClick={() => handleGuestRespond(offer.id, 'PASS', offer.userName)}
+                          className="flex-1 bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#6E6A63] hover:text-[#16120F] py-2.5 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-95 text-center disabled:opacity-50"
+                        >
+                          Pass
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="pt-2 flex items-center justify-between gap-2 border-t border-[#EADBCA]">
+                        <span className="text-[11px] text-[#6E6A63]">
+                          Chat locked until accepted
+                        </span>
+                        <button
+                          type="button"
+                          disabled={busyId === offer.id}
+                          onClick={() => handleWithdraw(offer.id)}
+                          className="px-4 py-2 rounded-full bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-xs font-semibold text-[#16120F] cursor-pointer disabled:opacity-50"
+                        >
+                          Withdraw
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            )
+          )}
 
-      {/* ============================================================ */}
-      {/* 4. PASS TAB (FOR HOST: PASS OFFERS)                          */}
-      {/* ============================================================ */}
-      {activeFilter === 'pass' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 animate-in fade-in duration-150">
-          {SAMPLE_PASS_OFFERS.map((item) => (
-            <div
-              key={item.id}
-              className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
-            >
-              <div>
-                <div className="flex items-center justify-between text-[11px] pb-3 mb-3 border-b border-[#EADBCA]/60">
-                  <span className="font-medium text-[#6E6A63]">{item.statusHeader}</span>
-                  <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">
-                    {item.refundBadge}
-                  </span>
-                </div>
+          {/* 2. COUNTER TAB */}
+          {activeFilter === 'counter' && (
+            counterOffers.length === 0 ? (
+              renderEmpty(
+                'No counter-offers right now',
+                'When a Guest proposes an alternate time or venue, it appears here for review.'
+              )
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-in fade-in duration-150">
+                {counterOffers.map((cnt) => (
+                  <div
+                    key={cnt.id}
+                    className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] sm:rounded-[28px] p-4 sm:p-6 shadow-xs flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] pb-3 mb-3 border-b border-[#EADBCA]/60">
+                        <span className="font-medium text-[#6E6A63]">{cnt.statusHeader}</span>
+                        {cnt.remainingTime && (
+                          <span className="text-[#9F1E19] font-semibold">{cnt.remainingTime}</span>
+                        )}
+                      </div>
 
-                <div className="flex items-center gap-3 mb-3">
-                  <img
-                    src={item.userAvatar}
-                    alt={item.userName}
-                    className="w-10 h-10 rounded-full object-cover border border-[#EADBCA]"
-                  />
-                  <div>
-                    <h3 className="font-serif font-bold text-sm text-[#16120F]">
-                      {item.userName}
-                    </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-[#6E6A63]">
-                      <span>{item.reliability} Reliability</span>
-                      <span>·</span>
-                      <span className="text-emerald-700 font-semibold flex items-center gap-0.5">
-                        <Check className="w-3 h-3" /> Verified
-                      </span>
+                      <div className="flex items-center gap-3 mb-4">
+                        <img
+                          src={cnt.userAvatar}
+                          alt={cnt.userName}
+                          className="w-12 h-12 rounded-full object-cover border border-[#EADBCA]"
+                        />
+                        <div>
+                          <h3 className="font-serif font-bold text-base text-[#16120F]">
+                            {cnt.userName}
+                          </h3>
+                          <p className="text-xs text-[#6E6A63]">
+                            {cnt.reliability.toFixed(2)} Reliability
+                          </p>
+                        </div>
+                      </div>
+
+                      {cnt.counterNote && (
+                        <div className="text-xs text-[#16120F] italic bg-[#FAF7F2] p-3 rounded-xl border border-[#EADBCA] mb-3">
+                          &ldquo;{cnt.counterNote}&rdquo;
+                        </div>
+                      )}
+
+                      <div className="space-y-3 mb-4">
+                        <div className="bg-[#F5EFE6] rounded-2xl p-3 border border-[#E5DDD0]">
+                          <span className="text-[10px] uppercase font-bold text-[#8A857D] block mb-1">
+                            Original Offer
+                          </span>
+                          <div className="text-xs font-bold text-[#16120F]">{cnt.occasion}</div>
+                          <div className="text-[11px] text-[#6E6A63]">{cnt.timeText}</div>
+                          <div className="text-[11px] text-[#6E6A63] mt-0.5">{cnt.venueName}</div>
+                        </div>
+
+                        <div className="bg-[#FAF7F2] rounded-2xl p-3 border-2 border-[#9F1E19]/30">
+                          <span className="text-[10px] uppercase font-bold text-[#9F1E19] block mb-1">
+                            Suggested Alternative
+                          </span>
+                          <div className="text-xs font-bold text-[#16120F]">
+                            {cnt.counterVenue || cnt.venueName}
+                          </div>
+                          <div className="text-[11px] text-[#6E6A63]">
+                            {cnt.counterTime || cnt.timeText}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-[#EADBCA] flex items-center gap-2">
+                      {isGuest ? (
+                        <button
+                          type="button"
+                          disabled={busyId === cnt.id}
+                          onClick={() => handleWithdraw(cnt.id)}
+                          className="w-full bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] py-2.5 rounded-full text-xs font-semibold cursor-pointer disabled:opacity-50"
+                        >
+                          Withdraw Counter
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            disabled={busyId === cnt.id}
+                            onClick={() => handleHostRespondCounter(cnt.id, 'ACCEPT')}
+                            className="flex-1 bg-[#9F1E19] hover:bg-[#851713] text-white py-2.5 rounded-full text-xs font-semibold cursor-pointer disabled:opacity-50"
+                          >
+                            Accept Counter
+                          </button>
+                          <button
+                            type="button"
+                            disabled={busyId === cnt.id}
+                            onClick={() => handleHostRespondCounter(cnt.id, 'DECLINE')}
+                            className="flex-1 bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] py-2.5 rounded-full text-xs font-semibold cursor-pointer disabled:opacity-50"
+                          >
+                            Decline
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
-                </div>
-
-                <p className="text-xs text-[#16120F] leading-relaxed mb-3">
-                  {item.note}
-                </p>
-
-                <p className="text-[10px] text-[#8A857D] italic border-t border-[#EADBCA]/50 pt-2">
-                  {item.registryNote}
-                </p>
+                ))}
               </div>
+            )
+          )}
 
-              <div className="pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onNavigateExplore) onNavigateExplore();
-                    else showToast('Navigating back to Discover feed...');
-                  }}
-                  className="w-full bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] py-2 rounded-full text-xs font-semibold transition-all cursor-pointer text-center"
-                >
-                  {item.buttonLabel}
-                </button>
+          {/* 3. PASS TAB */}
+          {activeFilter === 'pass' && (
+            passedOffers.length === 0 ? (
+              renderEmpty(
+                'No passed offers',
+                'Offers that were politely declined are recorded here.'
+              )
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 animate-in fade-in duration-150">
+                {passedOffers.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] p-5 shadow-xs flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] pb-3 mb-3 border-b border-[#EADBCA]/60">
+                        <span className="font-medium text-[#6E6A63]">{item.statusHeader}</span>
+                        <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+                          Escrow Released
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <img
+                          src={item.userAvatar}
+                          alt={item.userName}
+                          className="w-10 h-10 rounded-full object-cover border border-[#EADBCA]"
+                        />
+                        <div>
+                          <h3 className="font-serif font-bold text-sm text-[#16120F]">
+                            {item.userName}
+                          </h3>
+                          <p className="text-xs text-[#6E6A63]">
+                            {item.occasion} · {item.venueName}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-[#6E6A63] leading-relaxed">{item.note}</p>
+                    </div>
+                    <div className="pt-4">
+                      <button
+                        type="button"
+                        onClick={() => onNavigateExplore && onNavigateExplore()}
+                        className="w-full bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] py-2 rounded-full text-xs font-semibold cursor-pointer"
+                      >
+                        Explore
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            )
+          )}
 
-      {/* ============================================================ */}
-      {/* 5. EXPIRED / HISTORY TAB                                     */}
-      {/* ============================================================ */}
-      {activeFilter === 'expired' && (
-        <div className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] p-8 text-center max-w-lg mx-auto">
-          <Clock className="w-10 h-10 text-[#8A857D] mx-auto mb-3" />
-          <h3 className="font-serif font-bold text-lg text-[#16120F] mb-1">
-            Expired & Archived Itineraries
-          </h3>
-          <p className="text-xs text-[#6E6A63] leading-relaxed">
-            Offers that lapsed past their 48-hour deadline or completed historical dates are preserved here for safety and accountability.
-          </p>
-        </div>
+          {/* 4. EXPIRED / HISTORY TAB */}
+          {activeFilter === 'expired' && (
+            archivedOffers.length === 0 ? (
+              renderEmpty(
+                'Expired & Archived Itineraries',
+                'Offers that lapsed past their 48-hour deadline or completed historical dates are preserved here.'
+              )
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-in fade-in duration-150">
+                {archivedOffers.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-[#FAF7F2] border border-[#EADBCA] rounded-[24px] p-5 shadow-xs space-y-3"
+                  >
+                    <div className="flex items-center justify-between text-[11px] pb-2.5 border-b border-[#EADBCA]/60">
+                      <span className="font-semibold text-[#6E6A63]">{item.statusHeader}</span>
+                      <span className="text-[#8A857D]">{item.timeText}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={item.userAvatar}
+                        alt={item.userName}
+                        className="w-11 h-11 rounded-full object-cover border border-[#EADBCA]"
+                      />
+                      <div>
+                        <h3 className="font-serif font-bold text-sm text-[#16120F]">
+                          {item.userName}
+                        </h3>
+                        <p className="text-xs text-[#6E6A63]">
+                          {item.occasion} · {item.venueName}
+                        </p>
+                      </div>
+                    </div>
+                    {item.chatOpen && onOpenChat && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenChat(item)}
+                        className="px-4 py-1.5 rounded-full bg-white border border-[#E5DDD0] hover:border-[#9F1E19] text-xs font-semibold text-[#16120F] cursor-pointer"
+                      >
+                        View chat history
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )
+          )}
+        </>
       )}
 
       {/* Counter Modal */}
@@ -814,46 +733,31 @@ export function OffersView({ onOpenChat, onNavigateExplore }: OffersViewProps) {
           defaultOccasion={activeCounterOffer.occasion}
           defaultGiftAmount={activeCounterOffer.escrowAmount}
           onClose={() => setActiveCounterOffer(null)}
-          onSubmitSuccess={(counterData) => {
+          onSubmitSuccess={async (counterData) => {
+            const targetId = activeCounterOffer.id;
             setActiveCounterOffer(null);
-            setGuestOffers((prev) => prev.filter((o) => o.id !== activeCounterOffer.id));
-            setCounterList((prev) => [
-              {
-                id: `cnt-${Date.now()}`,
-                statusHeader: 'Counter is pending - Action Required',
-                respondTime: '~48h remaining',
-                userName: activeCounterOffer.userName,
-                userAvatar: activeCounterOffer.userAvatar,
-                reliability: activeCounterOffer.reliability,
-                isVerified: true,
-                guestName: 'You',
-                note: counterData.note || 'Suggested an alternative schedule and venue.',
-                originalOccasion: activeCounterOffer.occasion,
-                originalTime: activeCounterOffer.timeText,
-                originalEscrow: activeCounterOffer.escrowAmount,
-                originalVenue: activeCounterOffer.venueName,
-                originalLocation: activeCounterOffer.venueLocation,
-                suggestedOccasion: counterData.occasion,
-                suggestedTime: counterData.time,
-                suggestedEscrow: counterData.giftAmount,
-                suggestedVenue: counterData.venue,
-                suggestedLocation: 'New York',
-              },
-              ...prev,
-            ]);
-            setActiveFilter('counter');
-            showToast('Counter offer sent to host successfully!');
+            try {
+              await api.offers.respond(targetId, {
+                action: 'COUNTER',
+                counterVenue: counterData.venue,
+                counterNote: counterData.note,
+              });
+              setActiveFilter('counter');
+              showToast('Counter offer sent to host successfully!');
+              await loadOffers();
+            } catch (err: any) {
+              showToast(err?.message || 'Unable to submit counter-offer.');
+            }
           }}
         />
       )}
 
-      {/* Toast Notification */}
+      {/* Toast */}
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#16120F] text-white text-xs px-5 py-3 rounded-full shadow-lg z-50 animate-bounce">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#16120F] text-white text-xs px-5 py-3 rounded-full shadow-lg z-50">
           {toastMessage}
         </div>
       )}
-
     </div>
   );
 }
