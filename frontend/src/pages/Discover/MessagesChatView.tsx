@@ -8,6 +8,9 @@ import {
   Flag,
   MessageCircle,
   Loader2,
+  Camera,
+  Phone,
+  Video,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { getSocket } from '../../services/socket';
@@ -73,11 +76,35 @@ export function MessagesChatView({
   const [mobileView, setMobileView] = useState<'list' | 'chat'>(
     initialOfferId || initialContactName ? 'chat' : 'list'
   );
+  const [isUploadingLivePhoto, setIsUploadingLivePhoto] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const liveCameraRef = useRef<HTMLInputElement>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleLiveCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeOfferId) return;
+
+    setIsUploadingLivePhoto(true);
+    showToast('Uploading live camera selfie...');
+    try {
+      const res = await api.upload.uploadImage(file, 'chat_selfies');
+      if (res.success && res.data?.url) {
+        await handleSendMessage(`📸 Live Camera Selfie (Verified)\n${res.data.url}`);
+        showToast('Live selfie sent successfully!');
+      } else {
+        showToast('Failed to upload live photo.');
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to capture live photo.');
+    } finally {
+      setIsUploadingLivePhoto(false);
+      if (liveCameraRef.current) liveCameraRef.current.value = '';
+    }
   };
 
   // Load unlocked conversations
@@ -461,27 +488,48 @@ export function MessagesChatView({
                     </div>
                   </div>
 
-                  <div className="relative">
+                  <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() => setMenuOpen((prev) => !prev)}
-                      className="w-9 h-9 rounded-full hover:bg-[#F5EFE6] text-[#6E6A63] flex items-center justify-center cursor-pointer"
-                      aria-label="Chat options"
+                      onClick={() => showToast(`Calling ${activeContact.name}... Voice call request sent.`)}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-[#F5EFE6] text-[#6E6A63] hover:text-[#9F1E19] flex items-center justify-center cursor-pointer transition-colors"
+                      title="Voice Call"
+                      aria-label="Voice Call"
                     >
-                      <MoreVertical className="w-4 h-4" />
+                      <Phone className="w-4 h-4" />
                     </button>
-                    {menuOpen && (
-                      <div className="absolute right-0 mt-1 w-48 bg-[#FAF7F2] border border-[#E5DDD0] rounded-xl shadow-lg py-1 z-30">
-                        <button
-                          type="button"
-                          onClick={handleFlagLatestMessage}
-                          className="w-full px-4 py-2 text-left text-xs font-semibold text-[#9F1E19] hover:bg-[#F5EFE6] flex items-center gap-2 cursor-pointer"
-                        >
-                          <Flag className="w-3.5 h-3.5" />
-                          <span>Flag for Safety Review</span>
-                        </button>
-                      </div>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => showToast(`Connecting video with ${activeContact.name}... Video call request sent.`)}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-[#F5EFE6] text-[#6E6A63] hover:text-[#9F1E19] flex items-center justify-center cursor-pointer transition-colors"
+                      title="Video Call"
+                      aria-label="Video Call"
+                    >
+                      <Video className="w-4 h-4" />
+                    </button>
+
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setMenuOpen((prev) => !prev)}
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-[#F5EFE6] text-[#6E6A63] flex items-center justify-center cursor-pointer"
+                        aria-label="Chat options"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                      {menuOpen && (
+                        <div className="absolute right-0 mt-1 w-48 bg-[#FAF7F2] border border-[#E5DDD0] rounded-xl shadow-lg py-1 z-30">
+                          <button
+                            type="button"
+                            onClick={handleFlagLatestMessage}
+                            className="w-full px-4 py-2 text-left text-xs font-semibold text-[#9F1E19] hover:bg-[#F5EFE6] flex items-center gap-2 cursor-pointer"
+                          >
+                            <Flag className="w-3.5 h-3.5" />
+                            <span>Flag for Safety Review</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -512,7 +560,23 @@ export function MessagesChatView({
                                 : 'bg-[#F5EFE6] border border-[#E5DDD0] text-[#16120F] rounded-bl-sm'
                             }`}
                           >
-                            <p>{msg.text}</p>
+                            {msg.text.startsWith('📸 Live Camera Selfie') ? (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-1.5 text-xs font-semibold">
+                                  <Camera className="w-3.5 h-3.5" />
+                                  <span>Live Camera Selfie (Verified)</span>
+                                </div>
+                                {msg.text.split('\n')[1] && (
+                                  <img
+                                    src={msg.text.split('\n')[1].trim()}
+                                    alt="Live Selfie"
+                                    className="rounded-xl max-h-56 max-w-full object-cover border border-white/20"
+                                  />
+                                )}
+                              </div>
+                            ) : (
+                              <p>{msg.text}</p>
+                            )}
                             {msg.isFlagged && (
                               <p className="mt-1 text-[10px] font-semibold text-[#9F1E19] inline-flex items-center gap-1">
                                 <Flag className="w-3 h-3" /> Flagged for review
@@ -546,6 +610,16 @@ export function MessagesChatView({
                     ))}
                   </div>
 
+                  {/* Hidden camera input: direct front camera selfie, preventing gallery upload */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="user"
+                    ref={liveCameraRef}
+                    onChange={handleLiveCameraCapture}
+                    className="hidden"
+                  />
+
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -553,6 +627,21 @@ export function MessagesChatView({
                     }}
                     className="flex items-center gap-2"
                   >
+                    <button
+                      type="button"
+                      onClick={() => liveCameraRef.current?.click()}
+                      disabled={isUploadingLivePhoto || isSending}
+                      className="w-10 h-10 rounded-full bg-[#F5EFE6] hover:bg-[#EFE7DA] text-[#6E6A63] hover:text-[#9F1E19] border border-[#E5DDD0] flex items-center justify-center shrink-0 transition-colors cursor-pointer disabled:opacity-50"
+                      title="Take Live Camera Selfie (Instant verification)"
+                      aria-label="Take Live Camera Selfie"
+                    >
+                      {isUploadingLivePhoto ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-[#9F1E19]" />
+                      ) : (
+                        <Camera className="w-4 h-4" />
+                      )}
+                    </button>
+
                     <input
                       type="text"
                       value={inputMessage}

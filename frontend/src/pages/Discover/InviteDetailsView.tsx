@@ -120,11 +120,11 @@ export function InviteDetailsView({
           </a>
         </div>
 
-        {/* Eyebrow: — New offer to [Name] */}
+        {/* Eyebrow: — Date Invitation to [Name] */}
         <div className="flex items-center gap-2 mt-6 sm:mt-7">
           <span className="w-4 h-[1.5px] bg-[#9F1E19]"></span>
           <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
-            New offer to {targetProfileName}
+            Date Invitation to {targetProfileName}
           </span>
         </div>
 
@@ -235,10 +235,10 @@ export function InviteDetailsView({
             )}
           </div>
 
-          {/* 4. Gift Amount */}
+          {/* 4. Courtesy Gift / Appreciation */}
           <div>
             <label className="block text-xs font-semibold text-[#16120F] mb-2.5">
-              Gift Amount
+              Courtesy Gift / Appreciation
             </label>
             
             {/* Display / Input box */}
@@ -346,11 +346,11 @@ export function InviteDetailsView({
                 className="w-full sm:w-auto bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 px-9 rounded-full shadow-sm transition-all active:scale-[0.99] cursor-pointer inline-flex items-center justify-center gap-2"
               >
                 <Send className="w-3.5 h-3.5 rotate-45" />
-                <span>Send offer</span>
+                <span>Send Date Invitation</span>
               </button>
 
               <p className="text-[11px] sm:text-xs text-[#8A857D] mt-2.5 text-center sm:text-left">
-                Expires in 48 hours · Chat opens once she accepts
+                Expires in 48 hours · Private chat unlocks once accepted
               </p>
             </div>
           </div>

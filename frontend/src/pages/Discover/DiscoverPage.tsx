@@ -207,7 +207,19 @@ export function DiscoverPage({
           isIdVerified: Boolean(item.isIdVerified ?? item.isVerified),
           isSelfieVerified: Boolean(item.isSelfieVerified ?? item.isVerified),
         }));
-        setProfiles(mapped);
+        let result = mapped;
+        if (searchPreferences.interests && searchPreferences.interests.length > 0) {
+          result = result.filter((p) => {
+            const pInterests = (p.interests || []).map((i) => i.toLowerCase());
+            const bio = (p.bio || '').toLowerCase();
+            const openTo = (p.openTo || []).map((o) => o.toLowerCase());
+            return searchPreferences.interests!.some((int) => {
+              const lower = int.toLowerCase();
+              return pInterests.includes(lower) || bio.includes(lower) || openTo.includes(lower);
+            });
+          });
+        }
+        setProfiles(result);
       } else {
         setProfiles([]);
       }
@@ -357,6 +369,7 @@ export function DiscoverPage({
     if (searchPreferences.drinking) count++;
     if (searchPreferences.children) count++;
     if (searchPreferences.education && searchPreferences.education.length > 0) count++;
+    if (searchPreferences.interests && searchPreferences.interests.length > 0) count++;
     if (searchPreferences.lookingFor && searchPreferences.lookingFor.length > 0) count++;
     if (searchPreferences.bodyTypes && searchPreferences.bodyTypes.length > 0) count++;
     if (

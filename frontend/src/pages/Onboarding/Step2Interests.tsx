@@ -10,12 +10,12 @@ interface Step2InterestsProps {
 export function Step2Interests({ onBack, onContinue }: Step2InterestsProps) {
   // Pre-select the exact 6 items from the Figma screenshot
   const [selectedInterests, setSelectedInterests] = useState<string[]>([
-    'Win bars',
+    'Wine bars',
     'Brunch',
     'Live music',
     'Galleries',
     'Travel',
-    'Dog',
+    'Dogs',
   ]);
 
   const [submitted, setSubmitted] = useState(false);
@@ -23,7 +23,7 @@ export function Step2Interests({ onBack, onContinue }: Step2InterestsProps) {
   const categories: InterestCategory[] = [
     {
       title: 'Food & Drink',
-      items: ['Win bars', 'Sushi', 'Brunch', 'Coffee', 'Cooking'],
+      items: ['Wine bars', 'Sushi', 'Brunch', 'Coffee', 'Cooking'],
     },
     {
       title: 'Out & About',
@@ -31,7 +31,7 @@ export function Step2Interests({ onBack, onContinue }: Step2InterestsProps) {
     },
     {
       title: 'Chill & Create',
-      items: ['Movies', 'Books', 'Dancing', 'Dog', 'Fitness'],
+      items: ['Movies', 'Books', 'Dancing', 'Dogs', 'Fitness'],
     },
   ];
 

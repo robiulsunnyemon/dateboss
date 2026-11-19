@@ -354,7 +354,7 @@ export function LandingPage({
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
                     <span className="text-[#F3A83B] text-sm leading-none">👑</span>
-                    <span className="font-medium">Host</span>
+                    <span className="font-medium">Host (Men)</span>
                   </div>
                   <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
                     You Send The Offers. Pick The Place And The Time.
@@ -366,7 +366,7 @@ export function LandingPage({
                   onClick={onJoinAsHost}
                   className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#16120F] font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
                 >
-                  Join as a Host
+                  Join as a Host (Men)
                 </button>
               </div>
 
@@ -375,7 +375,7 @@ export function LandingPage({
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
                     <span className="text-[#8E8A83] text-sm leading-none">👑</span>
-                    <span className="font-medium">Guest of Honor</span>
+                    <span className="font-medium">Guest of Honor (Women)</span>
                   </div>
                   <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
                     You Receive The Offers. Say Yes, Counter Or Pass.
@@ -387,7 +387,7 @@ export function LandingPage({
                   onClick={onJoinAsGuest}
                   className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
                 >
-                  Join as a Guest of Honor
+                  Join as a Guest of Honor (Women)
                 </button>
               </div>
 

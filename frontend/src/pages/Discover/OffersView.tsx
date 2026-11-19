@@ -106,16 +106,16 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
 
           if (rawStatus === 'ACCEPTED') {
             statusType = 'accepted';
-            statusHeader = 'Offer Accepted · Date Confirmed';
+            statusHeader = 'Invitation Accepted · Date Confirmed';
             statusBadgeText = 'Chat Unlocked';
           } else if (rawStatus === 'COUNTERED') {
             statusType = 'counter';
             statusHeader = isGuest
-              ? 'Counter Sent · Awaiting Host'
-              : 'Counter Received · Action Required';
+              ? 'Counter-Proposal Sent · Awaiting Host'
+              : 'Counter-Proposal Received · Action Required';
           } else if (rawStatus === 'PASSED') {
             statusType = 'pass';
-            statusHeader = 'Offer Passed';
+            statusHeader = 'Invitation Passed';
           } else if (
             rawStatus === 'EXPIRED' ||
             rawStatus === 'CANCELLED' ||
@@ -127,7 +127,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
                 ? 'Completed Date'
                 : rawStatus === 'CANCELLED'
                 ? 'Withdrawn / Cancelled'
-                : 'Offer Expired (48h)';
+                : 'Invitation Expired (48h)';
           }
 
           return {
@@ -192,8 +192,8 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
       await api.offers.respond(offerId, { action });
       showToast(
         action === 'ACCEPT'
-          ? `You accepted ${hostName}'s offer! Date confirmed and chat is unlocked.`
-          : `Politely passed on ${hostName}'s offer.`
+          ? `You accepted ${hostName}'s invitation! Date confirmed and chat is unlocked.`
+          : `Politely passed on ${hostName}'s invitation.`
       );
       await loadOffers();
     } catch (err: any) {
@@ -212,8 +212,8 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
       await api.offers.hostRespond(offerId, action);
       showToast(
         action === 'ACCEPT'
-          ? 'Counter-offer accepted! Date confirmed and chat unlocked.'
-          : 'Counter-offer declined.'
+          ? 'Counter-proposal accepted! Date confirmed and chat unlocked.'
+          : 'Counter-proposal declined.'
       );
       await loadOffers();
     } catch (err: any) {
@@ -227,7 +227,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
     setBusyId(offerId);
     try {
       await api.offers.withdraw(offerId);
-      showToast('Offer withdrawn successfully.');
+      showToast('Invitation withdrawn successfully.');
       await loadOffers();
     } catch (err: any) {
       showToast(err?.message || 'Unable to withdraw offer.');
@@ -258,7 +258,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
       {/* Eyebrow */}
       <div className="flex items-center gap-2 mb-1.5">
         <span className="w-5 h-[1.5px] bg-[#9F1E19]" />
-        <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">Offers</span>
+        <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">Date Invitations</span>
       </div>
 
       {/* Headline */}
@@ -376,7 +376,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
           {((isGuest && activeFilter === 'received') || (!isGuest && activeFilter === 'sent')) && (
             activeOffers.length === 0 ? (
               renderEmpty(
-                isGuest ? 'No incoming offers yet' : 'No active offers sent yet',
+                isGuest ? 'No incoming invitations yet' : 'No active invitations sent yet',
                 isGuest
                   ? 'Verified hosts can send you curated invitations at vetted public venues.'
                   : 'Browse Discover to invite a Guest of Honor to a curated dinner or outing.'
@@ -436,7 +436,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
 
                         <div className="text-xs font-bold text-emerald-800 flex items-center gap-1">
                           <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                          <span>${offer.escrowAmount} Locked in Escrow</span>
+                          <span>${offer.escrowAmount} Courtesy Gift (Held in Escrow)</span>
                         </div>
 
                         <div>
@@ -453,6 +453,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
                       </div>
 
                       <div className="text-xs text-[#16120F] italic bg-[#FAF7F2] p-3 rounded-xl border border-[#EADBCA] mb-4">
+                        <span className="not-italic font-semibold text-[#9F1E19]">{offer.userName} imagines: </span>
                         &ldquo;{offer.note}&rdquo;
                       </div>
                     </div>
@@ -508,7 +509,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
                           onClick={() => handleWithdraw(offer.id)}
                           className="px-4 py-2 rounded-full bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-xs font-semibold text-[#16120F] cursor-pointer disabled:opacity-50"
                         >
-                          Withdraw
+                          Withdraw Invitation
                         </button>
                       </div>
                     )}
@@ -522,7 +523,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
           {activeFilter === 'counter' && (
             counterOffers.length === 0 ? (
               renderEmpty(
-                'No counter-offers right now',
+                'No counter-proposals right now',
                 'When a Guest proposes an alternate time or venue, it appears here for review.'
               )
             ) : (
@@ -565,7 +566,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
                       <div className="space-y-3 mb-4">
                         <div className="bg-[#F5EFE6] rounded-2xl p-3 border border-[#E5DDD0]">
                           <span className="text-[10px] uppercase font-bold text-[#8A857D] block mb-1">
-                            Original Offer
+                            Original Invitation
                           </span>
                           <div className="text-xs font-bold text-[#16120F]">{cnt.occasion}</div>
                           <div className="text-[11px] text-[#6E6A63]">{cnt.timeText}</div>
@@ -594,7 +595,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
                           onClick={() => handleWithdraw(cnt.id)}
                           className="w-full bg-[#FAF7F2] hover:bg-[#F5F1E6] border border-[#D9CFC1] text-[#16120F] py-2.5 rounded-full text-xs font-semibold cursor-pointer disabled:opacity-50"
                         >
-                          Withdraw Counter
+                          Withdraw Counter-Proposal
                         </button>
                       ) : (
                         <>
@@ -604,7 +605,7 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
                             onClick={() => handleHostRespondCounter(cnt.id, 'ACCEPT')}
                             className="flex-1 bg-[#9F1E19] hover:bg-[#851713] text-white py-2.5 rounded-full text-xs font-semibold cursor-pointer disabled:opacity-50"
                           >
-                            Accept Counter
+                            Accept Proposal
                           </button>
                           <button
                             type="button"
@@ -627,8 +628,8 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
           {activeFilter === 'pass' && (
             passedOffers.length === 0 ? (
               renderEmpty(
-                'No passed offers',
-                'Offers that were politely declined are recorded here.'
+                'No passed invitations',
+                'Invitations that were politely declined are recorded here.'
               )
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 animate-in fade-in duration-150">
@@ -680,8 +681,8 @@ export function OffersView({ onNavigateExplore, onOpenChat }: OffersViewProps) {
           {activeFilter === 'expired' && (
             archivedOffers.length === 0 ? (
               renderEmpty(
-                'Expired & Archived Itineraries',
-                'Offers that lapsed past their 48-hour deadline or completed historical dates are preserved here.'
+                'Expired & Archived Invitations',
+                'Invitations that lapsed past their 48-hour deadline or completed historical dates are preserved here.'
               )
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-in fade-in duration-150">

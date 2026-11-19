@@ -17,8 +17,26 @@ export interface SearchPreferenceFilters {
   children: 'No' | 'Yes' | null;
   bodyTypes: string[];
   education: string[];
+  interests?: string[];
   keywords: string;
 }
+
+const INTEREST_OPTIONS = [
+  'Wine bars',
+  'Brunch',
+  'Dogs',
+  'Live music',
+  'Galleries',
+  'Hiking',
+  'Travel',
+  'Sushi',
+  'Coffee',
+  'Cooking',
+  'Fitness',
+  'Movies',
+  'Dancing',
+  'Theatre',
+];
 
 interface SearchPreferenceModalProps {
   isOpen: boolean;
@@ -65,6 +83,7 @@ export function SearchPreferenceModal({
 
   const [bodyTypes, setBodyTypes] = useState<string[]>(initialFilters?.bodyTypes || []);
   const [education, setEducation] = useState<string[]>(initialFilters?.education || []);
+  const [interests, setInterests] = useState<string[]>(initialFilters?.interests || []);
   const [keywords, setKeywords] = useState(initialFilters?.keywords || '');
 
   useEffect(() => {
@@ -82,6 +101,7 @@ export function SearchPreferenceModal({
     setChildren(initialFilters?.children || null);
     setBodyTypes(initialFilters?.bodyTypes || []);
     setEducation(initialFilters?.education || []);
+    setInterests(initialFilters?.interests || []);
     setKeywords(initialFilters?.keywords || '');
   }, [isOpen, initialFilters]);
 
@@ -108,6 +128,12 @@ export function SearchPreferenceModal({
     );
   };
 
+  const toggleInterest = (item: string) => {
+    setInterests((prev) =>
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+    );
+  };
+
   const handleApply = () => {
     onApply({
       location,
@@ -125,6 +151,7 @@ export function SearchPreferenceModal({
       children,
       bodyTypes,
       education,
+      interests,
       keywords,
     });
     onClose();
@@ -144,6 +171,7 @@ export function SearchPreferenceModal({
     setChildren(null);
     setBodyTypes([]);
     setEducation([]);
+    setInterests([]);
     setKeywords('');
     onReset();
   };
@@ -441,6 +469,35 @@ export function SearchPreferenceModal({
                         </div>
                         <span className="truncate">{item}</span>
                       </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* What are their interests? Section (Client requested specific wording) */}
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-[#FAF7F2] mb-1.5">
+                What are their interests?
+              </label>
+              <div className="bg-[#FAF7F2] rounded-[22px] p-3.5 text-[#16120F] shadow-xs">
+                <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto pr-1">
+                  {INTEREST_OPTIONS.map((item) => {
+                    const isSelected = interests.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => toggleInterest(item)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#9F1E19] text-white shadow-xs'
+                            : 'bg-[#F5F1E6] border border-[#E5DECF] text-[#524D46] hover:border-[#9F1E19]/40'
+                        }`}
+                      >
+                        {isSelected && <Check className="w-3 h-3 inline mr-1 stroke-[2.5]" />}
+                        {item}
+                      </button>
                     );
                   })}
                 </div>

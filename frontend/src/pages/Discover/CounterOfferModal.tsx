@@ -70,11 +70,11 @@ export function CounterOfferModal({
           </div>
 
           <div className="text-[11px] font-semibold uppercase tracking-wider text-[#9F1E19] mb-1">
-            New offer to {recipientName}
+            Adjust invitation details for {recipientName}
           </div>
 
           <h1 className="font-serif text-2xl sm:text-[26px] font-bold text-[#16120F] leading-tight mb-4">
-            What Are You Inviting Her To?
+            Suggest Alternate Time & Place
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -145,10 +145,10 @@ export function CounterOfferModal({
               />
             </div>
 
-            {/* Gift Amount */}
+            {/* Courtesy Gift / Appreciation */}
             <div>
               <label className="block text-xs font-bold text-[#16120F] mb-1.5">
-                Gift Amount
+                Courtesy Gift / Appreciation
               </label>
               <div className="flex flex-wrap gap-2 mb-2">
                 {GIFT_TIERS.map((amt) => (
@@ -226,10 +226,10 @@ export function CounterOfferModal({
                 disabled={isSubmitting}
                 className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white py-3 rounded-full font-semibold text-xs transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
-                {isSubmitting ? 'Submitting Counter...' : 'Send offer'}
+                {isSubmitting ? 'Submitting Counter...' : 'Send Counter-Proposal'}
               </button>
               <p className="text-[10px] text-center text-[#8A857D] mt-2">
-                Expires in 48 hours · Chat opens once accepted
+                Expires in 48 hours · Private chat unlocks once accepted
               </p>
             </div>
           </form>

@@ -230,29 +230,35 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
                   </div>
                 </div>
 
-                <div className="bg-[#F5EFE6] rounded-[18px] p-3.5 mb-3 border border-[#E5DDD0] space-y-2.5">
+                {/* Celebratory Approved Green Venue Box (Client Meeting Requirement) */}
+                <div className="bg-[#ECFDF5]/90 rounded-[20px] p-4 mb-3.5 border-2 border-[#10B981]/40 space-y-3 shadow-xs">
                   <div>
-                    <div className="text-[10px] uppercase font-semibold text-[#9F1E19] tracking-wider">
-                      Reserved Venue
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#059669] text-white text-[10px] sm:text-[11px] font-bold tracking-wide uppercase inline-flex items-center gap-1 shadow-xs">
+                        <Check className="w-3 h-3 stroke-[3]" /> Reserved Venue
+                      </span>
+                      <span className="text-[11px] font-semibold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded-full">
+                        Confirmed &amp; Approved
+                      </span>
                     </div>
-                    <div className="text-xs sm:text-[13px] font-bold text-[#16120F] mt-0.5">
+                    <div className="text-base sm:text-lg font-serif font-bold text-[#065F46] mt-1.5 leading-snug">
                       {item.venueName}
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-[#6E6A63] mt-0.5">
-                      <MapPin className="w-3 h-3 text-[#9F1E19] shrink-0" />
-                      <span>{item.venueAddress}</span>
+                    <div className="flex items-center gap-1.5 text-xs text-[#047857] mt-1">
+                      <MapPin className="w-3.5 h-3.5 text-[#059669] shrink-0" />
+                      <span className="font-medium">{item.venueAddress}</span>
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-[#E5DDD0]/70">
-                    <div className="text-[10px] uppercase font-semibold text-[#9F1E19] tracking-wider">
-                      Reserved Time
+                  <div className="pt-2.5 border-t border-[#10B981]/20">
+                    <div className="text-[10px] uppercase font-bold text-[#065F46] tracking-wider">
+                      Reserved Date &amp; Time
                     </div>
-                    <div className="text-xs sm:text-[13px] font-bold text-[#16120F] mt-0.5">
+                    <div className="text-xs sm:text-sm font-semibold text-[#16120F] mt-0.5">
                       {item.dateTime}
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-[#6E6A63] mt-0.5">
-                      <Calendar className="w-3 h-3 text-[#9F1E19] shrink-0" />
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#6E6A63] mt-0.5">
+                      <Calendar className="w-3 h-3 text-[#059669] shrink-0" />
                       <span>{item.courtesyWindow}</span>
                     </div>
                   </div>

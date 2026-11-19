@@ -101,7 +101,7 @@ export function Step1Begin({
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 text-xs text-[#6E6A63]">
                 <span className="text-[#FCB943] text-sm leading-none">👑</span>
-                <span className="font-medium">Host</span>
+                <span className="font-medium">Host (Men)</span>
               </div>
               <h3 className="font-serif font-bold text-[#16120F] text-base sm:text-lg leading-snug">
                 You Send The Offers. Pick The Place And The Time.
@@ -124,7 +124,7 @@ export function Step1Begin({
               }}
               className="w-full bg-[#FCB943] hover:bg-[#E09C2C] text-[#16120F] font-bold text-xs py-3.5 px-4 rounded-full transition-colors mt-4 text-center shadow-xs cursor-pointer active:scale-[0.99]"
             >
-              Join as a Host
+              Join as a Host (Men)
             </button>
           </div>
 
@@ -133,7 +133,7 @@ export function Step1Begin({
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 text-xs text-[#6E6A63]">
                 <span className="text-[#8E8A83] text-sm leading-none">👑</span>
-                <span className="font-medium">Guest of Honor</span>
+                <span className="font-medium">Guest of Honor (Women)</span>
               </div>
               <h3 className="font-serif font-bold text-[#16120F] text-base sm:text-lg leading-snug">
                 You Receive The Offers. Say Yes, Counter Or Pass.
@@ -156,7 +156,7 @@ export function Step1Begin({
               }}
               className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-3.5 px-4 rounded-full transition-colors mt-4 text-center shadow-xs cursor-pointer active:scale-[0.99]"
             >
-              Join as a Guest of Honor
+              Join as a Guest of Honor (Women)
             </button>
           </div>
 

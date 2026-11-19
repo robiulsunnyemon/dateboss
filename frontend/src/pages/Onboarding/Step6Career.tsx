@@ -6,8 +6,8 @@ interface Step6CareerProps {
   onContinue?: (data: {
     education: string;
     occupation: string;
-    annualIncome: string;
-    netWorth: string;
+    annualIncome?: string;
+    netWorth?: string;
   }) => void;
 }
 
@@ -20,35 +20,15 @@ const EDUCATION_OPTIONS = [
   'Post-Doctoral',
 ];
 
-const FINANCIAL_BRACKETS = [
-  '< US $50,000',
-  'US $50,000',
-  'US $100,000',
-  'US $125,000',
-  'US $150,000',
-  'US $175,000',
-  'US $200,000',
-  'US $250,000',
-  'US $300,000',
-  'US $400,000',
-  'US $500,000',
-  'US $1,000,000',
-  'US $1,000,000+',
-];
-
 export function Step6Career({ onBack, onContinue }: Step6CareerProps) {
-  const [education, setEducation] = useState<string>('High school');
+  const [education, setEducation] = useState<string>('Bachelors Deg');
   const [occupation, setOccupation] = useState<string>('');
-  const [annualIncome, setAnnualIncome] = useState<string>('< US $50,000');
-  const [netWorth, setNetWorth] = useState<string>('< US $50,000');
 
   const handleContinue = () => {
     if (onContinue) {
       onContinue({
         education,
         occupation: occupation.trim() || 'Professional',
-        annualIncome,
-        netWorth,
       });
     }
   };
@@ -137,60 +117,6 @@ export function Step6Career({ onBack, onContinue }: Step6CareerProps) {
                 placeholder="Type your occupation here..."
                 className="w-full bg-[#F5F1E6] border border-[#E5DECF] rounded-full px-5 py-3 text-xs sm:text-sm text-[#16120F] placeholder:text-[#6E6A63] focus:outline-none focus:border-[#9F1E19] focus:ring-1 focus:ring-[#9F1E19] transition-colors"
               />
-            </div>
-          </div>
-
-          {/* Section 3: Annual Income */}
-          <div>
-            <h2 className="font-serif font-bold text-sm sm:text-base text-[#16120F] mb-3">
-              Annual Income
-            </h2>
-            <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
-              {FINANCIAL_BRACKETS.map((bracket) => {
-                const isSelected = annualIncome === bracket;
-                return (
-                  <button
-                    key={bracket}
-                    type="button"
-                    onClick={() => setAnnualIncome(bracket)}
-                    className={`inline-flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
-                      isSelected
-                        ? 'bg-[#16120F] text-white shadow-sm'
-                        : 'bg-[#F5F1E6] border border-[#E5DECF] text-[#6E6A63] hover:border-[#16120F]/30'
-                    }`}
-                  >
-                    {isSelected && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
-                    <span>{bracket}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Section 4: Net Worth */}
-          <div>
-            <h2 className="font-serif font-bold text-sm sm:text-base text-[#16120F] mb-3">
-              Net Worth
-            </h2>
-            <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
-              {FINANCIAL_BRACKETS.map((bracket) => {
-                const isSelected = netWorth === bracket;
-                return (
-                  <button
-                    key={bracket}
-                    type="button"
-                    onClick={() => setNetWorth(bracket)}
-                    className={`inline-flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
-                      isSelected
-                        ? 'bg-[#16120F] text-white shadow-sm'
-                        : 'bg-[#F5F1E6] border border-[#E5DECF] text-[#6E6A63] hover:border-[#16120F]/30'
-                    }`}
-                  >
-                    {isSelected && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
-                    <span>{bracket}</span>
-                  </button>
-                );
-              })}
             </div>
           </div>
         </div>
