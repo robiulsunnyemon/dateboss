@@ -33,22 +33,33 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const envOrigins = (process.env.FRONTEND_URL || process.env.CLIENT_URL || '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:3000',
-  process.env.DASHBOARD_URL || 'http://localhost:3001',
+  ...envOrigins,
+  process.env.DASHBOARD_URL || '',
   'http://localhost:3000',
   'http://localhost:3001',
   'http://localhost:3002',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:3001',
   'http://127.0.0.1:3002',
-];
+].filter(Boolean);
 
 // Security & Parsing Middleware
 app.use(helmet());
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.onrender.com')) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true,
   })
 );

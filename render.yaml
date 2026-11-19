@@ -1,0 +1,65 @@
+services:
+  # 1. Backend API & WebSockets (Node.js Express + Socket.io)
+  - type: web
+    name: thedateboss-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://thedateboss-frontend.onrender.com,https://thedateboss-admin.onrender.com
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dhjxwregt
+      - key: CLOUDINARY_API_KEY
+        value: 869394758679847
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+
+  # 2. Main User Frontend (Static Site with Global CDN)
+  - type: web
+    name: thedateboss-frontend
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://thedateboss-backend.onrender.com/api
+      - key: VITE_SOCKET_URL
+        value: https://thedateboss-backend.onrender.com
+
+  # 3. Admin Management Dashboard (Static Site with Global CDN)
+  - type: web
+    name: thedateboss-admin
+    runtime: static
+    plan: free
+    rootDir: client-dashboard
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://thedateboss-backend.onrender.com/api

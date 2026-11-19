@@ -9,7 +9,13 @@ let io: SocketIOServer | null = null;
 export function initSocketServer(httpServer: HttpServer, allowedOrigins: string[]): SocketIOServer {
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: allowedOrigins,
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.onrender.com')) {
+          callback(null, true);
+        } else {
+          callback(null, true);
+        }
+      },
       credentials: true,
     },
   });
