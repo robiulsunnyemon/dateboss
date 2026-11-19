@@ -14,164 +14,27 @@ import {
   Send,
   Award,
 } from 'lucide-react';
-import { dashboardApi } from '../services/api';
+import {
+  useDashboard,
+  DirectoryMember,
+  SubscriptionPlan,
+  PlanFeature,
+  MemberRole,
+  MembershipTier,
+  VerificationBadge,
+} from '../context/DashboardContext';
 
 type DirectoryTab = 'directory' | 'plans';
-type MemberRole = 'Host' | 'Guest of Honor';
-type MembershipTier = 'Gold' | 'Complimentary';
-type VerificationBadge = 'Verified' | 'Pending review';
-
-interface DirectoryMember {
-  id: string;
-  name: string;
-  email: string;
-  role: MemberRole;
-  membership: MembershipTier;
-  verification: VerificationBadge;
-  joined: string;
-  city: string;
-  avatar: string;
-}
-
-const DEFAULT_DIRECTORY_MEMBERS: DirectoryMember[] = [
-  {
-    id: 'mem-1',
-    name: 'James Alexander',
-    email: 'james.a@example.com',
-    role: 'Host',
-    membership: 'Gold',
-    verification: 'Verified',
-    joined: 'Today, 10:42 AM',
-    city: 'New York, US',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'mem-2',
-    name: 'Sophia Williams',
-    email: 'sophia.w@example.com',
-    role: 'Guest of Honor',
-    membership: 'Complimentary',
-    verification: 'Pending review',
-    joined: 'Today, 10:28 AM',
-    city: 'New York, US',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'mem-3',
-    name: 'Daniel Mitchell',
-    email: 'daniel.m@example.com',
-    role: 'Host',
-    membership: 'Gold',
-    verification: 'Verified',
-    joined: 'Today, 10:15 AM',
-    city: 'New York, US',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'mem-4',
-    name: 'Olivia Bennett',
-    email: 'olivia.b@example.com',
-    role: 'Guest of Honor',
-    membership: 'Complimentary',
-    verification: 'Pending review',
-    joined: 'Today, 9:56 AM',
-    city: 'New York, US',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'mem-5',
-    name: 'William Carter',
-    email: 'william.c@example.com',
-    role: 'Host',
-    membership: 'Gold',
-    verification: 'Pending review',
-    joined: 'Today, 9:32 AM',
-    city: 'Tribeca, NY',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'mem-6',
-    name: 'Emma Laurent',
-    email: 'emma.l@example.com',
-    role: 'Guest of Honor',
-    membership: 'Complimentary',
-    verification: 'Pending review',
-    joined: 'Yesterday',
-    city: 'Downtown, NY',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'mem-7',
-    name: 'Oliver Thompson',
-    email: 'oliver.t@example.com',
-    role: 'Host',
-    membership: 'Gold',
-    verification: 'Pending review',
-    joined: 'Yesterday',
-    city: 'West End, London',
-    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'mem-8',
-    name: 'Isabella Rose',
-    email: 'isabella.r@example.com',
-    role: 'Guest of Honor',
-    membership: 'Complimentary',
-    verification: 'Pending review',
-    joined: 'Yesterday',
-    city: 'SoHo, NY',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80',
-  },
-];
-
-interface PlanFeature {
-  icon: 'mail' | 'crown' | 'chat' | 'send' | 'award';
-  text: string;
-}
-
-interface SubscriptionPlan {
-  id: string;
-  name: string;
-  tierLabel: string;
-  price: string;
-  variant: 'guest' | 'host';
-  features: PlanFeature[];
-  footerNote: string;
-}
-
-const INITIAL_PLANS: SubscriptionPlan[] = [
-  {
-    id: 'plan-guest',
-    name: 'Guest of Honor',
-    tierLabel: 'Free',
-    price: '$0.00/Mo',
-    variant: 'guest',
-    features: [
-      { icon: 'mail', text: 'Receive offers from verified hosts' },
-      { icon: 'crown', text: 'Silver crown on your profile' },
-      { icon: 'chat', text: 'Chat opens only after you say yes' },
-    ],
-    footerNote: 'Cancel any time. Guests of honor never pay.',
-  },
-  {
-    id: 'plan-host',
-    name: 'Host',
-    tierLabel: 'Pro',
-    price: '$9.99/Mo',
-    variant: 'host',
-    features: [
-      { icon: 'send', text: 'Send offers to verified Guests of Honor' },
-      { icon: 'crown', text: 'Gold crown on your profile' },
-      { icon: 'award', text: 'A reliability score that builds trust' },
-    ],
-    footerNote: 'Cancel any time. Guests of honor never pay.',
-  },
-];
 
 export function MembersSubscriptionsView() {
+  const {
+    directoryMembers,
+    plans,
+    toggleMemberVerification,
+    updatePlan,
+  } = useDashboard();
+
   const [activeTab, setActiveTab] = useState<DirectoryTab>('directory');
-  const [members, setMembers] = useState<DirectoryMember[]>(DEFAULT_DIRECTORY_MEMBERS);
-  const [plans, setPlans] = useState<SubscriptionPlan[]>(INITIAL_PLANS);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -185,52 +48,9 @@ export function MembersSubscriptionsView() {
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
   const pageSize = 8;
 
-  useEffect(() => {
-    async function fetchMembersAndPlans() {
-      try {
-        const [membersRes, plansRes] = await Promise.all([
-          dashboardApi.admin.getMembers().catch(() => null),
-          dashboardApi.admin.getPlans().catch(() => null),
-        ]);
-        if (membersRes?.success && Array.isArray(membersRes.data) && membersRes.data.length > 0) {
-          const liveMembers: DirectoryMember[] = membersRes.data.map((u: any, index: number) => ({
-            id: u.id,
-            name: (u.nickname || u.email.split('@')[0]).replace(/,\s*\d+$/, ''),
-            email: u.email,
-            role: u.role === 'HOST' ? 'Host' : 'Guest of Honor',
-            membership: u.role === 'HOST' ? 'Gold' : 'Complimentary',
-            verification: u.isVerified ? 'Verified' : 'Pending review',
-            joined: index < 4 ? 'Today, 10:28 AM' : 'Yesterday',
-            city: u.locationCity || 'New York, US',
-            avatar:
-              u.hostProfile?.photos?.[0] ||
-              u.guestProfile?.photos?.[0] ||
-              DEFAULT_DIRECTORY_MEMBERS[index % DEFAULT_DIRECTORY_MEMBERS.length].avatar,
-          }));
-          setMembers(liveMembers);
-        }
-        if (plansRes?.success && Array.isArray(plansRes.data) && plansRes.data.length > 0) {
-          const livePlans: SubscriptionPlan[] = plansRes.data.map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            tierLabel: p.tierLabel,
-            price: p.priceDisplay,
-            variant: p.variant === 'host' ? 'host' : 'guest',
-            features: Array.isArray(p.features) ? p.features : [],
-            footerNote: p.footerNote || 'Cancel any time. Guests of honor never pay.',
-          }));
-          setPlans(livePlans);
-        }
-      } catch {
-        // Use fallback data seamlessly in demo mode
-      }
-    }
-    fetchMembersAndPlans();
-  }, []);
-
   const filteredMembers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return members.filter((m) => {
+    return directoryMembers.filter((m) => {
       const matchesSearch =
         !q || m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q);
       const matchesRole = roleFilter === 'ALL' || m.role === roleFilter;
@@ -240,7 +60,7 @@ export function MembersSubscriptionsView() {
         membershipFilter === 'ALL' || m.membership === membershipFilter;
       return matchesSearch && matchesRole && matchesVerif && matchesMembership;
     });
-  }, [members, searchQuery, roleFilter, verificationFilter, membershipFilter]);
+  }, [directoryMembers, searchQuery, roleFilter, verificationFilter, membershipFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredMembers.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
@@ -253,14 +73,8 @@ export function MembersSubscriptionsView() {
     setCurrentPage(1);
   }, [searchQuery, roleFilter, verificationFilter, membershipFilter]);
 
-  const toggleMemberVerification = (id: string) => {
-    setMembers((prev) =>
-      prev.map((m) =>
-        m.id === id
-          ? { ...m, verification: m.verification === 'Verified' ? 'Pending review' : 'Verified' }
-          : m
-      )
-    );
+  const handleToggleVerification = async (id: string) => {
+    await toggleMemberVerification(id);
     setSelectedMember((prev) =>
       prev && prev.id === id
         ? {
@@ -275,24 +89,8 @@ export function MembersSubscriptionsView() {
     e.preventDefault();
     if (!editingPlan) return;
     const planToSave = editingPlan;
-    setPlans((prev) =>
-      prev.map((p) => (p.id === planToSave.id ? planToSave : p))
-    );
     setEditingPlan(null);
-
-    try {
-      const numericPrice = parseFloat(planToSave.price.replace(/[^0-9.]/g, '') || '0');
-      await dashboardApi.admin.updatePlan(planToSave.id, {
-        name: planToSave.name,
-        tierLabel: planToSave.tierLabel,
-        priceDisplay: planToSave.price,
-        priceCents: Number.isNaN(numericPrice) ? 0 : Math.round(numericPrice * 100),
-        features: planToSave.features,
-        footerNote: planToSave.footerNote,
-      });
-    } catch {
-      // Keep local update in demo mode
-    }
+    await updatePlan(planToSave.id, planToSave);
   };
 
   const renderPlanFeatureIcon = (icon: PlanFeature['icon'], variant: 'guest' | 'host') => {
@@ -348,7 +146,7 @@ export function MembersSubscriptionsView() {
                 : 'bg-[#EFE7DA] text-[#6E6A63]'
             }`}
           >
-            {members.length}
+            {directoryMembers.length}
           </span>
         </button>
 
@@ -873,7 +671,7 @@ export function MembersSubscriptionsView() {
               </span>
               <button
                 type="button"
-                onClick={() => toggleMemberVerification(selectedMember.id)}
+                onClick={() => handleToggleVerification(selectedMember.id)}
                 className="px-4 py-2 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white text-xs font-semibold transition-colors"
               >
                 {selectedMember.verification === 'Verified'

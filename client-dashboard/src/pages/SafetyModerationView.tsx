@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   AlertTriangle,
   Check,
@@ -6,293 +6,22 @@ import {
   Flag,
   ShieldCheck,
 } from 'lucide-react';
-import { dashboardApi } from '../services/api';
+import {
+  useDashboard,
+  ThreadStatus,
+  ModerationThread,
+  ChatMessage,
+} from '../context/DashboardContext';
 
-type ThreadStatus = 'Flagged' | 'Warned' | 'Resolved';
 type ThreadFilter = ThreadStatus | 'ALL';
 
-interface ChatMessage {
-  id: string;
-  senderName: string;
-  senderAvatar: string;
-  align: 'left' | 'right';
-  text: string;
-  time: string;
-  isFlagged?: boolean;
-}
 
-interface ModerationThread {
-  id: string;
-  code: string;
-  title: string;
-  subtitle: string;
-  queueName: string;
-  queuePreview: string;
-  queueTime: string;
-  queueAvatar: string;
-  verifiedBadge?: boolean;
-  unreadCount?: number;
-  status: ThreadStatus;
-  flagReason: string;
-  flagSubtext: string;
-  dateLabel: string;
-  messages: ChatMessage[];
-}
-
-const INITIAL_THREADS: ModerationThread[] = [
-  {
-    id: 'thr-1',
-    code: 'CON-481',
-    title: 'William Carter  &  Sophia Williams',
-    subtitle: 'Private conversation',
-    queueName: 'William Carter',
-    queuePreview: "You still haven't replied. I'm going...",
-    queueTime: '10:34 AM',
-    queueAvatar:
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&auto=format&fit=crop&q=80',
-    verifiedBadge: true,
-    unreadCount: 1,
-    status: 'Flagged',
-    flagReason: 'Repeated unwanted contact',
-    flagSubtext: 'Flagged for a thoughtful human review.',
-    dateLabel: 'OCTOBER 24, 2024',
-    messages: [
-      {
-        id: 'm1',
-        senderName: 'William',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80',
-        align: 'left',
-        text: 'I really enjoyed our conversation yesterday. Are you free to meet this weekend?',
-        time: '10:15 AM',
-      },
-      {
-        id: 'm2',
-        senderName: 'Sophia',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-        align: 'right',
-        text: "Thank you, but I don't think we're the right match. Wishing you the best.",
-        time: '10:18 AM',
-      },
-      {
-        id: 'm3',
-        senderName: 'William',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80',
-        align: 'left',
-        text: 'Are you sure? I think you should give this another chance.',
-        time: '10:20 AM',
-      },
-      {
-        id: 'm4',
-        senderName: 'Sophia',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-        align: 'right',
-        text: "I'd prefer not to continue this conversation. Please respect that.",
-        time: '10:22 AM',
-      },
-      {
-        id: 'm5',
-        senderName: 'William',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80',
-        align: 'left',
-        text: "You still haven't replied. I'm going to keep trying.",
-        time: '10:34 AM',
-        isFlagged: true,
-      },
-    ],
-  },
-  {
-    id: 'thr-2',
-    code: 'CON-479',
-    title: 'Daniel Mitchell  &  Kristin Watson',
-    subtitle: 'Private conversation',
-    queueName: 'Kristin Watson',
-    queuePreview: "Let's catch up off-platform on...",
-    queueTime: '02:11 PM',
-    queueAvatar:
-      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80',
-    unreadCount: 1,
-    status: 'Flagged',
-    flagReason: 'Off-platform link solicitation',
-    flagSubtext: 'Detected external messaging link shared prior to venue confirmation.',
-    dateLabel: 'OCTOBER 24, 2024',
-    messages: [
-      {
-        id: 'k1',
-        senderName: 'Daniel',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
-        align: 'left',
-        text: 'Looking forward to Friday evening at Osteria Verde!',
-        time: '02:04 PM',
-      },
-      {
-        id: 'k2',
-        senderName: 'Kristin',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80',
-        align: 'right',
-        text: "Let's catch up off-platform on this external link before we confirm.",
-        time: '02:11 PM',
-        isFlagged: true,
-      },
-    ],
-  },
-  {
-    id: 'thr-3',
-    code: 'CON-465',
-    title: 'Oliver Thompson  &  Olivia Bennett',
-    subtitle: 'Private conversation',
-    queueName: 'Oliver Thompson',
-    queuePreview: 'Can we move dinner to a private...',
-    queueTime: 'Yesterday',
-    queueAvatar:
-      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&auto=format&fit=crop&q=80',
-    status: 'Warned',
-    flagReason: 'Non-public venue suggestion',
-    flagSubtext: 'Member reminded that all initial dates must take place in public venues.',
-    dateLabel: 'OCTOBER 23, 2024',
-    messages: [
-      {
-        id: 'o1',
-        senderName: 'Oliver',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=80',
-        align: 'left',
-        text: 'Can we move dinner to a private residence instead of the restaurant?',
-        time: '06:12 PM',
-        isFlagged: true,
-      },
-      {
-        id: 'o2',
-        senderName: 'Olivia',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
-        align: 'right',
-        text: 'I prefer keeping our first meeting at a public restaurant as planned.',
-        time: '06:19 PM',
-      },
-    ],
-  },
-  {
-    id: 'thr-4',
-    code: 'CON-452',
-    title: 'James Alexander  &  Emma Laurent',
-    subtitle: 'Private conversation',
-    queueName: 'Emma Laurent',
-    queuePreview: 'Thanks for confirming our 24h check-in.',
-    queueTime: '2 days ago',
-    queueAvatar:
-      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&auto=format&fit=crop&q=80',
-    status: 'Resolved',
-    flagReason: 'Automated keyword check',
-    flagSubtext: 'Reviewed by Trust & Safety and cleared as safe.',
-    dateLabel: 'OCTOBER 22, 2024',
-    messages: [
-      {
-        id: 'e1',
-        senderName: 'James',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-        align: 'left',
-        text: 'Just checking in ahead of tomorrow night at 8:00 PM!',
-        time: '04:00 PM',
-      },
-      {
-        id: 'e2',
-        senderName: 'Emma',
-        senderAvatar:
-          'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&auto=format&fit=crop&q=80',
-        align: 'right',
-        text: 'Thanks for confirming our 24h check-in. Looking forward to it!',
-        time: '04:05 PM',
-      },
-    ],
-  },
-];
 
 export function SafetyModerationView() {
-  const [threads, setThreads] = useState<ModerationThread[]>(INITIAL_THREADS);
+  const { threads, moderateThread } = useDashboard();
   const [activeFilter, setActiveFilter] = useState<ThreadFilter>('Flagged');
   const [selectedThreadId, setSelectedThreadId] = useState<string>('thr-1');
   const [actionToast, setActionToast] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function loadModerationThreads() {
-      try {
-        const res = await dashboardApi.admin.getModerationThreads();
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped: ModerationThread[] = res.data.map((offer: any) => {
-            const hostName = offer.host?.nickname || 'Host';
-            const guestName = offer.guest?.nickname || 'Guest';
-            const hostAvatar =
-              offer.host?.hostProfile?.photos?.[0] ||
-              'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&auto=format&fit=crop&q=80';
-            const guestAvatar =
-              offer.guest?.guestProfile?.photos?.[0] ||
-              'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80';
-            const statusMap: Record<string, ThreadStatus> = {
-              FLAGGED: 'Flagged',
-              WARNED: 'Warned',
-              RESOLVED: 'Resolved',
-            };
-            const msgs: ChatMessage[] = Array.isArray(offer.messages)
-              ? offer.messages.map((m: any) => {
-                  const isHostSender = m.senderId === offer.hostId;
-                  return {
-                    id: m.id,
-                    senderName: m.sender?.nickname || (isHostSender ? hostName : guestName),
-                    senderAvatar: isHostSender ? hostAvatar : guestAvatar,
-                    align: isHostSender ? 'left' : 'right',
-                    text: m.content,
-                    time: m.createdAt
-                      ? new Date(m.createdAt).toLocaleTimeString('en-US', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : '',
-                    isFlagged: Boolean(m.isFlagged),
-                  };
-                })
-              : [];
-            const lastMsg = msgs[msgs.length - 1];
-            return {
-              id: offer.id,
-              code: offer.threadCode || 'CON-481',
-              title: `${hostName}  &  ${guestName}`,
-              subtitle: 'Private conversation',
-              queueName: hostName,
-              queuePreview: lastMsg?.text || offer.flagReason || 'Flagged conversation',
-              queueTime: lastMsg?.time || 'Today',
-              queueAvatar: hostAvatar,
-              verifiedBadge: Boolean(offer.host?.isVerified),
-              unreadCount: offer.moderationStatus === 'FLAGGED' ? 1 : 0,
-              status: statusMap[offer.moderationStatus] || 'Flagged',
-              flagReason: offer.flagReason || 'Flagged conversation',
-              flagSubtext: offer.flagSubtext || 'Flagged for a thoughtful human review.',
-              dateLabel: new Date(offer.updatedAt || Date.now())
-                .toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })
-                .toUpperCase(),
-              messages: msgs,
-            };
-          });
-          setThreads(mapped);
-          setSelectedThreadId(mapped[0].id);
-        }
-      } catch {
-        // Fallback to demo threads if offline
-      }
-    }
-    loadModerationThreads();
-  }, []);
 
   const flaggedCount = threads.filter((t) => t.status === 'Flagged').length;
   const warnedCount = threads.filter((t) => t.status === 'Warned').length;
@@ -312,19 +41,9 @@ export function SafetyModerationView() {
     label: string,
     apiAction: 'SUSPEND' | 'WARN' | 'RESOLVE'
   ) => {
-    setThreads((prev) =>
-      prev.map((t) =>
-        t.id === threadId ? { ...t, status: nextStatus, unreadCount: 0 } : t
-      )
-    );
     setActionToast(label);
     setTimeout(() => setActionToast(null), 3000);
-
-    try {
-      await dashboardApi.admin.moderateThread(threadId, apiAction);
-    } catch {
-      // Keep optimistic update in demo mode
-    }
+    await moderateThread(threadId, nextStatus, apiAction);
   };
 
   return (

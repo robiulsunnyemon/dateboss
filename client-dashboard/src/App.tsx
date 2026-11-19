@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { DashboardProvider, useDashboard } from './context/DashboardContext';
 import { LoginPage } from './pages/LoginPage';
 import { TopBar } from './components/TopBar';
 import { Sidebar, DashboardSection } from './components/Sidebar';
@@ -10,11 +11,57 @@ import { AccountManagementView } from './pages/AccountManagementView';
 import { ReportsView } from './pages/ReportsView';
 import { SafetyModerationView } from './pages/SafetyModerationView';
 
-function DashboardShell() {
-  const { isAuthenticated, isLoading } = useAuth();
+function DashboardContent() {
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [pendingCount, setPendingCount] = useState<number>(4);
+  const { pendingCount } = useDashboard();
+
+  return (
+    <div className="min-h-screen bg-[#EFE7DA] text-[#16120F] flex flex-col">
+      <TopBar onOpenMobileMenu={() => setMobileMenuOpen(true)} />
+
+      <div className="flex flex-1">
+        <Sidebar
+          activeSection={activeSection}
+          onSelectSection={setActiveSection}
+          pendingCount={pendingCount}
+          mobileOpen={mobileMenuOpen}
+          onCloseMobile={() => setMobileMenuOpen(false)}
+        />
+
+        <main className="flex-1 p-5 sm:p-8 max-w-[1360px] w-full">
+          {/* Keep sections mounted with CSS visibility for instant 0ms tab switching */}
+          <div className={activeSection === 'overview' ? 'block' : 'hidden'}>
+            <OverviewView onNavigate={(sec) => setActiveSection(sec)} />
+          </div>
+
+          <div className={activeSection === 'verification' ? 'block' : 'hidden'}>
+            <VerificationView />
+          </div>
+
+          <div className={activeSection === 'members' ? 'block' : 'hidden'}>
+            <MembersSubscriptionsView />
+          </div>
+
+          <div className={activeSection === 'accounts' ? 'block' : 'hidden'}>
+            <AccountManagementView />
+          </div>
+
+          <div className={activeSection === 'reports' ? 'block' : 'hidden'}>
+            <ReportsView />
+          </div>
+
+          <div className={activeSection === 'safety' ? 'block' : 'hidden'}>
+            <SafetyModerationView />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function DashboardShell() {
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -36,32 +83,9 @@ function DashboardShell() {
   }
 
   return (
-    <div className="min-h-screen bg-[#EFE7DA] text-[#16120F] flex flex-col">
-      <TopBar onOpenMobileMenu={() => setMobileMenuOpen(true)} />
-
-      <div className="flex flex-1">
-        <Sidebar
-          activeSection={activeSection}
-          onSelectSection={setActiveSection}
-          pendingCount={pendingCount}
-          mobileOpen={mobileMenuOpen}
-          onCloseMobile={() => setMobileMenuOpen(false)}
-        />
-
-        <main className="flex-1 p-5 sm:p-8 max-w-[1360px] w-full">
-          {activeSection === 'overview' && (
-            <OverviewView onNavigate={(sec) => setActiveSection(sec)} />
-          )}
-          {activeSection === 'verification' && (
-            <VerificationView onCountChange={(c) => setPendingCount(c)} />
-          )}
-          {activeSection === 'members' && <MembersSubscriptionsView />}
-          {activeSection === 'accounts' && <AccountManagementView />}
-          {activeSection === 'reports' && <ReportsView />}
-          {activeSection === 'safety' && <SafetyModerationView />}
-        </main>
-      </div>
-    </div>
+    <DashboardProvider>
+      <DashboardContent />
+    </DashboardProvider>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Users,
   Crown,
@@ -10,8 +10,8 @@ import {
   Flag,
   UserCheck,
 } from 'lucide-react';
-import { dashboardApi } from '../services/api';
 import { DashboardSection } from '../components/Sidebar';
+import { useDashboard } from '../context/DashboardContext';
 
 interface OverviewViewProps {
   onNavigate: (section: DashboardSection) => void;
@@ -27,102 +27,21 @@ interface MemberRow {
   avatar: string;
 }
 
-const DEFAULT_MEMBERS: MemberRow[] = [
-  {
-    id: 'm-1',
-    name: 'James Alexander',
-    city: 'New York',
-    role: 'Host',
-    membership: 'Paid',
-    status: 'Verified',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'm-2',
-    name: 'Sophia Williams',
-    city: 'New York',
-    role: 'Guest of Honor',
-    membership: 'Complimentary',
-    status: 'Pending',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'm-3',
-    name: 'Daniel Mitchell',
-    city: 'New York',
-    role: 'Host',
-    membership: 'Paid',
-    status: 'Verified',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'm-4',
-    name: 'Olivia Bennett',
-    city: 'New York',
-    role: 'Guest of Honor',
-    membership: 'Complimentary',
-    status: 'Pending',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80',
-  },
-];
-
 export function OverviewView({ onNavigate }: OverviewViewProps) {
   const [timeframe, setTimeframe] = useState<'month' | 'quarter'>('month');
-  const [metrics, setMetrics] = useState({
-    totalMembers: 12846,
-    activeSubscriptions: 1846,
-    monthlyRevenue: 48620,
-    pendingVerification: 6,
-    openReports: 3,
-    flaggedThreads: 2,
-  });
-  const [members, setMembers] = useState<MemberRow[]>(DEFAULT_MEMBERS);
+  const { metrics, directoryMembers } = useDashboard();
 
-  useEffect(() => {
-    async function loadMetrics() {
-      try {
-        const res = await dashboardApi.admin.getMetrics();
-        if (res.success && res.data) {
-          const d = res.data;
-          setMetrics((prev) => ({
-            totalMembers: typeof d.totalUsers === 'number' ? d.totalUsers : prev.totalMembers,
-            activeSubscriptions:
-              typeof d.totalHosts === 'number' ? d.totalHosts : prev.activeSubscriptions,
-            monthlyRevenue:
-              typeof d.monthlyRevenueUsd === 'number'
-                ? Math.round(d.monthlyRevenueUsd)
-                : prev.monthlyRevenue,
-            pendingVerification:
-              typeof d.pendingVerifications === 'number'
-                ? d.pendingVerifications
-                : prev.pendingVerification,
-            openReports:
-              typeof d.openReports === 'number' ? d.openReports : prev.openReports,
-            flaggedThreads:
-              typeof d.flaggedThreads === 'number' ? d.flaggedThreads : prev.flaggedThreads,
-          }));
-          if (Array.isArray(d.recentMembers) && d.recentMembers.length > 0) {
-            const mapped: MemberRow[] = d.recentMembers.slice(0, 4).map((u: any) => ({
-              id: u.id,
-              name: u.nickname || u.email.split('@')[0],
-              city: u.locationCity || 'New York',
-              role: u.role === 'HOST' ? 'Host' : 'Guest of Honor',
-              membership: u.role === 'HOST' ? 'Paid' : 'Complimentary',
-              status: u.isVerified ? 'Verified' : 'Pending',
-              avatar:
-                u.hostProfile?.photos?.[0] ||
-                u.guestProfile?.photos?.[0] ||
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-            }));
-            setMembers(mapped);
-          }
-        }
-      } catch {
-        // Use demo fallback metrics seamlessly
-      }
-    }
-    loadMetrics();
-  }, []);
+  const members: MemberRow[] = useMemo(() => {
+    return directoryMembers.slice(0, 4).map((m) => ({
+      id: m.id,
+      name: m.name,
+      city: m.city,
+      role: m.role,
+      membership: m.membership === 'Gold' ? 'Paid' : 'Complimentary',
+      status: m.verification === 'Verified' ? 'Verified' : 'Pending',
+      avatar: m.avatar,
+    }));
+  }, [directoryMembers]);
 
   return (
     <div className="space-y-6">

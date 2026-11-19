@@ -1,160 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Check, Clock, ShieldCheck } from 'lucide-react';
-import { dashboardApi } from '../services/api';
-
-type VerificationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
-
-interface VerificationItem {
-  id: string;
-  name: string;
-  location: string;
-  distance: string;
-  avatar: string;
-  selfieUrl: string;
-  status: VerificationStatus;
-  submittedAt: string;
-  documentId: string;
-}
-
-const DEMO_VERIFICATIONS: VerificationItem[] = [
-  {
-    id: 'ver-1',
-    name: 'Sophia Williams, 27',
-    location: 'New York, US',
-    distance: '5.5 km away',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
-    selfieUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
-    status: 'PENDING',
-    submittedAt: 'Submitted today, 10:28 am',
-    documentId: 'ID<DEMO<WILLIAMS<<4821',
-  },
-  {
-    id: 'ver-2',
-    name: 'Olivia Bennett, 26',
-    location: 'New York, US',
-    distance: '3.2 km away',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80',
-    selfieUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=80',
-    status: 'PENDING',
-    submittedAt: 'Submitted today, 09:45 am',
-    documentId: 'ID<DEMO<BENNETT<<9034',
-  },
-  {
-    id: 'ver-3',
-    name: 'Camila Laurent, 29',
-    location: 'New York, US',
-    distance: '4.1 km away',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&auto=format&fit=crop&q=80',
-    selfieUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&auto=format&fit=crop&q=80',
-    status: 'PENDING',
-    submittedAt: 'Submitted today, 08:15 am',
-    documentId: 'ID<DEMO<LAURENT<<3120',
-  },
-  {
-    id: 'ver-4',
-    name: 'Elena Rostova, 28',
-    location: 'New York, US',
-    distance: '6.0 km away',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80',
-    selfieUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80',
-    status: 'PENDING',
-    submittedAt: 'Submitted yesterday, 07:10 pm',
-    documentId: 'ID<DEMO<ROSTOVA<<7712',
-  },
-  {
-    id: 'ver-5',
-    name: 'James Alexander, 33',
-    location: 'New York, US',
-    distance: '2.4 km away',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
-    selfieUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80',
-    status: 'APPROVED',
-    submittedAt: 'Submitted yesterday, 04:20 pm',
-    documentId: 'ID<DEMO<ALEXANDER<<1145',
-  },
-  {
-    id: 'ver-6',
-    name: 'Daniel Mitchell, 35',
-    location: 'New York, US',
-    distance: '4.8 km away',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80',
-    selfieUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80',
-    status: 'APPROVED',
-    submittedAt: 'Submitted yesterday, 02:10 pm',
-    documentId: 'ID<DEMO<MITCHELL<<5529',
-  },
-  {
-    id: 'ver-7',
-    name: 'Marcus Vance, 31',
-    location: 'New York, US',
-    distance: '7.5 km away',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&auto=format&fit=crop&q=80',
-    selfieUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&auto=format&fit=crop&q=80',
-    status: 'REJECTED',
-    submittedAt: 'Submitted 2 days ago',
-    documentId: 'ID<DEMO<VANCE<<6618',
-  },
-];
+import { useDashboard, VerificationStatus, VerificationItem } from '../context/DashboardContext';
 
 interface VerificationViewProps {
   onCountChange?: (pendingCount: number) => void;
 }
 
-export function VerificationView({ onCountChange }: VerificationViewProps) {
+export function VerificationView({ onCountChange }: VerificationViewProps = {}) {
   const [activeTab, setActiveTab] = useState<VerificationStatus>('PENDING');
-  const [items, setItems] = useState<VerificationItem[]>(DEMO_VERIFICATIONS);
+  const { verifications, reviewVerification } = useDashboard();
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadVerifications() {
-      try {
-        const res = await dashboardApi.admin.getVerifications();
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped: VerificationItem[] = res.data.map((v: any) => ({
-            id: v.id,
-            name: v.user?.nickname || v.user?.email || 'Member',
-            location: v.user?.locationCity || 'New York, US',
-            distance: '5.5 km away',
-            avatar: v.selfieUrl || DEMO_VERIFICATIONS[0].avatar,
-            selfieUrl: v.selfieUrl || DEMO_VERIFICATIONS[0].selfieUrl,
-            status: v.status as VerificationStatus,
-            submittedAt: 'Submitted today, 10:28 am',
-            documentId: 'ID<DEMO<VERIFIED<<4821',
-          }));
-          setItems(mapped);
-        }
-      } catch {
-        // Fallback to demo items
-      }
-    }
-    loadVerifications();
-  }, []);
+  const pendingCount = verifications.filter((i) => i.status === 'PENDING').length;
+  const approvedCount = verifications.filter((i) => i.status === 'APPROVED').length;
+  const rejectedCount = verifications.filter((i) => i.status === 'REJECTED').length;
 
-  const pendingCount = items.filter((i) => i.status === 'PENDING').length;
-  const approvedCount = items.filter((i) => i.status === 'APPROVED').length;
-  const rejectedCount = items.filter((i) => i.status === 'REJECTED').length;
-
-  useEffect(() => {
-    if (onCountChange) onCountChange(pendingCount);
-  }, [pendingCount, onCountChange]);
-
-  const filteredItems = items.filter((i) => i.status === activeTab);
+  const filteredItems = verifications.filter((i) => i.status === activeTab);
 
   const handleReview = async (id: string, action: 'APPROVE' | 'REJECT') => {
     setProcessingId(id);
-    const nextStatus: VerificationStatus = action === 'APPROVE' ? 'APPROVED' : 'REJECTED';
-
     try {
-      await dashboardApi.admin.reviewVerification(id, {
-        action,
-        rejectionReason: action === 'REJECT' ? 'Document clarity check failed' : undefined,
-      });
-    } catch {
-      // Allow local state update in demo mode even if offline
+      // 0ms INSTANT optimistic update
+      await reviewVerification(id, action);
     } finally {
-      setItems((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, status: nextStatus } : item))
-      );
       setProcessingId(null);
     }
   };

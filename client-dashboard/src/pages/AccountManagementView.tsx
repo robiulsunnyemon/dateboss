@@ -6,131 +6,18 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { dashboardApi } from '../services/api';
+import { useDashboard, AccountItem, AccountStatus } from '../context/DashboardContext';
 
-type AccountStatus = 'Active' | 'Suspended' | 'Banned';
 type FilterTab = 'ALL' | AccountStatus;
-type MemberRole = 'Host' | 'Guest of Honor';
-
-interface AccountItem {
-  id: string;
-  memberIdCode: string;
-  name: string;
-  email: string;
-  role: MemberRole;
-  status: AccountStatus;
-  avatar: string;
-}
-
-const DEFAULT_ACCOUNTS: AccountItem[] = [
-  {
-    id: 'acc-1',
-    memberIdCode: 'TDB-1048',
-    name: 'James Alexander',
-    email: 'james.a@example.com',
-    role: 'Host',
-    status: 'Active',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'acc-2',
-    memberIdCode: 'TDB-1047',
-    name: 'Sophia Williams',
-    email: 'sophia.w@example.com',
-    role: 'Guest of Honor',
-    status: 'Active',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'acc-3',
-    memberIdCode: 'TDB-1046',
-    name: 'Daniel Mitchell',
-    email: 'daniel.m@example.com',
-    role: 'Host',
-    status: 'Active',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'acc-4',
-    memberIdCode: 'TDB-1045',
-    name: 'Olivia Bennett',
-    email: 'olivia.b@example.com',
-    role: 'Guest of Honor',
-    status: 'Active',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'acc-5',
-    memberIdCode: 'TDB-1044',
-    name: 'William Carter',
-    email: 'william.c@example.com',
-    role: 'Host',
-    status: 'Active',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'acc-6',
-    memberIdCode: 'TDB-1043',
-    name: 'Emma Laurent',
-    email: 'emma.l@example.com',
-    role: 'Guest of Honor',
-    status: 'Active',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'acc-7',
-    memberIdCode: 'TDB-1042',
-    name: 'Oliver Thompson',
-    email: 'oliver.t@example.com',
-    role: 'Host',
-    status: 'Suspended',
-    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'acc-8',
-    memberIdCode: 'TDB-1041',
-    name: 'Isabella Rose',
-    email: 'isabella.r@example.com',
-    role: 'Guest of Honor',
-    status: 'Active',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80',
-  },
-];
 
 export function AccountManagementView() {
-  const [accounts, setAccounts] = useState<AccountItem[]>(DEFAULT_ACCOUNTS);
+  const { accounts, updateAccountStatus } = useDashboard();
   const [activeTab, setActiveTab] = useState<FilterTab>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
   const menuContainerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    async function loadAccounts() {
-      try {
-        const res = await dashboardApi.admin.getMembers();
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped: AccountItem[] = res.data.map((u: any, idx: number) => ({
-            id: u.id,
-            memberIdCode: `TDB-${1048 - idx}`,
-            name: (u.nickname || u.email.split('@')[0]).replace(/,\s*\d+$/, ''),
-            email: u.email,
-            role: u.role === 'HOST' ? 'Host' : 'Guest of Honor',
-            status: u.isActive === false ? 'Suspended' : 'Active',
-            avatar:
-              u.hostProfile?.photos?.[0] ||
-              u.guestProfile?.photos?.[0] ||
-              DEFAULT_ACCOUNTS[idx % DEFAULT_ACCOUNTS.length].avatar,
-          }));
-          setAccounts(mapped);
-        }
-      } catch {
-        // Fallback to DEFAULT_ACCOUNTS in demo mode
-      }
-    }
-    loadAccounts();
-  }, []);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -177,19 +64,8 @@ export function AccountManagementView() {
     id: string,
     action: 'SUSPEND' | 'BAN' | 'RESTORE'
   ) => {
-    const nextStatus: AccountStatus =
-      action === 'SUSPEND' ? 'Suspended' : action === 'BAN' ? 'Banned' : 'Active';
-
     setOpenMenuId(null);
-    setAccounts((prev) =>
-      prev.map((acc) => (acc.id === id ? { ...acc, status: nextStatus } : acc))
-    );
-
-    try {
-      await dashboardApi.admin.updateAccountStatus(id, action);
-    } catch {
-      // Allow local state update cleanly in demo mode
-    }
+    await updateAccountStatus(id, action);
   };
 
   return (

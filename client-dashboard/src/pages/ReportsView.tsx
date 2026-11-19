@@ -1,144 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ArrowRight, Flag, X, ShieldAlert, CheckCircle2, Clock } from 'lucide-react';
-import { dashboardApi } from '../services/api';
-
-type ReportStatus = 'NEW' | 'IN_REVIEW' | 'RESOLVED';
-type ReportPriority = 'High priority' | 'Medium priority' | 'Low priority';
-
-interface ReportItem {
-  id: string;
-  code: string;
-  title: string;
-  priority: ReportPriority;
-  description: string;
-  reportedName: string;
-  reportedAvatar: string;
-  reporterName: string;
-  timeAgo: string;
-  status: ReportStatus;
-  adminNote?: string;
-}
-
-const INITIAL_REPORTS: ReportItem[] = [
-  {
-    id: 'rpt-1',
-    code: 'RPT-2084',
-    title: 'Inappropriate behavior',
-    priority: 'High priority',
-    description:
-      'The member continued sending unwanted messages after I asked them to stop. I would like the conversation reviewed.',
-    reportedName: 'William Carter',
-    reportedAvatar:
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80',
-    reporterName: 'Sophia Williams',
-    timeAgo: '12 minutes ago',
-    status: 'NEW',
-  },
-  {
-    id: 'rpt-2',
-    code: 'RPT-2083',
-    title: 'Misleading profile',
-    priority: 'Medium priority',
-    description:
-      'The information on this profile does not appear to match the person I spoke with. Their age and location may be inaccurate.',
-    reportedName: 'Oliver Thompson',
-    reportedAvatar:
-      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=80',
-    reporterName: 'Olivia Bennett',
-    timeAgo: '34 minutes ago',
-    status: 'NEW',
-  },
-  {
-    id: 'rpt-3',
-    code: 'RPT-2082',
-    title: 'Suspicious activity',
-    priority: 'High priority',
-    description:
-      'This member shared an external link and asked me to continue our conversation on another website.',
-    reportedName: 'Daniel Mitchell',
-    reportedAvatar:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
-    reporterName: 'Emma Laurent',
-    timeAgo: '1 hour ago',
-    status: 'NEW',
-  },
-  {
-    id: 'rpt-4',
-    code: 'RPT-2079',
-    title: 'Unconfirmed cancellation',
-    priority: 'Medium priority',
-    description:
-      'Member cancelled the confirmed dinner reservation less than 2 hours before the scheduled time without notice.',
-    reportedName: 'Marcus Vance',
-    reportedAvatar:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-    reporterName: 'Camila Laurent',
-    timeAgo: 'Yesterday',
-    status: 'IN_REVIEW',
-    adminNote: 'Checking 24-hour check-in logs and reliability hold status.',
-  },
-  {
-    id: 'rpt-5',
-    code: 'RPT-2075',
-    title: 'Off-platform solicitation',
-    priority: 'High priority',
-    description:
-      'Reported for requesting payment outside the platform ecosystem prior to meeting at a public venue.',
-    reportedName: 'Lucas Meyer',
-    reportedAvatar:
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80',
-    reporterName: 'Isabella Rose',
-    timeAgo: '2 days ago',
-    status: 'RESOLVED',
-    adminNote: 'Account suspended following Trust & Safety review.',
-  },
-];
+import { useDashboard, ReportItem, ReportStatus } from '../context/DashboardContext';
 
 export function ReportsView() {
-  const [reports, setReports] = useState<ReportItem[]>(INITIAL_REPORTS);
+  const { reports, updateReportStatus } = useDashboard();
   const [activeTab, setActiveTab] = useState<ReportStatus>('NEW');
   const [selectedReport, setSelectedReport] = useState<ReportItem | null>(null);
   const [noteInput, setNoteInput] = useState('');
-
-  useEffect(() => {
-    async function loadReports() {
-      try {
-        const res = await dashboardApi.admin.getReports();
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped: ReportItem[] = res.data.map((r: any) => ({
-            id: r.id,
-            code: r.code || 'RPT-2000',
-            title: r.title,
-            priority:
-              r.priority === 'HIGH'
-                ? 'High priority'
-                : r.priority === 'LOW'
-                ? 'Low priority'
-                : 'Medium priority',
-            description: r.description,
-            reportedName: r.reported?.nickname || r.reported?.email || 'Member',
-            reportedAvatar:
-              r.reported?.hostProfile?.photos?.[0] ||
-              r.reported?.guestProfile?.photos?.[0] ||
-              'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
-            reporterName: r.reporter?.nickname || r.reporter?.email || 'Member',
-            timeAgo: r.createdAt
-              ? new Date(r.createdAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })
-              : 'Recently',
-            status: (r.status as ReportStatus) || 'NEW',
-            adminNote: r.adminNote || undefined,
-          }));
-          setReports(mapped);
-        }
-      } catch {
-        // Fallback to demo reports if offline
-      }
-    }
-    loadReports();
-  }, []);
 
   const newCount = reports.filter((r) => r.status === 'NEW').length;
   const inReviewCount = reports.filter((r) => r.status === 'IN_REVIEW').length;
@@ -153,28 +21,9 @@ export function ReportsView() {
 
   const handleUpdateStatus = async (id: string, nextStatus: ReportStatus) => {
     const note = noteInput.trim() || undefined;
-    setReports((prev) =>
-      prev.map((r) =>
-        r.id === id
-          ? {
-              ...r,
-              status: nextStatus,
-              adminNote: note || r.adminNote,
-            }
-          : r
-      )
-    );
     setSelectedReport(null);
     setNoteInput('');
-
-    try {
-      await dashboardApi.admin.updateReport(id, {
-        status: nextStatus,
-        adminNote: note,
-      });
-    } catch {
-      // Keep optimistic update in demo mode
-    }
+    await updateReportStatus(id, nextStatus, note);
   };
 
   return (
