@@ -327,23 +327,23 @@ export function LandingPage({
           
           <div className="w-full lg:w-[50%] xl:w-[48%] space-y-5 sm:space-y-7 pr-0 sm:pr-4">
             
-            {/* Label: Gifted dating */}
+            {/* Label: Intentional Dating */}
             <div className="flex items-center gap-2">
               <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
               <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
-                Gifted dating
+                Intentional Dating
               </span>
             </div>
 
             {/* Main Headline */}
             <h1 className="font-serif font-extrabold text-3xl sm:text-5xl md:text-6xl xl:text-[68px] leading-[1.12] sm:leading-[1.08] tracking-tight text-[#16120F]">
-              THE DATE STARTS <br />
-              WITH AN <span className="text-[#9F1E19] font-serif">OFFER.</span>
+              Skip the Small Talk. <br />
+              <span className="text-[#9F1E19] font-serif">Meet Someone.</span>
             </h1>
 
             {/* Subtitle */}
             <p className="text-[#656059] text-xs sm:text-base leading-relaxed max-w-lg font-normal">
-              Skip the 'hey'. Propose a real lunch, dinner or event, and let them say yes. Fewer ghosts, more tables for two.
+              Dating should be more than endless messaging. Discover someone interesting, make an offer, and see where things go.
             </p>
 
             {/* Two Action Cards (Stacked vertically on mobile, side-by-side on tablet/desktop) */}
@@ -450,10 +450,10 @@ export function LandingPage({
             <div className="border-b border-[#E3D9C8]/80 pb-3 sm:pb-4">
               <span className="text-xs font-semibold text-[#9F1E19]">01</span>
               <h3 className="font-serif font-bold text-base sm:text-lg text-[#16120F] mt-0.5">
-                Set The Scene
+                Make Your Move
               </h3>
               <p className="text-xs sm:text-sm text-[#6E6A63] mt-1 leading-relaxed">
-                Choose the venue, the time and the gesture. Every place is public and thoughtfully selected.
+                Choose a restaurant, event, date, and offer. Make it personal, and keep the plans somewhere public.
               </p>
             </div>
 
@@ -461,10 +461,10 @@ export function LandingPage({
             <div className="border-b border-[#E3D9C8]/80 pb-3 sm:pb-4">
               <span className="text-xs font-semibold text-[#9F1E19]">02</span>
               <h3 className="font-serif font-bold text-base sm:text-lg text-[#16120F] mt-0.5">
-                Get An Answer
+                Get a Response
               </h3>
               <p className="text-xs sm:text-sm text-[#6E6A63] mt-1 leading-relaxed">
-                They have 48 hours to accept, decline, or suggest another time. No hanging conversations.
+                Accept, decline, or suggest a different plan. You'll have 48 hours to respond to an invitation.
               </p>
             </div>
 
@@ -472,25 +472,28 @@ export function LandingPage({
             <div className="pb-1">
               <span className="text-xs font-semibold text-[#9F1E19]">03</span>
               <h3 className="font-serif font-bold text-base sm:text-lg text-[#16120F] mt-0.5">
-                Connect Before You Meet
+                Take It Offline
               </h3>
               <p className="text-xs sm:text-sm text-[#6E6A63] mt-1 leading-relaxed">
-                Once accepted, private chat opens. A check-in before the date keeps plans on track.
+                Once the invitation is accepted, private messaging opens so you can finalize the details before meeting.
               </p>
             </div>
 
           </div>
 
-          {/* Nested Invitation Card (An offer for you) */}
+          {/* Nested Invitation Card (A Date Invitation) */}
           <div className="bg-[#EDE5D6] border border-[#DDD3C2] rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-sm">
             
             <div className="mb-3 sm:mb-4">
-              <span className="text-xs text-[#6E6A63] font-normal block">
-                An offer for you
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#9F1E19] block">
+                A DATE INVITATION
               </span>
               <h4 className="font-serif font-bold text-xl sm:text-2xl text-[#16120F] mt-0.5 sm:mt-1">
-                Dinner For Two
+                Dinner for Two
               </h4>
+              <p className="text-xs text-[#6E6A63] mt-1 font-normal">
+                A little planning. A real opportunity to connect.
+              </p>
             </div>
 
             {/* Details Table */}
@@ -498,17 +501,17 @@ export function LandingPage({
               
               <div className="flex items-center justify-between py-2 sm:py-2.5">
                 <span className="text-[#6E6A63] font-normal">When</span>
-                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Thu, Nov 9, 8:00 PM</span>
+                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Thursday, 8:00 PM</span>
               </div>
 
               <div className="flex items-center justify-between py-2 sm:py-2.5">
                 <span className="text-[#6E6A63] font-normal">Where</span>
-                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Osteria Verde, Downtown</span>
+                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Osteria Verde</span>
               </div>
 
               <div className="flex items-center justify-between py-2 sm:py-2.5">
-                <span className="text-[#6E6A63] font-normal">The gift</span>
-                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Dinner is on Alex</span>
+                <span className="text-[#6E6A63] font-normal">What's Included</span>
+                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Dinner is covered.</span>
               </div>
 
               <div className="flex items-center justify-between py-2 sm:py-2.5">
@@ -520,15 +523,15 @@ export function LandingPage({
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2.5 sm:gap-3">
-              <button className="bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs px-5 sm:px-6 py-2 rounded-full shadow-sm transition-colors">
+              <button className="bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs px-5 sm:px-6 py-2 rounded-full shadow-sm transition-colors cursor-pointer">
                 Accept
               </button>
 
-              <button className="bg-white hover:bg-stone-50 border border-[#D5CEC2] text-[#16120F] font-semibold text-xs px-5 sm:px-6 py-2 rounded-full transition-colors">
-                Counter
+              <button className="bg-white hover:bg-stone-50 border border-[#D5CEC2] text-[#16120F] font-semibold text-xs px-5 sm:px-6 py-2 rounded-full transition-colors cursor-pointer">
+                Suggest Change
               </button>
 
-              <button className="text-[#7A756D] hover:text-[#16120F] text-xs font-medium px-3 sm:px-4 py-2 transition-colors">
+              <button className="text-[#7A756D] hover:text-[#16120F] text-xs font-medium px-3 sm:px-4 py-2 transition-colors cursor-pointer">
                 Pass
               </button>
             </div>
