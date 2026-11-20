@@ -142,9 +142,9 @@ export const testimonials: Testimonial[] = [
   {
     id: 't-2',
     quote: 'The 48-hour expiration rule is a lifesaver. No more dead matches cluttering my inbox. People here are actually serious about meeting in the real world rather than collecting pen pals.',
-    author: 'Michael Chen',
+    author: 'Jessica Taylor',
     location: 'Austin, TX',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
+    avatar: '/assets/testimonial-2-avatar.jpg',
     rating: 5,
     dateType: 'Drinks & Jazz'
   },

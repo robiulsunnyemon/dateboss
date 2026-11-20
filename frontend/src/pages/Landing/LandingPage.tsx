@@ -68,18 +68,18 @@ export function LandingPage({
       video: '/assets/testimonial-1.mp4',
       quote:
         '"I had the best experience with a date! We tried paddle boarding! It was so windy that we got blown backwards and we laughed the whole time as I struggled! We saw seals in the harbor and it was something I always wanted to do! It was a fun, exciting, great first date, and we are still seeing each other!"',
-      name: 'Farhan Ahmed',
-      role: 'Host',
-      avatar: '/assets/avatar-1.png',
+      name: 'Sarah Jenkins',
+      role: 'Member',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
     },
     {
       id: 2,
       video: '/assets/testimonial-2.mp4',
       quote:
         '"An exceptional, easy-to-navigate platform that makes meeting generous and established local men completely stress-free. Backed by top-tier safety and verified profiles, I was reviewing tailored offers and arranging memorable dates within days. It delivers an effortless, premium dating experience from the very first step."',
-      name: 'Farhana Ahmed',
-      role: 'Guest of honor',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80',
+      name: 'Jessica Taylor',
+      role: 'Member',
+      avatar: '/assets/testimonial-2-avatar.jpg',
     },
     {
       id: 3,
