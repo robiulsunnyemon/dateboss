@@ -91,5 +91,14 @@ export const dashboardApi = {
         method: 'POST',
         body: JSON.stringify(payload),
       }),
+    getAppeals: () => apiRequest('/admin/appeals'),
+    resolveAppeal: (
+      id: string,
+      payload: { status: 'ACCEPTED' | 'REJECTED'; adminNote?: string }
+    ) =>
+      apiRequest(`/admin/appeals/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }),
   },
 };

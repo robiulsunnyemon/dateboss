@@ -371,8 +371,35 @@ export class AdminController {
   static async getAppeals(_req: Request, res: Response): Promise<void> {
     const appeals = await prisma.appeal.findMany({
       include: {
-        user: { select: { id: true, nickname: true, email: true } },
-        review: true,
+        user: {
+          select: {
+            id: true,
+            nickname: true,
+            email: true,
+            hostProfile: { select: { photos: true } },
+            guestProfile: { select: { photos: true } },
+          },
+        },
+        review: {
+          include: {
+            reviewer: {
+              select: {
+                id: true,
+                nickname: true,
+                email: true,
+                hostProfile: { select: { photos: true } },
+                guestProfile: { select: { photos: true } },
+              },
+            },
+            reviewee: {
+              select: {
+                id: true,
+                nickname: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
