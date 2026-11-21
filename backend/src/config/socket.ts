@@ -71,8 +71,8 @@ export function initSocketServer(httpServer: HttpServer, allowedOrigins: string[
       }
     });
 
-    // LiveKit WebRTC Call Signaling
-    socket.on('call_user', async (payload: { offerId: string; isVideo?: boolean }) => {
+    // Real-Time WebRTC Call Signaling
+    socket.on('call_user', async (payload: { offerId: string; isVideo?: boolean; sdp?: any }) => {
       if (!payload?.offerId) return;
       try {
         const offer = await prisma.dateOffer.findUnique({
@@ -97,17 +97,35 @@ export function initSocketServer(httpServer: HttpServer, allowedOrigins: string[
           callerName: caller.nickname || 'Member',
           callerAvatar: callerAvatar || '/assets/discover-card-1.jpg',
           isVideo: payload.isVideo ?? true,
+          sdp: payload.sdp,
         });
       } catch (err) {
         console.error('Call signaling error:', err);
       }
     });
 
-    socket.on('call_accepted', (payload: { offerId: string; callerId: string }) => {
+    socket.on('call_accepted', (payload: { offerId: string; callerId: string; sdp?: any }) => {
       if (payload?.callerId) {
         io?.to(`user:${payload.callerId}`).emit('call_connected', {
           offerId: payload.offerId,
           receiverId: user.id,
+          sdp: payload.sdp,
+        });
+      }
+    });
+
+    socket.on('webrtc_signal', (payload: { offerId: string; targetUserId?: string; signal: any }) => {
+      if (payload?.targetUserId) {
+        io?.to(`user:${payload.targetUserId}`).emit('webrtc_signal', {
+          senderId: user.id,
+          offerId: payload.offerId,
+          signal: payload.signal,
+        });
+      } else if (payload?.offerId) {
+        socket.to(`offer:${payload.offerId}`).emit('webrtc_signal', {
+          senderId: user.id,
+          offerId: payload.offerId,
+          signal: payload.signal,
         });
       }
     });
