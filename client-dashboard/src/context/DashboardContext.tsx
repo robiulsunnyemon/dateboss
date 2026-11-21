@@ -78,6 +78,24 @@ export interface ReportItem {
   adminNote?: string;
 }
 
+export type AppealStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+export interface AppealItem {
+  id: string;
+  code: string;
+  reviewId: string;
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  reviewerName: string;
+  reviewerAvatar: string;
+  rating: number;
+  reviewFeedback: string;
+  reason: string;
+  status: AppealStatus;
+  adminNote?: string;
+  timeAgo: string;
+}
+
 export type ThreadStatus = 'Flagged' | 'Warned' | 'Resolved';
 export interface ChatMessage {
   id: string;
@@ -401,6 +419,44 @@ const DEFAULT_REPORTS: ReportItem[] = [
   },
 ];
 
+const DEFAULT_APPEALS: AppealItem[] = [
+  {
+    id: 'app-1',
+    code: 'APL-101',
+    reviewId: 'rev-1',
+    userId: 'usr-1',
+    userName: 'Julian Sterling',
+    userAvatar:
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+    reviewerName: 'Camila',
+    reviewerAvatar:
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+    rating: 2,
+    reviewFeedback: 'Bad experience, host arrived late and cancelled the dessert.',
+    reason: 'False Review - Host was on time at venue reservation desk and covered dinner.',
+    status: 'PENDING',
+    timeAgo: '20 minutes ago',
+  },
+  {
+    id: 'app-2',
+    code: 'APL-102',
+    reviewId: 'rev-2',
+    userId: 'usr-2',
+    userName: 'Marcus Vance',
+    userAvatar:
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
+    reviewerName: 'Elena Rostova',
+    reviewerAvatar:
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
+    rating: 1,
+    reviewFeedback: 'Total scam profile, never showed up.',
+    reason: 'Off Topic & Mistake - Date was mutually rescheduled due to flight delay.',
+    status: 'ACCEPTED',
+    adminNote: 'Flight delay proof verified. Review removed from profile.',
+    timeAgo: '2 hours ago',
+  },
+];
+
 const DEFAULT_THREADS: ModerationThread[] = [
   {
     id: 'thr-1',
@@ -475,6 +531,7 @@ interface DashboardContextType {
   plans: SubscriptionPlan[];
   reports: ReportItem[];
   threads: ModerationThread[];
+  appeals: AppealItem[];
   isInitialLoading: boolean;
   refreshAll: () => Promise<void>;
   
@@ -499,6 +556,11 @@ interface DashboardContextType {
     id: string,
     nextStatus: ThreadStatus,
     apiAction: 'WARN' | 'SUSPEND' | 'RESOLVE'
+  ) => Promise<void>;
+  resolveAppeal: (
+    id: string,
+    status: 'ACCEPTED' | 'REJECTED',
+    adminNote?: string
   ) => Promise<void>;
 }
 
@@ -535,6 +597,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [threads, setThreads] = useState<ModerationThread[]>(() => {
     return initialCache.current?.threads || DEFAULT_THREADS;
   });
+
+  const [appeals, setAppeals] = useState<AppealItem[]>(DEFAULT_APPEALS);
 
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(!initialCache.current);
 
@@ -573,6 +637,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         plansRes,
         reportsRes,
         threadsRes,
+        appealsRes,
       ] = await Promise.all([
         dashboardApi.admin.getMetrics().catch(() => null),
         dashboardApi.admin.getVerifications().catch(() => null),
@@ -580,6 +645,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         dashboardApi.admin.getPlans().catch(() => null),
         dashboardApi.admin.getReports().catch(() => null),
         dashboardApi.admin.getModerationThreads().catch(() => null),
+        dashboardApi.admin.getAppeals().catch(() => null),
       ]);
 
       // Metrics
@@ -773,6 +839,43 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         });
         setThreads(mappedThreads);
       }
+
+      // Appeals
+      if (
+        appealsRes?.success &&
+        Array.isArray(appealsRes.data) &&
+        appealsRes.data.length > 0
+      ) {
+        const mappedAppeals: AppealItem[] = appealsRes.data.map((a: any, idx: number) => ({
+          id: a.id,
+          code: `APL-${101 + idx}`,
+          reviewId: a.reviewId,
+          userId: a.userId,
+          userName: a.user?.nickname || a.user?.email || 'Member',
+          userAvatar:
+            a.user?.hostProfile?.photos?.[0] ||
+            a.user?.guestProfile?.photos?.[0] ||
+            DEFAULT_APPEALS[0].userAvatar,
+          reviewerName:
+            a.review?.reviewer?.nickname || a.review?.reviewer?.email || 'Reviewer',
+          reviewerAvatar:
+            a.review?.reviewer?.hostProfile?.photos?.[0] ||
+            a.review?.reviewer?.guestProfile?.photos?.[0] ||
+            DEFAULT_APPEALS[0].reviewerAvatar,
+          rating: a.review?.rating || 1,
+          reviewFeedback: a.review?.feedback || 'No written feedback provided.',
+          reason: a.reason || 'Reported review',
+          status: (a.status as AppealStatus) || 'PENDING',
+          adminNote: a.adminNote || undefined,
+          timeAgo: a.createdAt
+            ? new Date(a.createdAt).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+              })
+            : 'Recently',
+        }));
+        setAppeals(mappedAppeals);
+      }
     } finally {
       setIsInitialLoading(false);
     }
@@ -932,6 +1035,35 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  // 7. Instant Optimistic Resolve Appeal
+  const resolveAppeal = useCallback(
+    async (id: string, status: 'ACCEPTED' | 'REJECTED', adminNote?: string) => {
+      // 0ms INSTANT State Update
+      setAppeals((prev) =>
+        prev.map((a) =>
+          a.id === id
+            ? {
+                ...a,
+                status,
+                adminNote: adminNote !== undefined ? adminNote : a.adminNote,
+              }
+            : a
+        )
+      );
+
+      // Background API sync
+      try {
+        await dashboardApi.admin.resolveAppeal(id, {
+          status,
+          adminNote,
+        });
+      } catch (err) {
+        console.warn('API resolve appeal failed, keeping local state:', err);
+      }
+    },
+    []
+  );
+
   const value: DashboardContextType = {
     metrics,
     verifications,
@@ -941,6 +1073,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     plans,
     reports,
     threads,
+    appeals,
     isInitialLoading,
     refreshAll,
     reviewVerification,
@@ -949,6 +1082,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     updatePlan,
     updateReportStatus,
     moderateThread,
+    resolveAppeal,
   };
 
   return (

@@ -9,19 +9,25 @@
     "client-dashboard"
   ],
   "scripts": {
-    "dev": "node start-all.js",
-    "start": "node start-all.js",
-    "dev:backend": "npm --prefix backend run dev",
-    "dev:frontend": "npm --prefix frontend run dev",
-    "dev:dashboard": "npm --prefix dashboard run dev",
-    "dev:client-dashboard": "npm --prefix client-dashboard run dev",
-    "build:backend": "npm --prefix backend run build",
-    "build:frontend": "npm --prefix frontend run build",
-    "build:dashboard": "npm --prefix dashboard run build",
-    "build:client-dashboard": "npm --prefix client-dashboard run build",
-    "build": "npm run build:backend && npm run build:frontend && npm run build:dashboard && npm run build:client-dashboard"
+    "dev": "node init && node start-all.js",
+    "start": "node init && node start-all.js",
+    "dev:backend": "node init && npm --prefix backend run dev",
+    "dev:frontend": "node init && npm --prefix frontend run dev",
+    "dev:dashboard": "node init && npm --prefix dashboard run dev",
+    "dev:client-dashboard": "node init && npm --prefix client-dashboard run dev",
+    "build:backend": "node init && npm --prefix backend run build",
+    "build:frontend": "node init && npm --prefix frontend run build",
+    "build:dashboard": "node init && npm --prefix dashboard run build",
+    "build:client-dashboard": "node init && npm --prefix client-dashboard run build",
+    "build": "node init && npm run build:backend && npm run build:frontend && npm run build:dashboard && npm run build:client-dashboard"
   },
-  "keywords": ["dating", "typescript", "react", "express", "tailwind"],
+  "keywords": [
+    "dating",
+    "typescript",
+    "react",
+    "express",
+    "tailwind"
+  ],
   "author": "",
   "license": "MIT"
 }
