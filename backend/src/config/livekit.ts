@@ -5,7 +5,7 @@ export const isLiveKitConfigured = (): boolean => {
 };
 
 export const getLiveKitServerUrl = (): string => {
-  return process.env.LIVEKIT_URL || 'wss://thedateboss-demo.livekit.cloud';
+  return process.env.LIVEKIT_URL || 'wss://tapeit-vhdb9won.livekit.cloud';
 };
 
 export const createLiveKitToken = async (
@@ -13,9 +13,9 @@ export const createLiveKitToken = async (
   participantIdentity: string,
   participantName: string
 ): Promise<string> => {
-  const apiKey = process.env.LIVEKIT_API_KEY || 'devkey';
+  const apiKey = process.env.LIVEKIT_API_KEY || 'APIxGwctBUzQN9S';
   const apiSecret =
-    process.env.LIVEKIT_API_SECRET || 'secret_key_dateboss_livekit_development_32chars';
+    process.env.LIVEKIT_API_SECRET || 'kv8RceaNav5xa1xeWqTNGYMLK7vdYirZytKi0VVKKs5';
 
   const at = new AccessToken(apiKey, apiSecret, {
     identity: participantIdentity,

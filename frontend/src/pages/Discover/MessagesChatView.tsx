@@ -16,7 +16,7 @@ import {
 import { api } from '../../services/api';
 import { getSocket } from '../../services/socket';
 import { useAuth } from '../../context/AuthContext';
-import { WebRTCVideoCallModal } from './WebRTCVideoCallModal';
+import { LiveKitVideoCallModal } from './LiveKitVideoCallModal';
 
 export interface ChatContact {
   offerId: string;
@@ -82,15 +82,14 @@ export function MessagesChatView({
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const liveCameraRef = useRef<HTMLInputElement>(null);
 
-  // Direct WebRTC Video/Voice Call State
+  // LiveKit WebRTC Video/Voice Call State
   interface ActiveCallState {
     offerId: string;
+    token: string;
+    serverUrl: string;
     partnerName: string;
     partnerAvatar?: string;
-    targetUserId?: string;
     isVideo: boolean;
-    isInitiator: boolean;
-    initialSdp?: any;
   }
   const [activeCall, setActiveCall] = useState<ActiveCallState | null>(null);
   const [isStartingCall, setIsStartingCall] = useState(false);
@@ -101,7 +100,6 @@ export function MessagesChatView({
     callerName: string;
     callerAvatar?: string;
     isVideo: boolean;
-    sdp?: any;
   }
   const [incomingCall, setIncomingCall] = useState<IncomingCallState | null>(null);
 
@@ -110,37 +108,65 @@ export function MessagesChatView({
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleStartCall = (isVideo: boolean) => {
+  const handleStartCall = async (isVideo: boolean) => {
     if (!activeOfferId || !activeContact || isStartingCall) return;
     setIsStartingCall(true);
-    showToast(`Starting ${isVideo ? 'video' : 'voice'} call with ${activeContact.name}...`);
+    showToast(`Securing LiveKit channel with ${activeContact.name}...`);
 
-    setActiveCall({
-      offerId: activeOfferId,
-      partnerName: activeContact.name,
-      partnerAvatar: activeContact.avatar,
-      targetUserId: activeContact.partnerId,
-      isVideo,
-      isInitiator: true,
-    });
-    setIsStartingCall(false);
+    try {
+      const res = await api.messages.getCallToken(activeOfferId);
+      if (res.success && res.data?.token) {
+        getSocket()?.emit('call_user', {
+          offerId: activeOfferId,
+          isVideo,
+        });
+
+        setActiveCall({
+          offerId: activeOfferId,
+          token: res.data.token,
+          serverUrl: res.data.serverUrl || 'wss://tapeit-vhdb9won.livekit.cloud',
+          partnerName: activeContact.name,
+          partnerAvatar: activeContact.avatar,
+          isVideo,
+        });
+      } else {
+        showToast('Unable to start LiveKit room. Please try again.');
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to initialize video call');
+    } finally {
+      setIsStartingCall(false);
+    }
   };
 
-  const handleAcceptIncomingCall = () => {
+  const handleAcceptIncomingCall = async () => {
     if (!incomingCall) return;
     const callData = incomingCall;
     setIncomingCall(null);
-    showToast(`Joining call with ${callData.callerName}...`);
+    showToast(`Connecting with ${callData.callerName}...`);
 
-    setActiveCall({
-      offerId: callData.offerId,
-      partnerName: callData.callerName,
-      partnerAvatar: callData.callerAvatar,
-      targetUserId: callData.callerId,
-      isVideo: callData.isVideo,
-      isInitiator: false,
-      initialSdp: callData.sdp,
-    });
+    try {
+      const res = await api.messages.getCallToken(callData.offerId);
+      if (res.success && res.data?.token) {
+        getSocket()?.emit('call_accepted', {
+          offerId: callData.offerId,
+          callerId: callData.callerId,
+        });
+
+        setActiveCall({
+          offerId: callData.offerId,
+          token: res.data.token,
+          serverUrl: res.data.serverUrl || 'wss://tapeit-vhdb9won.livekit.cloud',
+          partnerName: callData.callerName,
+          partnerAvatar: callData.callerAvatar,
+          isVideo: callData.isVideo,
+        });
+      } else {
+        showToast('Unable to join call room.');
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to connect call');
+    }
   };
 
   const handleDeclineIncomingCall = () => {
@@ -154,6 +180,11 @@ export function MessagesChatView({
   };
 
   const handleEndActiveCall = () => {
+    if (activeCall) {
+      getSocket()?.emit('call_ended', {
+        offerId: activeCall.offerId,
+      });
+    }
     setActiveCall(null);
   };
 
@@ -808,16 +839,14 @@ export function MessagesChatView({
         </div>
       )}
 
-      {/* WebRTC Active Video/Voice Call Stage */}
+      {/* LiveKit Active Video/Voice Call Stage */}
       {activeCall && (
-        <WebRTCVideoCallModal
-          offerId={activeCall.offerId}
+        <LiveKitVideoCallModal
+          serverUrl={activeCall.serverUrl}
+          token={activeCall.token}
           partnerName={activeCall.partnerName}
           partnerAvatar={activeCall.partnerAvatar}
-          targetUserId={activeCall.targetUserId}
           isVideo={activeCall.isVideo}
-          isInitiator={activeCall.isInitiator}
-          initialSdp={activeCall.initialSdp}
           onEndCall={handleEndActiveCall}
         />
       )}
