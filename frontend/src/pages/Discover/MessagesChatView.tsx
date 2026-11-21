@@ -11,10 +11,12 @@ import {
   Camera,
   Phone,
   Video,
+  PhoneOff,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { getSocket } from '../../services/socket';
 import { useAuth } from '../../context/AuthContext';
+import { LiveKitVideoCallModal } from './LiveKitVideoCallModal';
 
 export interface ChatContact {
   offerId: string;
@@ -80,9 +82,111 @@ export function MessagesChatView({
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const liveCameraRef = useRef<HTMLInputElement>(null);
 
+  // LiveKit WebRTC Video/Voice Call State
+  interface ActiveCallState {
+    token: string;
+    serverUrl: string;
+    roomName: string;
+    partnerName: string;
+    partnerAvatar?: string;
+    isVideo: boolean;
+  }
+  const [activeCall, setActiveCall] = useState<ActiveCallState | null>(null);
+  const [isStartingCall, setIsStartingCall] = useState(false);
+
+  interface IncomingCallState {
+    offerId: string;
+    callerId: string;
+    callerName: string;
+    callerAvatar?: string;
+    isVideo: boolean;
+  }
+  const [incomingCall, setIncomingCall] = useState<IncomingCallState | null>(null);
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleStartCall = async (isVideo: boolean) => {
+    if (!activeOfferId || !activeContact || isStartingCall) return;
+    setIsStartingCall(true);
+    showToast(`Starting ${isVideo ? 'video' : 'voice'} call with ${activeContact.name}...`);
+
+    try {
+      const res = await api.messages.getCallToken(activeOfferId);
+      if (res.success && res.data?.token) {
+        // Emit signaling to partner so their screen rings
+        getSocket()?.emit('call_user', {
+          offerId: activeOfferId,
+          isVideo,
+        });
+
+        // Open our own LiveKit room immediately
+        setActiveCall({
+          token: res.data.token,
+          serverUrl: res.data.serverUrl,
+          roomName: res.data.roomName,
+          partnerName: activeContact.name,
+          partnerAvatar: activeContact.avatar,
+          isVideo,
+        });
+      } else {
+        showToast('Unable to connect call. Please try again.');
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to start call.');
+    } finally {
+      setIsStartingCall(false);
+    }
+  };
+
+  const handleAcceptIncomingCall = async () => {
+    if (!incomingCall) return;
+    const callData = incomingCall;
+    setIncomingCall(null);
+    showToast(`Joining call with ${callData.callerName}...`);
+
+    try {
+      const res = await api.messages.getCallToken(callData.offerId);
+      if (res.success && res.data?.token) {
+        getSocket()?.emit('call_accepted', {
+          offerId: callData.offerId,
+          callerId: callData.callerId,
+        });
+
+        setActiveCall({
+          token: res.data.token,
+          serverUrl: res.data.serverUrl,
+          roomName: res.data.roomName,
+          partnerName: callData.callerName,
+          partnerAvatar: callData.callerAvatar,
+          isVideo: callData.isVideo,
+        });
+      } else {
+        showToast('Unable to join call.');
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to connect incoming call.');
+    }
+  };
+
+  const handleDeclineIncomingCall = () => {
+    if (!incomingCall) return;
+    getSocket()?.emit('call_ended', {
+      offerId: incomingCall.offerId,
+      targetUserId: incomingCall.callerId,
+    });
+    setIncomingCall(null);
+    showToast('Call declined.');
+  };
+
+  const handleEndActiveCall = () => {
+    if (activeOfferId) {
+      getSocket()?.emit('call_ended', { offerId: activeOfferId });
+    }
+    setActiveCall(null);
+    showToast('Call ended.');
   };
 
   const handleLiveCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -221,14 +325,28 @@ export function MessagesChatView({
         }
       };
 
+      const handleIncomingCall = (payload: IncomingCallState) => {
+        setIncomingCall(payload);
+      };
+
+      const handleCallTerminated = () => {
+        setActiveCall(null);
+        setIncomingCall(null);
+        showToast('Call ended.');
+      };
+
       socket.on('new_message', handleNewMessage);
       socket.on('user_typing', handleTyping);
+      socket.on('incoming_call', handleIncomingCall);
+      socket.on('call_terminated', handleCallTerminated);
 
       return () => {
         isMounted = false;
         socket.emit('leave_offer', activeOfferId);
         socket.off('new_message', handleNewMessage);
         socket.off('user_typing', handleTyping);
+        socket.off('incoming_call', handleIncomingCall);
+        socket.off('call_terminated', handleCallTerminated);
       };
     }
 
@@ -491,19 +609,21 @@ export function MessagesChatView({
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() => showToast(`Calling ${activeContact.name}... Voice call request sent.`)}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-[#F5EFE6] text-[#6E6A63] hover:text-[#9F1E19] flex items-center justify-center cursor-pointer transition-colors"
-                      title="Voice Call"
-                      aria-label="Voice Call"
+                      disabled={isStartingCall}
+                      onClick={() => handleStartCall(false)}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-[#F5EFE6] text-[#6E6A63] hover:text-[#9F1E19] flex items-center justify-center cursor-pointer transition-colors disabled:opacity-50"
+                      title="Start Live Voice Call"
+                      aria-label="Start Live Voice Call"
                     >
                       <Phone className="w-4 h-4" />
                     </button>
                     <button
                       type="button"
-                      onClick={() => showToast(`Connecting video with ${activeContact.name}... Video call request sent.`)}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-[#F5EFE6] text-[#6E6A63] hover:text-[#9F1E19] flex items-center justify-center cursor-pointer transition-colors"
-                      title="Video Call"
-                      aria-label="Video Call"
+                      disabled={isStartingCall}
+                      onClick={() => handleStartCall(true)}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-[#F5EFE6] text-[#6E6A63] hover:text-[#9F1E19] flex items-center justify-center cursor-pointer transition-colors disabled:opacity-50"
+                      title="Start Live HD Video Call"
+                      aria-label="Start Live HD Video Call"
                     >
                       <Video className="w-4 h-4" />
                     </button>
@@ -670,6 +790,67 @@ export function MessagesChatView({
           </div>
         </div>
       </div>
+
+      {/* LiveKit Incoming Call Modal */}
+      {incomingCall && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="w-full max-w-sm bg-[#FAF7F2] border border-[#E5DDD0] rounded-3xl p-6 shadow-2xl text-center space-y-4">
+            <div className="relative mx-auto w-20 h-20">
+              <img
+                src={incomingCall.callerAvatar || '/assets/discover-card-1.jpg'}
+                alt={incomingCall.callerName}
+                className="w-20 h-20 rounded-full object-cover border-2 border-[#9F1E19]"
+              />
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white animate-ping" />
+            </div>
+
+            <div>
+              <h3 className="font-serif font-bold text-lg text-[#16120F]">
+                {incomingCall.callerName}
+              </h3>
+              <p className="text-xs text-[#6E6A63] mt-0.5">
+                Incoming {incomingCall.isVideo ? 'Video' : 'Voice'} Call...
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center gap-5 pt-2">
+              <button
+                type="button"
+                onClick={handleDeclineIncomingCall}
+                className="w-12 h-12 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-lg transition-transform active:scale-95 cursor-pointer"
+                title="Decline"
+              >
+                <PhoneOff className="w-5 h-5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleAcceptIncomingCall}
+                className="w-12 h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-transform active:scale-95 animate-bounce cursor-pointer"
+                title="Accept"
+              >
+                {incomingCall.isVideo ? (
+                  <Video className="w-5 h-5" />
+                ) : (
+                  <Phone className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LiveKit Active Video/Voice Call Stage */}
+      {activeCall && (
+        <LiveKitVideoCallModal
+          serverUrl={activeCall.serverUrl}
+          token={activeCall.token}
+          partnerName={activeCall.partnerName}
+          partnerAvatar={activeCall.partnerAvatar}
+          isVideo={activeCall.isVideo}
+          onEndCall={handleEndActiveCall}
+        />
+      )}
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#16120F] text-white text-xs px-5 py-3 rounded-full shadow-lg z-50">

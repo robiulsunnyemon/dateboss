@@ -248,6 +248,14 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ reason }),
       }),
+    getCallToken: (offerId: string) =>
+      apiRequest<{ token: string; roomName: string; serverUrl: string; participantName: string }>(
+        '/messages/call-token',
+        {
+          method: 'POST',
+          body: JSON.stringify({ offerId }),
+        }
+      ),
   },
 
   upload: {

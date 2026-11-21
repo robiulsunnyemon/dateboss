@@ -10,6 +10,7 @@ const router = Router();
 router.use(authenticateUser);
 
 router.get('/conversations', asyncHandler(MessagesController.getConversations));
+router.post('/call-token', asyncHandler(MessagesController.getCallToken));
 router.get('/:offerId', asyncHandler(MessagesController.getMessages));
 router.post(
   '/:offerId',

@@ -3,6 +3,7 @@ import { prisma } from '../../config/db';
 import { getIO } from '../../config/socket';
 import { OfferStatus, ModerationStatus } from '@prisma/client';
 import { AppError } from '../../middleware/errorHandler';
+import { createLiveKitToken, getLiveKitServerUrl } from '../../config/livekit';
 
 export class MessagesController {
   // GET /api/messages/conversations - Active unlocked conversations for the user
@@ -211,6 +212,53 @@ export class MessagesController {
       success: true,
       message: 'Message flagged for Trust & Safety review',
       data: updated,
+    });
+  }
+
+  // POST /api/messages/call-token - Generate LiveKit video/voice room access token
+  static async getCallToken(req: Request, res: Response): Promise<void> {
+    const userId = req.user!.id;
+    const { offerId } = req.body;
+
+    if (!offerId) {
+      throw new AppError('offerId is required to start a call', 400);
+    }
+
+    const offer = await prisma.dateOffer.findUnique({
+      where: { id: offerId },
+      include: {
+        host: { select: { id: true, nickname: true, email: true } },
+        guest: { select: { id: true, nickname: true, email: true } },
+      },
+    });
+
+    if (!offer) {
+      throw new AppError('Date offer not found', 404);
+    }
+
+    if (offer.hostId !== userId && offer.guestId !== userId) {
+      throw new AppError('You are not a participant of this date offer', 403);
+    }
+
+    if (offer.status !== OfferStatus.ACCEPTED && offer.status !== OfferStatus.COMPLETED) {
+      throw new AppError('Private calls unlock after the date invitation is accepted', 400);
+    }
+
+    const currentMember = offer.hostId === userId ? offer.host : offer.guest;
+    const participantName =
+      currentMember.nickname || currentMember.email.split('@')[0] || 'Member';
+    const roomName = `dateboss-room-${offerId}`;
+
+    const token = await createLiveKitToken(roomName, userId, participantName);
+
+    res.json({
+      success: true,
+      data: {
+        token,
+        roomName,
+        serverUrl: getLiveKitServerUrl(),
+        participantName,
+      },
     });
   }
 }

@@ -70,6 +70,61 @@ export function initSocketServer(httpServer: HttpServer, allowedOrigins: string[
         });
       }
     });
+
+    // LiveKit WebRTC Call Signaling
+    socket.on('call_user', async (payload: { offerId: string; isVideo?: boolean }) => {
+      if (!payload?.offerId) return;
+      try {
+        const offer = await prisma.dateOffer.findUnique({
+          where: { id: payload.offerId },
+          include: {
+            host: { select: { id: true, nickname: true, hostProfile: { select: { photos: true } } } },
+            guest: { select: { id: true, nickname: true, guestProfile: { select: { photos: true } } } },
+          },
+        });
+        if (!offer || (offer.status !== 'ACCEPTED' && offer.status !== 'COMPLETED')) return;
+
+        const targetUserId = offer.hostId === user.id ? offer.guestId : offer.hostId;
+        const caller = offer.hostId === user.id ? offer.host : offer.guest;
+        const callerAvatar =
+          offer.hostId === user.id
+            ? offer.host.hostProfile?.photos?.[0]
+            : offer.guest.guestProfile?.photos?.[0];
+
+        io?.to(`user:${targetUserId}`).emit('incoming_call', {
+          offerId: payload.offerId,
+          callerId: user.id,
+          callerName: caller.nickname || 'Member',
+          callerAvatar: callerAvatar || '/assets/discover-card-1.jpg',
+          isVideo: payload.isVideo ?? true,
+        });
+      } catch (err) {
+        console.error('Call signaling error:', err);
+      }
+    });
+
+    socket.on('call_accepted', (payload: { offerId: string; callerId: string }) => {
+      if (payload?.callerId) {
+        io?.to(`user:${payload.callerId}`).emit('call_connected', {
+          offerId: payload.offerId,
+          receiverId: user.id,
+        });
+      }
+    });
+
+    socket.on('call_ended', (payload: { offerId: string; targetUserId?: string }) => {
+      if (payload?.targetUserId) {
+        io?.to(`user:${payload.targetUserId}`).emit('call_terminated', {
+          offerId: payload.offerId,
+          reason: 'Call ended',
+        });
+      } else if (payload?.offerId) {
+        socket.to(`offer:${payload.offerId}`).emit('call_terminated', {
+          offerId: payload.offerId,
+          reason: 'Call ended',
+        });
+      }
+    });
   });
 
   return io;
