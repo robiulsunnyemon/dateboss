@@ -169,7 +169,7 @@ export const faqs: FaqItem[] = [
   {
     id: 'f-2',
     question: 'Is this an escort or paid companionship service?',
-    answer: 'No, absolutely not. The Date Inc is strictly a premium dating platform designed for genuine romantic connections. Offers refer exclusively to date proposals (such as picking a restaurant, drinks venue, or activity and clarifying who hosts or splits the bill). We have zero tolerance for transactional or compensated dating.',
+    answer: 'No, absolutely not. The Date Boss is strictly a premium dating platform designed for genuine romantic connections. Invitations refer exclusively to date proposals (such as picking a restaurant, drinks venue, or activity and clarifying who hosts or splits the bill). We have zero tolerance for transactional or compensated dating.',
     category: 'Safety & Policy'
   },
   {

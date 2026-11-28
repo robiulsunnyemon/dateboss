@@ -242,9 +242,9 @@ export function OfferEventsView({
           </span>
         </div>
 
-        {/* Headline: Where Should The Offer Take Them? */}
+        {/* Headline: Where Should The Date Take Them? */}
         <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#16120F] tracking-tight leading-tight mt-1.5">
-          Where Should The Offer Take Them?
+          Where Should The Date Take Them?
         </h1>
 
         {/* Subtitle: Pick a kind of outing, or write your own. */}

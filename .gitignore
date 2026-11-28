@@ -5,3 +5,5 @@ dist
 client_meating/
 *.zip
 config.bat
+.env
+*.env

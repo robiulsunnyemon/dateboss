@@ -188,7 +188,7 @@ export function ConfirmedDatesView({ onOpenChat }: ConfirmedDatesViewProps) {
             No confirmed dates yet
           </h3>
           <p className="text-xs text-[#6E6A63] mt-1.5 leading-relaxed">
-            Once an offer is accepted, your itinerary, 24-hour check-in, and private chat appear here.
+            Once an invitation is accepted, your itinerary, 24-hour check-in, and private chat appear here.
           </p>
         </div>
       ) : (

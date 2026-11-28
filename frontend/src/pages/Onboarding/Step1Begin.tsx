@@ -104,7 +104,7 @@ export function Step1Begin({
                 <span className="font-medium">Host (Men)</span>
               </div>
               <h3 className="font-serif font-bold text-[#16120F] text-base sm:text-lg leading-snug">
-                You Send The Offers. Pick The Place And The Time.
+                You Send The Invitations. Pick The Place And The Time.
               </h3>
             </div>
 
@@ -136,7 +136,7 @@ export function Step1Begin({
                 <span className="font-medium">Guest of Honor (Women)</span>
               </div>
               <h3 className="font-serif font-bold text-[#16120F] text-base sm:text-lg leading-snug">
-                You Receive The Offers. Say Yes, Counter Or Pass.
+                You Receive The Invitations. Say Yes, Counter Or Pass.
               </h3>
             </div>
 

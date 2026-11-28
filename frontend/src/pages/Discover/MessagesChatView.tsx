@@ -499,7 +499,7 @@ export function MessagesChatView({
                 </div>
               ) : filteredContacts.length === 0 ? (
                 <div className="p-4 rounded-2xl bg-[#F5EFE6] border border-[#E5DDD0] text-center text-xs text-[#6E6A63]">
-                  Messages unlock once a date offer is accepted.
+                  Messages unlock once an invitation is accepted.
                 </div>
               ) : (
                 filteredContacts.map((contact) => {
@@ -571,7 +571,7 @@ export function MessagesChatView({
                   Chat Opens After Yes
                 </h3>
                 <p className="text-xs text-[#6E6A63] max-w-sm mt-1 leading-relaxed">
-                  Private messaging unlocks automatically once a date offer is accepted.
+                  Private messaging unlocks automatically once an invitation is accepted.
                 </p>
               </div>
             ) : (

@@ -87,10 +87,10 @@ export function AskForAnOfferModal({ hostProfile, onClose, onSubmitSuccess }: As
 
           {/* Title & Description */}
           <h1 className="font-serif text-2xl sm:text-[28px] font-bold text-[#16120F] leading-tight">
-            Ask For An Offer
+            Request An Invitation
           </h1>
           <p className="text-xs sm:text-[13px] text-[#6E6A63] mt-1.5 leading-relaxed font-normal">
-            Tell Hosts what you'd love. They send you a gifted offer and you choose who to accept.
+            Tell Hosts what you'd love. They send you a date invitation and you choose who to accept.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
@@ -303,7 +303,7 @@ export function AskForAnOfferModal({ hostProfile, onClose, onSubmitSuccess }: As
                 disabled={isSubmitting}
                 className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white py-3 rounded-full font-semibold text-xs transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
-                {isSubmitting ? 'Sending Request...' : 'Send offer'}
+                {isSubmitting ? 'Sending Request...' : 'Send Request'}
               </button>
               <p className="text-[10px] text-center text-[#8A857D] mt-2">
                 Expires in 48 hours · Chat opens once host accepts

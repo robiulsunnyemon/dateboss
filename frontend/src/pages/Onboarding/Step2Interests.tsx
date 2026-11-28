@@ -90,7 +90,7 @@ export function Step2Interests({ onBack, onContinue }: Step2InterestsProps) {
 
         {/* Subtitle */}
         <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-2 leading-relaxed">
-          Pick at least 5. They show on your profile and help plan offers you'll love.
+          Pick at least 5. They show on your profile and help plan dates you'll love.
         </p>
 
         {/* Dynamic Chosen Counter */}

@@ -229,7 +229,7 @@ export function Step2GuestEvents({ onBack, onContinue }: Step2GuestEventsProps) 
 
         {/* Subtitle */}
         <p className="text-[#6E6A63] text-xs sm:text-sm font-normal mt-1 leading-relaxed max-w-[580px]">
-          Choose the outings you&apos;d love to be asked on. Hosts see these on your profile and can send an offer for any of them.
+          Choose the outings you&apos;d love to be asked on. Hosts see these on your profile and can send an invitation for any of them.
         </p>
 
         {/* Dynamic Chosen Counter */}

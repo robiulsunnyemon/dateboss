@@ -1,7 +1,7 @@
 {
   "name": "thedateinc-backend",
   "version": "1.0.0",
-  "description": "Backend API for The Date Inc dating & date offer platform",
+  "description": "Backend API for The Date Boss dating & date invitation platform",
   "main": "dist/server.js",
   "scripts": {
     "build": "node init && prisma generate && tsc",

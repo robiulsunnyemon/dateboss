@@ -123,7 +123,7 @@ export function LandingPage({
     {
       question: '2. Is This An Escort Or Paid-Companionship Service?',
       answer:
-        'No, absolutely not. Thedateboss is strictly a premium dating platform designed for genuine romantic connections and intentional dates. Compensated dating or escorting is strictly prohibited and immediately banned.',
+        'No, absolutely not. The Date Boss is strictly a premium dating platform designed for genuine romantic connections and intentional dates. Compensated dating or escorting is strictly prohibited and immediately banned.',
     },
     {
       question: "3. What Happens If Someone Doesn't Show?",
@@ -133,7 +133,7 @@ export function LandingPage({
     {
       question: '4. Can I Switch Between Host And Guest Of Honor?',
       answer:
-        'Yes! Every member has full versatility. You can switch between initiating date offers as a Host and receiving curated date proposals as a Guest of Honor whenever you like.',
+        'Yes! Every member has full versatility. You can switch between sending date invitations as a Host and receiving curated date proposals as a Guest of Honor whenever you like.',
     },
   ]);
 
@@ -347,14 +347,6 @@ export function LandingPage({
           
           <div className="w-full lg:w-[50%] xl:w-[48%] space-y-5 sm:space-y-7 pr-0 sm:pr-4">
             
-            {/* Label: Gifted Dating & Intentional Dating */}
-            <div className="flex items-center gap-2">
-              <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
-              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#9F1E19]">
-                Gifted Dating
-              </span>
-            </div>
-
             {/* Main Headline */}
             <div>
               <h1 className="font-serif font-extrabold text-3xl sm:text-5xl md:text-6xl xl:text-[68px] leading-[1.12] sm:leading-[1.08] tracking-tight text-[#16120F]">
@@ -362,13 +354,13 @@ export function LandingPage({
                 <span className="text-[#9F1E19] font-serif">Meet Someone.</span>
               </h1>
               <p className="font-serif italic text-base sm:text-lg text-[#6E6458] font-medium mt-1.5">
-                The date starts with an offer.
+                The date starts with an invitation.
               </p>
             </div>
 
             {/* Subtitle */}
             <p className="text-[#656059] text-xs sm:text-base leading-relaxed max-w-lg font-normal">
-              Skip the &quot;hey.&quot; Propose a real lunch, dinner, or event, and let them say yes. Fewer ghosts, more tables for two.
+              Skip the &quot;hey.&quot; Propose a real lunch, dinner, or event, and let them say yes. Less ghosting, more dating.
             </p>
 
             {/* Question Prompt above cards (matching client reference) */}
@@ -415,7 +407,7 @@ export function LandingPage({
                       </div>
                     </div>
                     <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
-                      You Send The Offers. Pick The Place And The Time.
+                      You Send The Invitations. Pick The Place And The Time.
                     </h3>
                   </div>
 
@@ -461,7 +453,7 @@ export function LandingPage({
                       </div>
                     </div>
                     <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
-                      You Receive The Offers. Say Yes, Counter Or Pass.
+                      You Receive The Invitations. Say Yes, Counter Or Pass.
                     </h3>
                   </div>
 
@@ -566,58 +558,89 @@ export function LandingPage({
           </div>
 
           {/* Nested Invitation Card (A Date Invitation) */}
-          <div className="bg-[#EDE5D6] border border-[#DDD3C2] rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-sm">
-            
-            <div className="mb-3 sm:mb-4">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#9F1E19] block">
-                A DATE INVITATION
-              </span>
-              <h4 className="font-serif font-bold text-xl sm:text-2xl text-[#16120F] mt-0.5 sm:mt-1">
-                Dinner for Two
-              </h4>
-              <p className="text-xs text-[#6E6A63] mt-1 font-normal">
-                A little planning. A real opportunity to connect.
-              </p>
-            </div>
-
-            {/* Details Table */}
-            <div className="divide-y divide-[#D8CDBC] text-xs mb-5 sm:mb-6">
+          <div 
+            className="relative overflow-hidden bg-[#EDE5D6] border border-[#DDD3C2] rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-sm transition-all"
+            style={{
+              backgroundImage: `linear-gradient(135deg, rgba(248, 244, 237, 0.94) 0%, rgba(243, 237, 226, 0.90) 50%, rgba(238, 230, 216, 0.86) 100%), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=80'), url('/assets/hero-couple.jpg')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               
-              <div className="flex items-center justify-between py-2 sm:py-2.5">
-                <span className="text-[#6E6A63] font-normal">When</span>
-                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Thursday, 8:00 PM</span>
+              <div className="flex-1">
+                <div className="mb-3 sm:mb-4">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#9F1E19] block">
+                    A DATE INVITATION
+                  </span>
+                  <h4 className="font-serif font-bold text-xl sm:text-2xl text-[#16120F] mt-0.5 sm:mt-1">
+                    Dinner for Two
+                  </h4>
+                  <p className="text-xs text-[#6E6A63] mt-1 font-normal">
+                    A little planning. A real opportunity to connect.
+                  </p>
+                </div>
+
+                {/* Details Table */}
+                <div className="divide-y divide-[#D8CDBC] text-xs mb-5 sm:mb-6">
+                  
+                  <div className="flex items-center justify-between py-2 sm:py-2.5">
+                    <span className="text-[#6E6A63] font-normal">When</span>
+                    <span className="font-medium text-[#16120F] text-xs sm:text-sm">Thursday, 8:00 PM</span>
+                  </div>
+
+                  <div className="flex items-center justify-between py-2 sm:py-2.5">
+                    <span className="text-[#6E6A63] font-normal">Where</span>
+                    <span className="font-medium text-[#16120F] text-xs sm:text-sm">Osteria Verde</span>
+                  </div>
+
+                  <div className="flex items-center justify-between py-2 sm:py-2.5">
+                    <span className="text-[#6E6A63] font-normal">What's Included</span>
+                    <span className="font-medium text-[#16120F] text-xs sm:text-sm">Dinner is covered.</span>
+                  </div>
+
+                  <div className="flex items-center justify-between py-2 sm:py-2.5">
+                    <span className="text-[#6E6A63] font-normal">Expires in</span>
+                    <span className="font-bold text-[#9F1E19] text-xs sm:text-sm">47h 12min</span>
+                  </div>
+
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <button className="bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs px-5 sm:px-6 py-2 rounded-full shadow-sm transition-colors cursor-pointer">
+                    Accept
+                  </button>
+
+                  <button className="bg-white hover:bg-stone-50 border border-[#D5CEC2] text-[#16120F] font-semibold text-xs px-5 sm:px-6 py-2 rounded-full transition-colors cursor-pointer">
+                    Suggest Change
+                  </button>
+
+                  <button className="text-[#7A756D] hover:text-[#16120F] text-xs font-medium px-3 sm:px-4 py-2 transition-colors cursor-pointer">
+                    Pass
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center justify-between py-2 sm:py-2.5">
-                <span className="text-[#6E6A63] font-normal">Where</span>
-                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Osteria Verde</span>
+              {/* Lively Restaurant Venue Photo Card */}
+              <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0">
+                <div className="relative rounded-xl overflow-hidden border border-[#D5CEC2] shadow-sm group">
+                  <img
+                    src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=600&auto=format&fit=crop&q=80"
+                    alt="Osteria Verde candlelit dinner setting"
+                    className="w-full h-44 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-3 left-3.5 right-3.5 text-white">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#FCD34D] block">
+                      Venue Experience
+                    </span>
+                    <p className="font-serif font-bold text-sm text-white">Osteria Verde</p>
+                    <p className="text-[11px] text-white/80">Candlelit dinner & romantic table for two</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center justify-between py-2 sm:py-2.5">
-                <span className="text-[#6E6A63] font-normal">What's Included</span>
-                <span className="font-medium text-[#16120F] text-xs sm:text-sm">Dinner is covered.</span>
-              </div>
-
-              <div className="flex items-center justify-between py-2 sm:py-2.5">
-                <span className="text-[#6E6A63] font-normal">Expires in</span>
-                <span className="font-bold text-[#9F1E19] text-xs sm:text-sm">47h 12min</span>
-              </div>
-
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <button className="bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs px-5 sm:px-6 py-2 rounded-full shadow-sm transition-colors cursor-pointer">
-                Accept
-              </button>
-
-              <button className="bg-white hover:bg-stone-50 border border-[#D5CEC2] text-[#16120F] font-semibold text-xs px-5 sm:px-6 py-2 rounded-full transition-colors cursor-pointer">
-                Suggest Change
-              </button>
-
-              <button className="text-[#7A756D] hover:text-[#16120F] text-xs font-medium px-3 sm:px-4 py-2 transition-colors cursor-pointer">
-                Pass
-              </button>
             </div>
 
           </div>
