@@ -250,15 +250,12 @@ export function LandingPage({
             </button>
 
             {/* Official Logo: thedateboss (Hidden on mobile phones, visible on tablet & desktop) */}
-            <a href="#" className="hidden sm:flex items-center gap-2.5 shrink-0">
+            <a href="#" className="hidden sm:flex items-center shrink-0">
               <img
                 src="/assets/logo.png"
-                alt="thedateboss seal"
-                className="h-8 sm:h-9 w-auto object-contain drop-shadow-sm"
+                alt="thedateboss"
+                className="h-8 sm:h-9 w-auto object-contain"
               />
-              <span className="font-serif font-bold text-lg sm:text-xl text-[#16120F] tracking-tight">
-                thedateboss
-              </span>
             </a>
 
             {/* Center Desktop: Nav Capsule on clean cream background */}
