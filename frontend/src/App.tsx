@@ -294,8 +294,11 @@ export function App() {
           <img
             src="/assets/logo.png"
             alt="thedateboss"
-            className="h-9 w-auto object-contain animate-pulse"
+            className="h-14 w-14 object-contain animate-pulse drop-shadow-md"
           />
+          <span className="font-serif font-bold text-xl text-[#16120F] tracking-tight">
+            thedateboss
+          </span>
           <p className="text-xs font-medium text-[#6E6A63]">Verifying session...</p>
         </div>
       </div>
