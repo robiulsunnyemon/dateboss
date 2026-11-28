@@ -371,17 +371,8 @@ export function LandingPage({
               Skip the &quot;hey.&quot; Propose a real lunch, dinner, or event, and let them say yes. Fewer ghosts, more tables for two.
             </p>
 
-            {/* Two Action Cards with Wax Seal decoration */}
+            {/* Two Action Cards */}
             <div className="relative pt-1 max-w-xl">
-              {/* Authentic Red Wax Seal Stamp beside cards (matching client reference Image 4) */}
-              <div className="hidden sm:block absolute -left-7 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
-                <img
-                  src="/assets/seal.png"
-                  alt="thedateboss wax seal"
-                  className="w-13 h-13 object-contain drop-shadow-[0_4px_12px_rgba(159,30,25,0.45)]"
-                />
-              </div>
-
               <div id="roles" className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                 
                 {/* Card 1: Host */}
@@ -407,17 +398,7 @@ export function LandingPage({
 
                 {/* Card 2: Guest of Honor */}
                 <div className="relative bg-[#FFFDF9] border border-[#E5DDD0] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_4px_18px_rgba(40,25,10,0.04)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#9F1E19] transition-all">
-                  
-                  {/* Wax Seal on Mobile on Guest card edge */}
-                  <div className="sm:hidden absolute -left-3.5 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
-                    <img
-                      src="/assets/seal.png"
-                      alt="thedateboss wax seal"
-                      className="w-8 h-8 object-contain drop-shadow-[0_2px_8px_rgba(159,30,25,0.4)]"
-                    />
-                  </div>
-
-                  <div className="space-y-2 pl-2 sm:pl-0">
+                  <div className="space-y-2">
                     <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
                       <span className="text-[#8E8A83] text-sm leading-none">👑</span>
                       <span className="font-medium">Guest of Honor (Women)</span>
