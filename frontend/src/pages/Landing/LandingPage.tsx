@@ -379,7 +379,28 @@ export function LandingPage({
                 <div className="bg-[#FFFDF9] border border-[#E5DDD0] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_4px_18px_rgba(40,25,10,0.04)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#D4A751] transition-all">
                   <div className="space-y-2">
                     <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
-                      <span className="text-[#D4A751] text-sm leading-none">👑</span>
+                      <svg
+                        viewBox="0 0 20 16"
+                        className="w-4 h-3.5 inline-block shrink-0"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M2 15H18L19.5 4L14 9.5L10 1.5L6 9.5L0.5 4L2 15Z"
+                          fill="url(#goldCrownGrad)"
+                          stroke="#7A5615"
+                          strokeWidth="1.2"
+                          strokeLinejoin="round"
+                        />
+                        <defs>
+                          <linearGradient id="goldCrownGrad" x1="10" y1="1.5" x2="10" y2="15" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#E8C570" />
+                            <stop offset="50%" stopColor="#C59341" />
+                            <stop offset="100%" stopColor="#9B6F1C" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
                       <span className="font-medium">Host (Men)</span>
                     </div>
                     <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
@@ -400,7 +421,28 @@ export function LandingPage({
                 <div className="relative bg-[#FFFDF9] border border-[#E5DDD0] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_4px_18px_rgba(40,25,10,0.04)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#9F1E19] transition-all">
                   <div className="space-y-2">
                     <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
-                      <span className="text-[#8E8A83] text-sm leading-none">👑</span>
+                      <svg
+                        viewBox="0 0 20 16"
+                        className="w-4 h-3.5 inline-block shrink-0"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M2 15H18L19.5 4L14 9.5L10 1.5L6 9.5L0.5 4L2 15Z"
+                          fill="url(#silverCrownGrad)"
+                          stroke="#6E6861"
+                          strokeWidth="1.2"
+                          strokeLinejoin="round"
+                        />
+                        <defs>
+                          <linearGradient id="silverCrownGrad" x1="10" y1="1.5" x2="10" y2="15" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#FAF7F2" />
+                            <stop offset="50%" stopColor="#D9D2C7" />
+                            <stop offset="100%" stopColor="#B3ACA0" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
                       <span className="font-medium">Guest of Honor (Women)</span>
                     </div>
                     <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
