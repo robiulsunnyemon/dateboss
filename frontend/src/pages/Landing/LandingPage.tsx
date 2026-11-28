@@ -187,15 +187,15 @@ export function LandingPage({
          ========================================================================= */}
       <section className="relative w-full bg-[#F8F4EC] overflow-hidden min-h-0 lg:h-[730px] xl:h-[770px] flex flex-col justify-between border-b border-[#E5DDD0]/80">
         
-        {/* Luxury Stationery Open Envelope Flap (Top-Left corner matching client reference) */}
-        <div className="absolute -top-2 -left-2 z-20 pointer-events-none select-none">
+        {/* Luxury Stationery Open Envelope Flap (Mobile Only - matches client reference; hidden on desktop for pristine elegant header) */}
+        <div className="block md:hidden absolute -top-1 -left-1 z-10 pointer-events-none select-none">
           <svg
             width="170"
             height="150"
             viewBox="0 0 170 150"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-28 h-24 sm:w-40 sm:h-36 drop-shadow-[0_8px_18px_rgba(45,30,15,0.16)]"
+            className="w-28 h-24 sm:w-36 sm:h-32 drop-shadow-[0_8px_18px_rgba(45,30,15,0.14)]"
           >
             {/* Envelope interior backing shadow */}
             <path
