@@ -371,6 +371,13 @@ export function LandingPage({
               Skip the &quot;hey.&quot; Propose a real lunch, dinner, or event, and let them say yes. Fewer ghosts, more tables for two.
             </p>
 
+            {/* Question Prompt above cards (matching client reference) */}
+            <div className="pt-1 sm:pt-2">
+              <p className="text-xs sm:text-sm font-bold tracking-widest uppercase text-[#7A746B]">
+                How would you like to join?
+              </p>
+            </div>
+
             {/* Two Action Cards */}
             <div className="relative pt-1 max-w-xl">
               <div id="roles" className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
