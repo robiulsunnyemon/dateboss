@@ -187,51 +187,13 @@ export function LandingPage({
          ========================================================================= */}
       <section className="relative w-full bg-[#F8F4EC] overflow-hidden min-h-0 lg:h-[730px] xl:h-[770px] flex flex-col justify-between border-b border-[#E5DDD0]/80">
         
-        {/* Luxury Stationery Open Envelope Flap (Mobile Only - matches client reference; hidden on desktop for pristine elegant header) */}
-        <div className="block md:hidden absolute -top-1 -left-1 z-10 pointer-events-none select-none">
-          <svg
-            width="170"
-            height="150"
-            viewBox="0 0 170 150"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-28 h-24 sm:w-36 sm:h-32 drop-shadow-[0_8px_18px_rgba(45,30,15,0.14)]"
-          >
-            {/* Envelope interior backing shadow */}
-            <path
-              d="M0 0 L160 0 L135 75 L0 125 Z"
-              fill="#E5D8B8"
-              opacity="0.85"
-            />
-            {/* Envelope folded open flap with parchment texture */}
-            <path
-              d="M0 0 L150 12 L80 94 L0 65 Z"
-              fill="url(#envelopeFlapGrad)"
-              stroke="#D5C59D"
-              strokeWidth="1.2"
-            />
-            {/* Flap top crease highlight */}
-            <path
-              d="M0 0 L150 12"
-              stroke="#FFFDF6"
-              strokeWidth="1.5"
-              opacity="0.9"
-            />
-            {/* Flap fold shade */}
-            <path
-              d="M0 65 L80 94 L150 12"
-              stroke="#C4B184"
-              strokeWidth="1"
-              opacity="0.65"
-            />
-            <defs>
-              <linearGradient id="envelopeFlapGrad" x1="15" y1="5" x2="120" y2="95" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#FBF7EE" />
-                <stop offset="45%" stopColor="#F2E8D2" />
-                <stop offset="100%" stopColor="#DFCFAF" />
-              </linearGradient>
-            </defs>
-          </svg>
+        {/* Luxury Stationery Open Envelope (Mobile Only - authentic client reference; hidden on desktop for clean header) */}
+        <div className="block md:hidden absolute -top-3 -left-4 z-10 pointer-events-none select-none">
+          <img
+            src="/assets/envelope-luxury.png"
+            alt="Luxury stationery envelope"
+            className="w-36 sm:w-44 h-auto select-none pointer-events-none"
+          />
         </div>
 
         {/* Mobile Ambient Background: Restores the romantic restaurant image for mobile visitors */}
