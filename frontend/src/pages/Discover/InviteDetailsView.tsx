@@ -346,7 +346,7 @@ export function InviteDetailsView({
                 className="w-full sm:w-auto bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3.5 px-9 rounded-full shadow-sm transition-all active:scale-[0.99] cursor-pointer inline-flex items-center justify-center gap-2"
               >
                 <Send className="w-3.5 h-3.5 rotate-45" />
-                <span>Send Date Invitation</span>
+                <span>Extend an invitation</span>
               </button>
 
               <p className="text-[11px] sm:text-xs text-[#8A857D] mt-2.5 text-center sm:text-left">

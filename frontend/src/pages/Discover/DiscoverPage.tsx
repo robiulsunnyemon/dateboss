@@ -717,7 +717,7 @@ export function DiscoverPage({
                               onClick={() => setAskOfferHostProfile(profile)}
                               className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
                             >
-                              Request Invitation
+                              Request invitation
                             </button>
                           ) : (
                             <button
@@ -725,7 +725,7 @@ export function DiscoverPage({
                               onClick={() => openOfferModal(profile)}
                               className="flex-1 py-2.5 px-3 rounded-full bg-[#9F1E19] hover:bg-[#851713] text-white font-semibold text-xs text-center shadow-xs transition-all active:scale-95 cursor-pointer"
                             >
-                              Send Invitation
+                              Extend an invitation
                             </button>
                           )}
                         </div>
@@ -1157,7 +1157,7 @@ export function DiscoverPage({
                     className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Request an Invitation from {viewProfileModal.name}</span>
+                    <span>Request an invitation from {viewProfileModal.name}</span>
                   </button>
                 ) : (
                   <button
@@ -1171,7 +1171,7 @@ export function DiscoverPage({
                     className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-medium text-xs sm:text-sm py-3 rounded-full shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Send className="w-3.5 h-3.5 rotate-45" />
-                    <span>Send an Invitation to {viewProfileModal.name}</span>
+                    <span>Extend an invitation to {viewProfileModal.name}</span>
                   </button>
                 )}
               </div>

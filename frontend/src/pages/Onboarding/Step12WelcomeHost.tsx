@@ -116,7 +116,7 @@ export function Step12WelcomeHost({
   const features = plan?.features?.length
     ? plan.features
     : [
-        { icon: 'send', text: 'Send invitations to verified Guests of Honor' },
+        { icon: 'send', text: 'Extend invitations to verified Guests of Honor' },
         { icon: 'crown', text: 'Gold crown on your profile' },
         { icon: 'award', text: 'A reliability score that builds trust' },
       ];

@@ -407,7 +407,7 @@ export function LandingPage({
                       </div>
                     </div>
                     <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
-                      You Send The Invitations. Pick The Place And The Time.
+                      You Extend The Invitations. Pick The Place And The Time.
                     </h3>
                   </div>
 

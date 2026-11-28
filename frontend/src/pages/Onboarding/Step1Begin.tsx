@@ -104,7 +104,7 @@ export function Step1Begin({
                 <span className="font-medium">Host (Men)</span>
               </div>
               <h3 className="font-serif font-bold text-[#16120F] text-base sm:text-lg leading-snug">
-                You Send The Invitations. Pick The Place And The Time.
+                You Extend The Invitations. Pick The Place And The Time.
               </h3>
             </div>
 
