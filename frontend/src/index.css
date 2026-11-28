@@ -32,6 +32,24 @@
     font-family: 'Raleway', system-ui, sans-serif;
     font-weight: 400;
   }
+
+  /* Client Selected "Bar Gold" Metallic Gradient Button */
+  .btn-bar-gold {
+    background: linear-gradient(108deg, #C59341 0%, #DCB362 26%, #FEF8DD 49%, #FCE8A6 54%, #D4A751 75%, #B47F28 100%);
+    box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.75), 0 4px 14px rgba(180, 127, 40, 0.28);
+    border: 1px solid rgba(184, 140, 52, 0.5);
+    color: #1A1208;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn-bar-gold:hover {
+    filter: brightness(1.05);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), 0 6px 18px rgba(180, 127, 40, 0.38);
+    transform: translateY(-1px);
+  }
+  .btn-bar-gold:active {
+    transform: translateY(0);
+    filter: brightness(0.98);
+  }
 }
 
 /* Custom scrollbar matching Brand Guide */

@@ -181,11 +181,69 @@ export function LandingPage({
       
       {/* =========================================================================
           HERO SECTION WRAPPER
-          - Desktop: Header + Left Content + Right Smooth Arched Couple Photo
-          - Mobile: Clean header with hamburger menu, stacked cards, photo hidden
+          - Envelope-style luxury stationery aesthetic
+          - Desktop: Arched restaurant couple photo + luxury cream parchment background
+          - Mobile: Romantic ambient background overlay with warm vignette
          ========================================================================= */}
-      <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-0 lg:h-[730px] xl:h-[770px] flex flex-col justify-between border-b border-[#E5DDD0]/70">
+      <section className="relative w-full bg-[#F8F4EC] overflow-hidden min-h-0 lg:h-[730px] xl:h-[770px] flex flex-col justify-between border-b border-[#E5DDD0]/80">
         
+        {/* Luxury Stationery Open Envelope Flap (Top-Left corner matching client reference) */}
+        <div className="absolute -top-2 -left-2 z-20 pointer-events-none select-none">
+          <svg
+            width="170"
+            height="150"
+            viewBox="0 0 170 150"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-28 h-24 sm:w-40 sm:h-36 drop-shadow-[0_8px_18px_rgba(45,30,15,0.16)]"
+          >
+            {/* Envelope interior backing shadow */}
+            <path
+              d="M0 0 L160 0 L135 75 L0 125 Z"
+              fill="#E5D8B8"
+              opacity="0.85"
+            />
+            {/* Envelope folded open flap with parchment texture */}
+            <path
+              d="M0 0 L150 12 L80 94 L0 65 Z"
+              fill="url(#envelopeFlapGrad)"
+              stroke="#D5C59D"
+              strokeWidth="1.2"
+            />
+            {/* Flap top crease highlight */}
+            <path
+              d="M0 0 L150 12"
+              stroke="#FFFDF6"
+              strokeWidth="1.5"
+              opacity="0.9"
+            />
+            {/* Flap fold shade */}
+            <path
+              d="M0 65 L80 94 L150 12"
+              stroke="#C4B184"
+              strokeWidth="1"
+              opacity="0.65"
+            />
+            <defs>
+              <linearGradient id="envelopeFlapGrad" x1="15" y1="5" x2="120" y2="95" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#FBF7EE" />
+                <stop offset="45%" stopColor="#F2E8D2" />
+                <stop offset="100%" stopColor="#DFCFAF" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        {/* Mobile Ambient Background: Restores the romantic restaurant image for mobile visitors */}
+        <div className="absolute inset-0 block lg:hidden pointer-events-none z-0 overflow-hidden">
+          <img
+            src="/assets/hero-couple.jpg"
+            alt="Romantic couple dining background"
+            className="w-full h-full object-cover object-[center_top] opacity-25 filter saturate-110 mix-blend-multiply"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#F8F4EC]/40 via-[#F8F4EC]/85 to-[#F8F4EC] pointer-events-none" />
+        </div>
+
         {/* SVG ClipPath Definition: smooth organic sweeping arch matching Figma */}
         <svg width="0" height="0" className="absolute">
           <defs>
@@ -200,7 +258,7 @@ export function LandingPage({
           </defs>
         </svg>
 
-        {/* Right Photo: Visible strictly on desktop (hidden on mobile/tablet) */}
+        {/* Right Photo: Visible strictly on desktop */}
         <div className="absolute right-0 top-0 bottom-0 w-[48%] xl:w-[49%] h-full z-10 pointer-events-none hidden lg:block overflow-hidden">
           <div
             className="w-full h-full relative"
@@ -327,70 +385,96 @@ export function LandingPage({
           
           <div className="w-full lg:w-[50%] xl:w-[48%] space-y-5 sm:space-y-7 pr-0 sm:pr-4">
             
-            {/* Label: Intentional Dating */}
+            {/* Label: Gifted Dating & Intentional Dating */}
             <div className="flex items-center gap-2">
               <span className="w-6 h-[1.5px] bg-[#9F1E19]"></span>
-              <span className="text-xs font-semibold text-[#9F1E19] tracking-wide">
-                Intentional Dating
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#9F1E19]">
+                Gifted Dating
               </span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="font-serif font-extrabold text-3xl sm:text-5xl md:text-6xl xl:text-[68px] leading-[1.12] sm:leading-[1.08] tracking-tight text-[#16120F]">
-              Skip the Small Talk. <br />
-              <span className="text-[#9F1E19] font-serif">Meet Someone.</span>
-            </h1>
+            <div>
+              <h1 className="font-serif font-extrabold text-3xl sm:text-5xl md:text-6xl xl:text-[68px] leading-[1.12] sm:leading-[1.08] tracking-tight text-[#16120F]">
+                Skip the Small Talk. <br />
+                <span className="text-[#9F1E19] font-serif">Meet Someone.</span>
+              </h1>
+              <p className="font-serif italic text-base sm:text-lg text-[#6E6458] font-medium mt-1.5">
+                The date starts with an offer.
+              </p>
+            </div>
 
             {/* Subtitle */}
             <p className="text-[#656059] text-xs sm:text-base leading-relaxed max-w-lg font-normal">
-              Dating should be more than endless messaging. Discover someone interesting, make an offer, and see where things go.
+              Skip the &quot;hey.&quot; Propose a real lunch, dinner, or event, and let them say yes. Fewer ghosts, more tables for two.
             </p>
 
-            {/* Two Action Cards (Stacked vertically on mobile, side-by-side on tablet/desktop) */}
-            <div id="roles" className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-1 max-w-xl">
-              
-              {/* Card 1: Host */}
-              <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#F3A83B] transition-colors">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
-                    <span className="text-[#F3A83B] text-sm leading-none">👑</span>
-                    <span className="font-medium">Host (Men)</span>
-                  </div>
-                  <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
-                    You Send The Offers. Pick The Place And The Time.
-                  </h3>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={onJoinAsHost}
-                  className="w-full bg-[#F3A83B] hover:bg-[#DE952B] text-[#16120F] font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
-                >
-                  Join as a Host (Men)
-                </button>
+            {/* Two Action Cards with Wax Seal decoration */}
+            <div className="relative pt-1 max-w-xl">
+              {/* Authentic Red Wax Seal Stamp beside cards (matching client reference Image 4) */}
+              <div className="hidden sm:block absolute -left-7 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
+                <img
+                  src="/assets/seal.png"
+                  alt="thedateboss wax seal"
+                  className="w-13 h-13 object-contain drop-shadow-[0_4px_12px_rgba(159,30,25,0.45)]"
+                />
               </div>
 
-              {/* Card 2: Guest of Honor */}
-              <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#9F1E19] transition-colors">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
-                    <span className="text-[#8E8A83] text-sm leading-none">👑</span>
-                    <span className="font-medium">Guest of Honor (Women)</span>
+              <div id="roles" className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                
+                {/* Card 1: Host */}
+                <div className="bg-[#FFFDF9] border border-[#E5DDD0] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_4px_18px_rgba(40,25,10,0.04)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#D4A751] transition-all">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
+                      <span className="text-[#D4A751] text-sm leading-none">👑</span>
+                      <span className="font-medium">Host (Men)</span>
+                    </div>
+                    <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
+                      You Send The Offers. Pick The Place And The Time.
+                    </h3>
                   </div>
-                  <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
-                    You Receive The Offers. Say Yes, Counter Or Pass.
-                  </h3>
+
+                  <button
+                    type="button"
+                    onClick={onJoinAsHost}
+                    className="w-full btn-bar-gold font-bold text-xs py-3 px-4 rounded-full mt-3 sm:mt-4 text-center cursor-pointer tracking-wide"
+                  >
+                    Join as a Host (Men)
+                  </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={onJoinAsGuest}
-                  className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-3 px-4 rounded-full transition-colors mt-3 sm:mt-4 text-center shadow-sm"
-                >
-                  Join as a Guest of Honor (Women)
-                </button>
-              </div>
+                {/* Card 2: Guest of Honor */}
+                <div className="relative bg-[#FFFDF9] border border-[#E5DDD0] rounded-[20px] sm:rounded-[22px] p-4 sm:p-5 shadow-[0_4px_18px_rgba(40,25,10,0.04)] flex flex-col justify-between min-h-[175px] sm:min-h-[195px] hover:border-[#9F1E19] transition-all">
+                  
+                  {/* Wax Seal on Mobile on Guest card edge */}
+                  <div className="sm:hidden absolute -left-3.5 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
+                    <img
+                      src="/assets/seal.png"
+                      alt="thedateboss wax seal"
+                      className="w-8 h-8 object-contain drop-shadow-[0_2px_8px_rgba(159,30,25,0.4)]"
+                    />
+                  </div>
 
+                  <div className="space-y-2 pl-2 sm:pl-0">
+                    <div className="flex items-center gap-1.5 text-xs text-[#6E6861]">
+                      <span className="text-[#8E8A83] text-sm leading-none">👑</span>
+                      <span className="font-medium">Guest of Honor (Women)</span>
+                    </div>
+                    <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug">
+                      You Receive The Offers. Say Yes, Counter Or Pass.
+                    </h3>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={onJoinAsGuest}
+                    className="w-full bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs py-3 px-4 rounded-full transition-all mt-3 sm:mt-4 text-center shadow-[0_4px_14px_rgba(159,30,25,0.25)] hover:shadow-[0_6px_18px_rgba(159,30,25,0.35)] cursor-pointer tracking-wide"
+                  >
+                    Join as a Guest of Honor (Women)
+                  </button>
+                </div>
+
+              </div>
             </div>
 
             {/* Trust Checkmarks */}
@@ -422,7 +506,7 @@ export function LandingPage({
       <section id="how-it-works" className="w-full max-w-[1360px] mx-auto px-4 sm:px-10 lg:px-14 py-8 sm:py-12 lg:py-16">
         
         {/* Large Rounded Container Card */}
-        <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[24px] sm:rounded-[32px] p-5 sm:p-12 lg:p-16 shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
+        <div className="bg-[#FBF8F1] border border-[#E5DDD0] rounded-[24px] sm:rounded-[32px] p-5 sm:p-12 lg:p-16 shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
           
           {/* Top Label */}
           <div className="flex items-center gap-2 mb-3">
@@ -551,7 +635,7 @@ export function LandingPage({
       <section id="why-us" className="w-full max-w-[1360px] mx-auto px-4 sm:px-10 lg:px-14 pb-10 sm:pb-20">
         
         {/* Large Rounded Container Card */}
-        <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[24px] sm:rounded-[32px] p-5 sm:p-12 lg:p-16 text-center shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
+        <div className="bg-[#FBF8F1] border border-[#E5DDD0] rounded-[24px] sm:rounded-[32px] p-5 sm:p-12 lg:p-16 text-center shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
           
           {/* Top Label */}
           <div className="flex items-center justify-center gap-2 mb-3">
@@ -794,7 +878,7 @@ export function LandingPage({
          ========================================================================= */}
       <section className="max-w-[1360px] mx-auto w-full px-4 sm:px-10 lg:px-14 pb-12 sm:pb-20">
         
-        <div className="bg-[#FAF7F2] border border-[#E5DDD0] rounded-[24px] sm:rounded-[32px] p-6 sm:p-14 lg:p-16 text-center shadow-sm">
+        <div className="bg-[#FBF8F1] border border-[#E5DDD0] rounded-[24px] sm:rounded-[32px] p-6 sm:p-14 lg:p-16 text-center shadow-sm">
           
           <div className="flex flex-col items-center max-w-xl mx-auto space-y-4">
             
@@ -818,14 +902,14 @@ export function LandingPage({
               <button
                 type="button"
                 onClick={onJoinAsHost}
-                className="w-full sm:w-auto bg-[#F3A83B] hover:bg-[#DE952B] text-[#16120F] font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
+                className="w-full sm:w-auto btn-bar-gold font-bold text-xs px-8 py-3 rounded-full shadow-sm tracking-wide cursor-pointer"
               >
                 Join as a Host
               </button>
               <button
                 type="button"
                 onClick={onJoinAsGuest}
-                className="w-full sm:w-auto bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs px-7 py-3 rounded-full transition-colors shadow-sm"
+                className="w-full sm:w-auto bg-[#9F1E19] hover:bg-[#851713] text-white font-bold text-xs px-8 py-3 rounded-full transition-all shadow-[0_4px_14px_rgba(159,30,25,0.25)] hover:shadow-[0_6px_18px_rgba(159,30,25,0.35)] tracking-wide cursor-pointer"
               >
                 Join as a Guest of Honor
               </button>
