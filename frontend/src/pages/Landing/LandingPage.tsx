@@ -470,15 +470,15 @@ export function LandingPage({
             </div>
 
             {/* Trust Checkmarks */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#6D6760] font-normal pt-1">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#3D3832] font-medium pt-3 sm:pt-4">
               <span className="inline-flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#6E6A63]" /> ID-verified members
+                <Check className="w-3.5 h-3.5 text-[#851713]" /> ID-verified members
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#6E6A63]" /> Public venues only
+                <Check className="w-3.5 h-3.5 text-[#851713]" /> Public venues only
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#6E6A63]" /> Offers expire in 48h
+                <Check className="w-3.5 h-3.5 text-[#851713]" /> Invitations expire in 48h
               </span>
             </div>
 
@@ -487,7 +487,7 @@ export function LandingPage({
         </div>
 
         {/* Bottom spacing */}
-        <div className="h-4 sm:h-6 w-full" />
+        <div className="h-6 sm:h-10 w-full" />
       </section>
 
 
