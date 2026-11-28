@@ -249,8 +249,8 @@ export function LandingPage({
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
 
-            {/* Official Logo: thedateboss */}
-            <a href="#" className="flex items-center shrink-0">
+            {/* Official Logo: thedateboss (Hidden on mobile phones, visible on tablet & desktop) */}
+            <a href="#" className="hidden sm:flex items-center shrink-0">
               <img
                 src="/assets/logo.png"
                 alt="thedateboss"
